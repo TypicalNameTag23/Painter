@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taui", "Taui\Taui.csproj", "{053846D5-DCDB-4358-B5DF-3DBC123F5B8B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample", "Sample\Sample.csproj", "{1FCC632F-864E-4203-9080-B89E7EA3E2B4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{053846D5-DCDB-4358-B5DF-3DBC123F5B8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{053846D5-DCDB-4358-B5DF-3DBC123F5B8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{053846D5-DCDB-4358-B5DF-3DBC123F5B8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{053846D5-DCDB-4358-B5DF-3DBC123F5B8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FCC632F-864E-4203-9080-B89E7EA3E2B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FCC632F-864E-4203-9080-B89E7EA3E2B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FCC632F-864E-4203-9080-B89E7EA3E2B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FCC632F-864E-4203-9080-B89E7EA3E2B4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
