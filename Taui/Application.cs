@@ -59,6 +59,8 @@ public class Application //todo: make singleton or implement TopLevel like Avalo
     public event ConsoleKeyEventHandler? OnKeyPress;
     
     public static event FrameRenderEventHandler? BeforeFrameRender;
+    
+    public static event FrameRenderEventHandler? AfterFrameRender;
 
     /// <summary>
     /// Starts this <see cref="Application"/> if it hasn't already been started.
@@ -103,9 +105,9 @@ public class Application //todo: make singleton or implement TopLevel like Avalo
     }
 
     /// <summary>
-    /// Renders a frame this <see cref="Application"/> out to the console.
+    /// Displays a frame of this <see cref="Application"/> to the console.
     /// </summary>
-    private void RenderApplication()
+    private void Display()
     {
         BeforeFrameRender?.Invoke();
         if (_canvas.Width != Console.BufferWidth || _canvas.Height != Console.BufferHeight)
@@ -132,6 +134,7 @@ public class Application //todo: make singleton or implement TopLevel like Avalo
         }
 
         _canvas.Clear();
+        AfterFrameRender?.Invoke();
     }
 }
 
