@@ -1,10 +1,9 @@
-﻿using System.Runtime.InteropServices.ComTypes;
-using Taui;
-using Taui.Composeables;
+﻿using Painter;
+using Painter.Components;
 
 namespace Sample;
 
-class Program
+static class Program
 {
     static void Main()
     {
@@ -16,9 +15,9 @@ class Program
         
         var mainWindow = new Window
         {
-            Drawable = new FpsTacker
+            Drawable = new TextBlock
             {
-                Blinking = true
+                Text = "asddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd98712 ny398yn981732y 48713y7981y379813 END"
             }
         };
 
@@ -27,7 +26,7 @@ class Program
             if (consoleKeyInfo.Key == ConsoleKey.Spacebar)
             {
                 Console.SetCursorPosition(0, 0);
-                Console.Write("Hello!");
+                Console.Write("Pressed Space!");
             }
         };
         

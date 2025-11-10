@@ -1,22 +1,24 @@
-using Taui.Composeables;
-using Taui.Drawing;
-using Taui.Exceptions;
-using Taui.Utilities;
+using Painter.Components;
+using Painter.Drawing;
+using Painter.Events;
+using Painter.Exceptions;
+using Painter.Utilities;
 
-namespace Taui;
+namespace Painter;
 
+// todo: Should this be static, is this a bad design pattern?
 /// <summary>
 /// A Painter Application.
 /// </summary>
-public static class Application //todo: make singleton or implement TopLevel like Avalonia?
+public static class Application 
 {
-    private static int _targetFps;
+    private static int _targetFps = -1;
     private static int _timeBetweenFrames;
     private static Canvas _canvas;
     private static Canvas _priorCanvas;
 
     /// <summary>
-    /// The target FPS for this <see cref="Application"/>.
+    /// The target FPS for this <see cref="Application"/>, -1 for no cap.
     /// </summary>
     public static int TargetFps
     {
@@ -55,30 +57,33 @@ public static class Application //todo: make singleton or implement TopLevel lik
     /// </summary>
     public static int Height => Console.BufferHeight;
 
+    /// <summary>
+    /// Event fired when the quit key (like Ctrl+C) is pressed, can be canceled.
+    /// </summary>
     public static event ConsoleCancelEventHandler? OnQuitKeyPress;
     
+    /// <summary>
+    /// Event fired when a key is pressed.
+    /// </summary>
     public static event ConsoleKeyEventHandler? OnKeyPress;
     
+    /// <summary>
+    /// Event fired before a frame is rendered.
+    /// </summary>
     public static event FrameRenderEventHandler? BeforeFrameRender;
     
+    /// <summary>
+    /// Event fired after a frame is rendered.
+    /// </summary>
     public static event FrameRenderEventHandler? AfterFrameRender;
 
     /// <summary>
     /// Starts this <see cref="Application"/> if it hasn't already been started.
     /// </summary>
-    /// <exception cref="TauiException">Thrown if this <see cref="Application"/> is already started or if the <see cref="Window"/> hasn't been set.</exception>
+    /// <exception cref="PainterException">Thrown if this <see cref="Application"/> is already started or if the <see cref="Window"/> hasn't been set.</exception>
     public static void Start()
     {
-        if (State != ApplicationState.Inactive)
-        {
-            throw new TauiException("Can't start application when it is already active.");
-        }
-
-        if (Window is null)
-        {
-            throw new TauiException("Window must be set before application is started.");
-        }
-        
+        ValidateCanStart();
         Console.Clear();
         Console.CursorVisible = false;
         Console.CancelKeyPress += (sender, args) =>
@@ -98,55 +103,65 @@ public static class Application //todo: make singleton or implement TopLevel lik
         {
             if (Console.KeyAvailable)
             {
-                OnKeyPress?.Invoke(Console.ReadKey());
+                var key = Console.ReadKey(true);
+                OnKeyPress?.Invoke(key);
             }
             
             Display();
-            Thread.Sleep(_timeBetweenFrames);
+            Thread.Sleep(_timeBetweenFrames); // is there a better way of doing this?
         }
     }
 
-    /// <summary>
-    /// Displays a frame of this <see cref="Application"/> to the console.
-    /// </summary>
+    private static void ValidateCanStart()
+    {
+        if (State != ApplicationState.Inactive)
+        {
+            throw new PainterException("Can't start application when it is already active.");
+        }
+
+        if (Window is null)
+        {
+            throw new PainterException("Window must be set before application is started.");
+        }
+    }
+
     private static void Display()
     {
         BeforeFrameRender?.Invoke();
-        if (_canvas.Width != Console.BufferWidth || _canvas.Height != Console.BufferHeight)
-        {
-            _canvas.Resize(Width, Height);
-            _priorCanvas.Resize(Width, Height);
-            _priorCanvas.Clear();
-            Console.Clear();
-        } 
-        //todo: dont redraw the entire app every frame when the elements dont change?
-        //todo: dont print anything if the pixel is nothing, unless the previous frame had something at that pixel?
-        
+        CheckPrintableAreaChanged();
         Window.DrawOnto(_canvas);
         Console.SetCursorPosition(0, 0);
-        _canvas.RunOnPixels((point, pixel) =>
+        _canvas.RunOnDrawnPixels((point, pixel) =>
         {
-            if (_priorCanvas.View(point) != pixel)
+            if (_priorCanvas.View(point) != pixel) // Don't need to print again if the pixel hasn't changed
             {
                 ConsoleUtils.WriteTo(point, pixel);
             }
             
-            _priorCanvas.Erase(point);
+            _priorCanvas.Erase(point); // Remove the pixel from the previous canvas if there was one, since it has already been overriden
         });
         
-        _priorCanvas.RunOnPixels((point, _) => ConsoleUtils.WriteTo(point, null));
-        (_priorCanvas, _canvas) = (_canvas, _priorCanvas);
+        _priorCanvas.RunOnDrawnPixels((point, _) => ConsoleUtils.WriteTo(point, null)); // Override all remaining pixels from the previous canvas
+        (_priorCanvas, _canvas) = (_canvas, _priorCanvas); // Swap canvases
         _canvas.Clear();
         AfterFrameRender?.Invoke();
     }
-}
 
-/// <summary>
-/// The <see cref="Application"/>'s state.
-/// </summary>
-public enum ApplicationState
-{
-    Inactive,
-    Running,
-    Killed
+    private static void CheckPrintableAreaChanged()
+    {
+        if (_canvas.Width == Width && _canvas.Height == Height)
+        {
+            return;
+        }
+
+        if (_canvas.Width > Width || _canvas.Height > Height)
+        {
+            Console.Clear();
+        }
+        
+        _canvas.Resize(Width, Height);
+        _priorCanvas.Resize(Width, Height);
+        _priorCanvas.Clear();
+    }
+    
 }

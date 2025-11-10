@@ -1,24 +1,41 @@
-using System.Drawing;
-using Taui.Drawing;
-using Point = Taui.Drawing.Point;
+using Painter.Drawing;
+using Point = Painter.Drawing.Point;
 
-namespace Taui.Composeables;
+namespace Painter.Components;
 
-public class TextBlock : IDrawable
+/// <summary>
+/// A basic <see cref="TextBlock"/> for displaying text to the UI.
+/// </summary>
+public class TextBlock : IDrawable // todo: text wrapping
 {
+    /// <summary>
+    /// The text to display to the UI.
+    /// </summary>
     public string Text { get; set; } = "";
     
-    public ConsoleColor TextColor { get; set; } = ConsoleColor.White;
+    /// <summary>
+    /// The color of the text being displayed.
+    /// </summary>
+    public ConsoleColor? TextColor { get; set; } = null;
     
-    public ConsoleColor BackgroundColor { get; set; } = ConsoleColor.Black;
+    /// <summary>
+    /// The background color of the text being displayed.
+    /// </summary>
+    public ConsoleColor? BackgroundColor { get; set; } = null; // inherit from parent background color
 
+    /// <summary>
+    /// The X position of this text on the <see cref="Canvas"/>.
+    /// </summary>
     public int X { get; set; } = 0;
 
+    /// <summary>
+    /// The Y position of this text on the <see cref="Canvas"/>.
+    /// </summary>
     public int Y { get; set; } = 0;
 
     public void DrawOnto(Canvas canvas)
     {
-        for (var i = 0; i < Text.Length; i++)
+        for (var i = 0; i < Text.Length && i < canvas.Width; i++)
         {
             var point = new Point(X + i, Y);
             var pixel = new Pixel(Text[i])

@@ -1,18 +1,21 @@
 using System.Diagnostics;
-using System.Numerics;
-using Taui;
-using Taui.Composeables;
-using Taui.Drawing;
+using Painter;
+using Painter.Components;
+using Painter.Drawing;
 
 namespace Sample;
 
 public class FpsTacker : IDrawable
 {
-    private TextBlock _textBlock = new();
+    private TextBlock _textBlock = new()
+    {
+        TextColor = ConsoleColor.DarkGreen,
+        BackgroundColor = ConsoleColor.Black
+    };
     private int _frames;
     private long _renderTime;
     private Stopwatch _renderStopwatch;
-    private bool show = false;
+    private bool show;
 
     public bool Blinking { get; set; } = true;
 
