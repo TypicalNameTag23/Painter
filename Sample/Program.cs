@@ -7,7 +7,7 @@ static class Program
 {
     static void Main()
     {
-        Application.TargetFps = -1;
+        Application.TargetFramerate = -1;
         Application.OnQuitKeyPress += (_, args) =>
         {
             args.Cancel = false;
