@@ -17,12 +17,7 @@ class Program
         
         var mainWindow = new Window
         {
-            Composable = new FpsTacker()/*new TextBlock
-            {
-                Text = $"{app.Width} | {app.Height}",
-                TextColor = ConsoleColor.Red,
-                BackgroundColor = ConsoleColor.DarkGray
-            }*/
+            Composable = new FpsTacker()
         };
 
         app.Window = mainWindow;
