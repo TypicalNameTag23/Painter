@@ -1,5 +1,6 @@
 using System.Drawing;
 using Taui.Drawing;
+using Point = Taui.Drawing.Point;
 
 namespace Taui.Composeables;
 
@@ -19,7 +20,14 @@ public class TextBlock : IComposable
     {
         for (var i = 0; i < Text.Length; i++)
         {
-            canvas.Draw(X + i, Y, Text[i], TextColor, BackgroundColor);
+            var point = new Point(X + i, Y);
+            var pixel = new Pixel(Text[i])
+            {
+                ForegroundColor = TextColor,
+                BackgroundColor = BackgroundColor
+            };
+            
+            canvas.Draw(point, pixel);
         }
     }
 

@@ -1,4 +1,3 @@
-using System.Drawing;
 using Taui.Exceptions;
 
 namespace Taui.Drawing;
@@ -8,17 +7,17 @@ namespace Taui.Drawing;
 /// </summary>
 public class Canvas
 {
-    private Pixel?[,] _pixelArray;
+    private readonly Dictionary<Point, Pixel> _drawnPixels = [];
     
     /// <summary>
     /// The width of this canvas.
     /// </summary>
-    public int Width { get; }
+    public int Width { get; private set; }
     
     /// <summary>
     /// The height of this canvas.
     /// </summary>
-    public int Height { get; }
+    public int Height { get; private set; }
 
     /// <summary>
     /// Constructs a new <see cref="Canvas"/>.
@@ -29,93 +28,64 @@ public class Canvas
     {
         Width = width;
         Height = height;
-        _pixelArray = new Pixel[Width, Height];
-        for (var y = 0; y < Height; y++)
-        {
-            for (var x = 0; x < Width; x++)
-            {
-                _pixelArray[x, y] = null;
-            }
-        }
     }
-    
+
     /// <summary>
     /// Draw to a pixel on this canvas.
     /// </summary>
-    /// <param name="x">The x coord to draw to.</param>
-    /// <param name="y">The y coord to draw to.</param>
+    /// <param name="point"></param>
     /// <param name="pixel">The <see cref="Pixel"/> to draw to this canvas.</param>
-    /// <exception cref="TauiException">Thrown when trying to draw to a pixel outside of the <see cref="Canvas"/>.</exception>
-    public void Draw(int x, int y, Pixel pixel)
+    /// <exception cref="TauiException">Thrown when trying to draw to a pixel outside the <see cref="Canvas"/>.</exception>
+    public void Draw(Point point, Pixel pixel)
     {
-        if (x >= Width || y >= Height)
+        if (point.X >= Width || point.Y >= Height)
         {
-            throw new TauiException($"Trying to draw to pixel outside of the canvas (x: {x}, y: {y}) (width: {Width}, height: {Height})");
+            throw new TauiException($"Trying to draw to pixel outside of the canvas (x: {point.X}, y: {point.Y}) (width: {Width}, height: {Height})");
         }
-        
-        _pixelArray[x, y] = pixel;
+
+        _drawnPixels[point] = pixel;
     }
 
     /// <summary>
-    /// Draw to a pixel on this canvas.
+    /// 
     /// </summary>
-    /// <param name="x">The x coord to draw to.</param>
-    /// <param name="y">The y coord to draw to.</param>
-    /// <param name="character">The character to draw to the pixel.</param>
-    /// <param name="foregroundColor">The color of the character.</param>
-    /// <exception cref="TauiException">Thrown when trying to draw to a pixel outside of the <see cref="Canvas"/>.</exception>
-    public void Draw(int x, int y, char character, ConsoleColor foregroundColor, ConsoleColor backgroundColor)
+    /// <param name="point"></param>
+    /// <exception cref="TauiException"></exception>
+    public void Erase(Point point)
     {
-        if (x >= Width || y >= Height)
+        if (point.X >= Width || point.Y >= Height)
         {
-            throw new TauiException($"Trying to draw to pixel outside of the canvas (x: {x}, y: {y}) (width: {Width}, height: {Height})");
-        }
-        
-        _pixelArray[x, y] = new Pixel(character)
-        {
-            ForegroundColor = foregroundColor,
-            BackgroundColor = backgroundColor
-        };
-    }
-
-    /// <summary>
-    /// Draw to a pixel on this canvas.
-    /// </summary>
-    /// <param name="x">The x coord to draw to.</param>
-    /// <param name="y">The y coord to draw to.</param>
-    /// <param name="pixels"></param>
-    /// <exception cref="TauiException">Thrown when trying to draw to a pixel outside of the <see cref="Canvas"/>.</exception>
-    public void Draw(int x, int y, Pixel[,] pixels)
-    {
-        if (x >= Width || y >= Height)
-        {
-            throw new TauiException($"Trying to draw to pixel outside of the canvas (x: {x}, y: {y}) (width: {Width}, height: {Height})");
+            throw new TauiException($"Trying to draw to pixel outside of the canvas (x: {point.X}, y: {point.Y}) (width: {Width}, height: {Height})");
         }
 
-        for (; y < pixels.GetLength(1); y++)
-        {
-            for (; x < pixels.GetLength(0); x++)
-            {
-                Draw(x, y, pixels[x, y]);
-            }
-        }
+        _drawnPixels.Remove(point);
     }
 
     /// <summary>
     /// View a pixel on this canvas.
     /// </summary>
-    /// <param name="x">The x coord to view.</param>
-    /// <param name="y">The y coord to view.</param>
+    /// <param name="point"></param>
     /// <returns>The pixel at the specified coords.</returns>
-    /// <exception cref="TauiException">Thrown when trying to view a pixel outside of the <see cref="Canvas"/></exception>
-    public Pixel View(int x, int y)
+    /// <exception cref="TauiException">Thrown when trying to view a pixel outside the <see cref="Canvas"/></exception>
+    public Pixel? View(Point point)
     {
-        if (x >= Width || y >= Height)
+        if (point.X >= Width || point.Y >= Height)
         {
-            throw new TauiException($"Trying to view pixel outside of the canvas (x: {x}, y: {y}) (width: {Width}, height: {Height})");
+            throw new TauiException($"Trying to view pixel outside of the canvas (x: {point.X}, y: {point.Y}) (width: {Width}, height: {Height})");
         }
         
-        return _pixelArray[x, y];
+        return _drawnPixels.GetValueOrDefault(point);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
+    public void Resize(int width, int height)
+    {
+        Width = width;
+        Height = height;
     }
 
     /// <summary>
@@ -123,21 +93,68 @@ public class Canvas
     /// </summary>
     public void Clear()
     {
-        Array.Clear(_pixelArray);
+        _drawnPixels.Clear();
     }
-
+    
     /// <summary>
     /// Runs the provided function on all pixels in this <see cref="Canvas"/>.
     /// </summary>
     /// <param name="func">The function to run</param>
-    public void RunOnPixels(Action<int, int, Pixel> func)
+    public void RunOnPixels(Action<Point, Pixel> func)
     {
-        for (var y = 0; y < Height; y++)
+        foreach (var pointPixelPair in _drawnPixels)
         {
-            for (var x = 0; x < Width; x++)
-            {
-                func(x, y, _pixelArray[x, y]);
-            }
+            func(pointPixelPair.Key, pointPixelPair.Value);
         }
     }
+    
 }
+
+    // Move to extensions class 
+    // /// <summary>
+    // /// Draw to a pixel on this canvas.
+    // /// </summary>
+    // /// <param name="x">The x coord to draw to.</param>
+    // /// <param name="y">The y coord to draw to.</param>
+    // /// <param name="character">The character to draw to the pixel.</param>
+    // /// <param name="foregroundColor">The color of the character.</param>
+    // /// <exception cref="TauiException">Thrown when trying to draw to a pixel outside the <see cref="Canvas"/>.</exception>
+    // public void Draw(Point point, char character, ConsoleColor foregroundColor, ConsoleColor backgroundColor)
+    // {
+    //     if (x >= Width || y >= Height)
+    //     {
+    //         throw new TauiException($"Trying to draw to pixel outside the canvas (x: {point.X}, y: {point.Y}) (width: {Width}, height: {Height})");
+    //     }
+    //
+    //     var point = new Point(x, y);
+    //     var pixel = new Pixel(character)
+    //     {
+    //         ForegroundColor = foregroundColor,
+    //         BackgroundColor = backgroundColor
+    //     };
+    //     
+    //     _drawnPixels[point] = pixel;
+    // }
+    //
+    // /// <summary>
+    // /// Draw to a pixel on this canvas.
+    // /// </summary>
+    // /// <param name="x">The x coord to draw to.</param>
+    // /// <param name="y">The y coord to draw to.</param>
+    // /// <param name="pixels"></param>
+    // /// <exception cref="TauiException">Thrown when trying to draw to a pixel outside the <see cref="Canvas"/>.</exception>
+    // public void Draw(Point point, Pixel[,] pixels)
+    // {
+    //     if (x >= Width || y >= Height)
+    //     {
+    //         throw new TauiException($"Trying to draw to pixel outside the canvas (x: {point.X}, y: {point.Y}) (width: {Width}, height: {Height})");
+    //     }
+    //
+    //     for (; y < pixels.GetLength(1); y++)
+    //     {
+    //         for (; x < pixels.GetLength(0); x++)
+    //         {
+    //             Draw(x, y, pixels[x, y]);
+    //         }
+    //     }
+    // }

@@ -8,19 +8,31 @@ class Program
 {
     static void Main()
     {
-        var app = new Application();
-        app.TargetFps = -1;
-        app.OnQuitKeyPress += (_, args) =>
+        Application.TargetFps = -1;
+        Application.OnQuitKeyPress += (_, args) =>
         {
             args.Cancel = false;
         };
         
         var mainWindow = new Window
         {
-            Composable = new FpsTacker()
+            Composable = new FpsTacker
+            {
+                Blinking = true
+            }
         };
 
-        app.Window = mainWindow;
-        app.Start();
+        Application.OnKeyPress += consoleKeyInfo =>
+        {
+            if (consoleKeyInfo.Key == ConsoleKey.Spacebar)
+            {
+                Console.SetCursorPosition(0, 0);
+                Console.Write(
+                    "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0");
+            }
+        };
+        
+        Application.Window = mainWindow;
+        Application.Start();
     }
 }
