@@ -26,7 +26,7 @@ public static class Application
         set
         {
             _targetFramerate = value;
-            if (value > -1)
+            if (value > 0)
             {
                 _timeBetweenFrames = 1000 / value;
             }
