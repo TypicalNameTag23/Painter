@@ -135,13 +135,30 @@ public static class Application
         {
             if (_priorCanvas.View(point) != pixel) // Don't need to print again if the pixel hasn't changed
             {
-                ConsoleUtils.WriteTo(point, pixel);
+                try
+                {
+                    ConsoleUtils.WriteTo(point, pixel);
+                }
+                catch (PainterException)
+                {
+                    return; // skip frame if user is in the middle of resizing terminal
+                }
             }
             
             _priorCanvas.Erase(point); // Remove the pixel from the previous canvas if there was one, since it has already been overriden
         });
         
-        _priorCanvas.RunOnDrawnPixels((point, _) => ConsoleUtils.WriteTo(point, null)); // Override all remaining pixels from the previous canvas
+        _priorCanvas.RunOnDrawnPixels((point, _) =>
+        {
+            try
+            {
+                ConsoleUtils.WriteTo(point, null);
+            }
+            catch (PainterException)
+            {
+                return; // skip frame if user is in the middle of resizing terminal
+            }
+        }); // Override all remaining pixels from the previous canvas
         (_priorCanvas, _canvas) = (_canvas, _priorCanvas); // Swap canvases
         _canvas.Clear();
         AfterFrameRender?.Invoke();
@@ -153,12 +170,8 @@ public static class Application
         {
             return;
         }
-
-        if (_canvas.Width > Width || _canvas.Height > Height)
-        {
-            Console.Clear();
-        }
         
+        Console.Clear();
         _canvas.Resize(Width, Height);
         _priorCanvas.Resize(Width, Height);
         _priorCanvas.Clear();
