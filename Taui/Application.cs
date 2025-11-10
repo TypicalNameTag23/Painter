@@ -99,7 +99,7 @@ public class Application //todo: make singleton or implement TopLevel like Avalo
                 OnKeyPress?.Invoke(Console.ReadKey());
             }
             
-            RenderApplication();
+            Display();
             Thread.Sleep(_timeBetweenFrames);
         }
     }
