@@ -12,20 +12,20 @@ namespace Painter;
 /// </summary>
 public static class Application 
 {
-    private static int _targetFps = -1;
+    private static int _targetFramerate = -1;
     private static int _timeBetweenFrames;
     private static Canvas _canvas;
     private static Canvas _priorCanvas;
 
     /// <summary>
-    /// The target FPS for this <see cref="Application"/>, -1 for no cap.
+    /// The target framerate for this <see cref="Application"/>, -1 for no cap.
     /// </summary>
-    public static int TargetFps
+    public static int TargetFramerate
     {
-        get => _targetFps;
+        get => _targetFramerate;
         set
         {
-            _targetFps = value;
+            _targetFramerate = value;
             if (value > -1)
             {
                 _timeBetweenFrames = 1000 / value;
@@ -99,14 +99,20 @@ public static class Application
         _canvas = new Canvas(Width, Height);
         _priorCanvas = new Canvas(Width, Height);
         State = ApplicationState.Running;
+        new Thread(_ =>
+        {
+            while (State == ApplicationState.Running)
+            {
+                if (Console.KeyAvailable)
+                {
+                    var key = Console.ReadKey(true);
+                    OnKeyPress?.Invoke(key);
+                }
+            }
+        }).Start();
+        
         while (State == ApplicationState.Running)
         {
-            if (Console.KeyAvailable)
-            {
-                var key = Console.ReadKey(true);
-                OnKeyPress?.Invoke(key);
-            }
-            
             Display();
             Thread.Sleep(_timeBetweenFrames); // is there a better way of doing this?
         }
