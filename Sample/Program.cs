@@ -16,7 +16,7 @@ class Program
         
         var mainWindow = new Window
         {
-            Composable = new FpsTacker
+            Drawable = new FpsTacker
             {
                 Blinking = true
             }
@@ -27,8 +27,7 @@ class Program
             if (consoleKeyInfo.Key == ConsoleKey.Spacebar)
             {
                 Console.SetCursorPosition(0, 0);
-                Console.Write(
-                    "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0");
+                Console.Write("Hello!");
             }
         };
         

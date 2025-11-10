@@ -4,7 +4,7 @@ using Point = Taui.Drawing.Point;
 
 namespace Taui.Composeables;
 
-public class TextBlock : IComposable
+public class TextBlock : IDrawable
 {
     public string Text { get; set; } = "";
     
@@ -16,7 +16,7 @@ public class TextBlock : IComposable
 
     public int Y { get; set; } = 0;
 
-    public void ComposeOnto(Canvas canvas)
+    public void DrawOnto(Canvas canvas)
     {
         for (var i = 0; i < Text.Length; i++)
         {

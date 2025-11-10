@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Taui\Taui.csproj" />
+      <ProjectReference Include="..\Painter\Painter.csproj" />
     </ItemGroup>
 
 </Project>

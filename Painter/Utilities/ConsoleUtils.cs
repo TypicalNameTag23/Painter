@@ -11,12 +11,19 @@ public static class ConsoleUtils
         if (pixel is null)
         {
             Console.ResetColor();
-            Console.Write($" ");
+            Console.Write(" ");
             return;
         }
+
+        if (pixel.ForegroundColor is not null)
+        {
+            Console.ForegroundColor = (ConsoleColor) pixel.ForegroundColor;
+        }
         
-        Console.ForegroundColor = pixel.ForegroundColor;
-        Console.BackgroundColor = pixel.BackgroundColor;
+        if (pixel.BackgroundColor is not null)
+        {
+            Console.ForegroundColor = (ConsoleColor) pixel.BackgroundColor;
+        }
         Console.Write(pixel.Character);
         Console.ResetColor();
     }

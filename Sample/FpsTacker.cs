@@ -6,7 +6,7 @@ using Taui.Drawing;
 
 namespace Sample;
 
-public class FpsTacker : IComposable
+public class FpsTacker : IDrawable
 {
     private TextBlock _textBlock = new();
     private int _frames;
@@ -62,11 +62,11 @@ public class FpsTacker : IComposable
         }).Start();
     }
     
-    public void ComposeOnto(Canvas canvas)
+    public void DrawOnto(Canvas canvas)
     {
         if (show)
         {
-            _textBlock.ComposeOnto(canvas);
+            _textBlock.DrawOnto(canvas);
         }
     }
 }

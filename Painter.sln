@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taui", "Taui\Taui.csproj", "{053846D5-DCDB-4358-B5DF-3DBC123F5B8B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Painter", "Painter\Painter.csproj", "{053846D5-DCDB-4358-B5DF-3DBC123F5B8B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample", "Sample\Sample.csproj", "{1FCC632F-864E-4203-9080-B89E7EA3E2B4}"
 EndProject

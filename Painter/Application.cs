@@ -6,7 +6,7 @@ using Taui.Utilities;
 namespace Taui;
 
 /// <summary>
-/// A Taui Application.
+/// A Painter Application.
 /// </summary>
 public static class Application //todo: make singleton or implement TopLevel like Avalonia?
 {
@@ -122,7 +122,7 @@ public static class Application //todo: make singleton or implement TopLevel lik
         //todo: dont redraw the entire app every frame when the elements dont change?
         //todo: dont print anything if the pixel is nothing, unless the previous frame had something at that pixel?
         
-        Window.ComposeOnto(_canvas);
+        Window.DrawOnto(_canvas);
         Console.SetCursorPosition(0, 0);
         _canvas.RunOnPixels((point, pixel) =>
         {
