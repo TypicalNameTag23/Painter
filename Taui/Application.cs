@@ -114,8 +114,9 @@ public static class Application //todo: make singleton or implement TopLevel lik
         BeforeFrameRender?.Invoke();
         if (_canvas.Width != Console.BufferWidth || _canvas.Height != Console.BufferHeight)
         {
-            _canvas = new Canvas(Width, Height);
-            _priorCanvas = new Canvas(Width, Height);
+            _canvas.Resize(Width, Height);
+            _priorCanvas.Resize(Width, Height);
+            _priorCanvas.Clear();
             Console.Clear();
         } 
         //todo: dont redraw the entire app every frame when the elements dont change?
@@ -125,8 +126,12 @@ public static class Application //todo: make singleton or implement TopLevel lik
         Console.SetCursorPosition(0, 0);
         _canvas.RunOnPixels((point, pixel) =>
         {
+            if (_priorCanvas.View(point) != pixel)
+            {
+                ConsoleUtils.WriteTo(point, pixel);
+            }
+            
             _priorCanvas.Erase(point);
-            ConsoleUtils.WriteTo(point, pixel);
         });
         
         _priorCanvas.RunOnPixels((point, _) => ConsoleUtils.WriteTo(point, null));

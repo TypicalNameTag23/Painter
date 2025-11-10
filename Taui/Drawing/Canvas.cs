@@ -12,12 +12,12 @@ public class Canvas
     /// <summary>
     /// The width of this canvas.
     /// </summary>
-    public int Width { get; }
+    public int Width { get; private set; }
     
     /// <summary>
     /// The height of this canvas.
     /// </summary>
-    public int Height { get; }
+    public int Height { get; private set; }
 
     /// <summary>
     /// Constructs a new <see cref="Canvas"/>.
@@ -45,7 +45,7 @@ public class Canvas
 
         _drawnPixels[point] = pixel;
     }
-    
+
     /// <summary>
     /// 
     /// </summary>
@@ -60,7 +60,7 @@ public class Canvas
 
         _drawnPixels.Remove(point);
     }
-    
+
     /// <summary>
     /// View a pixel on this canvas.
     /// </summary>
@@ -76,21 +76,16 @@ public class Canvas
         
         return _drawnPixels.GetValueOrDefault(point);
     }
-    
+
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="point"></param>
-    /// <returns></returns>
-    /// <exception cref="TauiException"></exception>
-    public bool IsPointDrawnTo(Point point)
+    /// <param name="width"></param>
+    /// <param name="height"></param>
+    public void Resize(int width, int height)
     {
-        if (point.X >= Width || point.Y >= Height)
-        {
-            throw new TauiException($"Trying to view pixel outside of the canvas (x: {point.X}, y: {point.Y}) (width: {Width}, height: {Height})");
-        }
-        
-        return _drawnPixels.ContainsKey(point);
+        Width = width;
+        Height = height;
     }
 
     /// <summary>
