@@ -8,6 +8,8 @@
 /Painter/obj/project.assets.json
 /Sample/obj/project.nuget.cache
 /Painter/obj/project.nuget.cache
+/Painter/bin/Release/
+/Painter/bin/Debug/
 /Sample/obj/project.packagespec.json
 /Painter/obj/project.packagespec.json
 /.idea/.idea.Painter/.idea/dictionaries/project.xml
