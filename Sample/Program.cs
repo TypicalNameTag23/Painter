@@ -15,9 +15,9 @@ static class Program
         
         var mainWindow = new Window
         {
-            Drawable = new TextBlock
+            Drawable = new FpsTacker()
             {
-                Text = "asddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd98712 ny398yn981732y 48713y7981y379813 END"
+                Blinking = false
             }
         };
 

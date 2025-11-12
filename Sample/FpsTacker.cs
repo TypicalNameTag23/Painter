@@ -1,16 +1,17 @@
 using System.Diagnostics;
+using System.Drawing;
 using Painter;
 using Painter.Components;
 using Painter.Drawing;
 
 namespace Sample;
 
-public class FpsTacker : IDrawable
+public class FpsTacker : Drawable
 {
     private TextBlock _textBlock = new()
     {
-        TextColor = ConsoleColor.DarkGreen,
-        BackgroundColor = ConsoleColor.Black
+        TextColor = null,
+        BackgroundColor = null
     };
     private int _frames;
     private long _renderTime;
@@ -40,7 +41,7 @@ public class FpsTacker : IDrawable
                 if (!Blinking)
                 {
                     show = true;
-                    _textBlock.Text = $"FPS: {_frames} | RT: {_renderTime}ms";
+                    _textBlock.Text = $"FPS: {_frames} | RT: {_renderTime}ms";// + "asddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddasddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddasddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddasdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd";
                     _frames = 0;
                 }
                 else
@@ -65,7 +66,7 @@ public class FpsTacker : IDrawable
         }).Start();
     }
     
-    public void DrawOnto(Canvas canvas)
+    public override void DrawOnto(Canvas canvas)
     {
         if (show)
         {
