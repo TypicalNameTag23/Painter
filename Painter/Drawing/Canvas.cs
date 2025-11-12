@@ -1,6 +1,6 @@
 using System.Drawing;
 using System.Text;
-using Painter.Exceptions;
+using Painter.Rendering;
 
 namespace Painter.Drawing;
 
@@ -70,16 +70,16 @@ public class Canvas
         _buffer.Clear();
     }
 
-    public void Resize(int width, int height)
+    internal void Resize(int width, int height)
     {
-        if (Width <= 0 || Height <= 0) // Should use setters for this?
+        if (Width <= 0 || Height <= 0)
         {
-            throw new PainterException($"Canvas size can not be less than 0 (width: {width}, height: {height}).");
+            return;
         }
         
         Width = width;
         Height = height;
-        Console.Clear();
+        
     }
 
     private bool IsOutsideCanvas(uint x, uint y)

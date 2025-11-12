@@ -1,6 +1,6 @@
 using System.Drawing;
 
-namespace Painter;
+namespace Painter.Rendering;
 
 internal static class AnsiTerminalCodes
 {

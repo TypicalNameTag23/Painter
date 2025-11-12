@@ -1,12 +1,13 @@
 using Painter.Components;
 using Painter.Drawing;
 using Painter.Events;
-using Painter.Exceptions;
+using Painter.Rendering;
 
 namespace Painter;
 
-public static class Application 
+public static class Application
 {
+    private static Window _mainWindow = new();
     private static int _targetFramerate = -1;
     private static int _timeBetweenFrames;
     private static Canvas _canvas;
@@ -27,8 +28,12 @@ public static class Application
             }
         }
     }
-    
-    public static Window Window { get; set; }
+
+    public static IDrawable? Drawable
+    {
+        get => _mainWindow.Drawable;
+        set => _mainWindow.Drawable = value;
+    }
     
     public static ApplicationState State { get; private set; } = ApplicationState.Inactive;
     
@@ -46,11 +51,6 @@ public static class Application
     
     public static void Start()
     {
-        // var s = "asd" + AnsiTerminalCodes.SetCursorPosition(0, 0) + "1111";
-        // Console.Write(s);
-        //
-        // return;
-        ValidateCanStart();
         Console.Clear();
         Console.CursorVisible = false;
         Console.CancelKeyPress += (sender, args) =>
@@ -84,24 +84,11 @@ public static class Application
         }
     }
 
-    private static void ValidateCanStart()
-    {
-        if (State != ApplicationState.Inactive)
-        {
-            throw new PainterException("Can't start application when it is already active.");
-        }
-
-        if (Window is null)
-        {
-            throw new PainterException("Window must be set before application is started.");
-        }
-    }
-
     private static void Display()
     {
         BeforeFrameRender?.Invoke();
         CheckPrintableAreaChanged();
-        Window.DrawOnto(_canvas);
+        _mainWindow.Draw(_canvas);
         _canvas.Display();
         AfterFrameRender?.Invoke();
     }
@@ -113,6 +100,8 @@ public static class Application
             return;
         }
 
+        _mainWindow.Width = Width;
+        _mainWindow.Height = Height;
         _canvas.Resize(Width, Height);
     }
     
