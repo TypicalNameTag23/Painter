@@ -1,11 +1,22 @@
 using Painter.Drawing;
 
-namespace Painter.Components;
+namespace Painter;
 
 public class Window : IDrawable
 {
-    public IDrawable? Drawable { get; set; }
+    public IDrawable? Drawable
+    {
+        get;
+        set
+        {
+            field?.Parent = null;
+            field = value;
+            field?.Parent = this;
+        }
+    }
 
+    public IDrawable? Parent { get; set; }
+    
     public int? Width { get; set; }
     
     public int? Height { get; set; }

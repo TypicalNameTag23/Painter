@@ -1,18 +1,22 @@
 using System.Diagnostics;
 using System.Drawing;
 using Painter;
-using Painter.Components;
 using Painter.Drawing;
+using Painter.Widgets;
 
 namespace Sample;
 
-public class FpsTacker : Drawable
+public class FpsTacker : Widget
 {
     private TextBlock _textBlock = new()
     {
-        TextColor = null,
-        BackgroundColor = null
+        TextColor = Color.DarkGreen,
+        BackgroundColor = Color.Black,
+        TextAlignment = TextAlignment.Center,
+        Width = 30,
+        Height = 1
     };
+    
     private int _frames;
     private long _renderTime;
     private Stopwatch _renderStopwatch;
@@ -22,6 +26,7 @@ public class FpsTacker : Drawable
 
     public FpsTacker()
     {
+        _textBlock.Parent = this;
         Application.BeforeFrameRender += () =>
         {
             _renderStopwatch = Stopwatch.StartNew();
@@ -54,23 +59,19 @@ public class FpsTacker : Drawable
                     }
                     else
                     {
+                        _textBlock.Text = "";
                         show = false;
                         _frames = 0;
                     }
                 }
-                
-                
                 
                 Thread.Sleep(1000);
             }
         }).Start();
     }
     
-    public override void DrawOnto(Canvas canvas)
+    public override void Draw(Canvas canvas)
     {
-        if (show)
-        {
-            _textBlock.DrawOnto(canvas);
-        }
+        _textBlock.Draw(canvas);
     }
 }

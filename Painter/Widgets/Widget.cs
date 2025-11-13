@@ -5,37 +5,94 @@ namespace Painter.Widgets;
 
 public abstract class Widget : IDrawable
 {
-    private IDrawable? _parent;
-    private int? _width;
-    private int? _height;
-
-    internal event WidgetDirtyEventHandler? OnWidgetDirty;
+    public event WidgetDirtyEventHandler? OnWidgetMarkedDirty;
     
-    public IDrawable? Parent
-    {
-        get => _parent;
-        internal set => _parent = value;
-    }
+    public IDrawable? Parent { get; set; }
 
     public int X { get; set; } = 0;
 
     public int Y { get; set; } = 0;
 
+    public int? MaxWidth { get; set; }
+    
+    public int MinWidth
+    {
+        get;
+        set
+        {
+            if (value < 0)
+            {
+                field = 0;
+                return;
+            }
+
+            field = value;
+        }
+    }
+
     public int? Width
     {
-        get => _width ?? Parent?.Width;
-        set => _width = value;
+        get => field ?? Parent?.Width;
+        set
+        {
+            if (value < MinWidth)
+            {
+                field = MinWidth;
+                return;
+            }
+
+            if (value > MaxWidth)
+            {
+                field = MaxWidth;
+                return;
+            }
+
+            field = value;
+        }
     }
-    
+
+    public int? MaxHeight { get; set; }
+
+    public int MinHeight
+    {
+        get;
+        set
+        {
+            if (value < 0)
+            {
+                field = 0;
+                return;
+            }
+
+            field = value;
+        }
+    }
+
     public int? Height 
     {
-        get => _height ?? Parent?.Height;
-        set => _height = value;
+        get => field ?? Parent?.Height;
+        set
+        {
+            if (value < MinHeight)
+            {
+                field = MinHeight;
+                return;
+            }
+
+            if (value > MaxWidth)
+            {
+                field = MaxWidth;
+                return;
+            }
+
+            field = value;
+        }
     }
-    
-    internal void MarkDirty()
+
+
+    public void MarkDirty()
     {
-        OnWidgetDirty?.Invoke(this);
+        OnWidgetMarkedDirty?.Invoke(this);
     }
     
     public abstract void Draw(Canvas canvas);

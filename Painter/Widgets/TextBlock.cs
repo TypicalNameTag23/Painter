@@ -6,14 +6,16 @@ namespace Painter.Widgets;
 public class TextBlock : Widget
 {
     public string Text { get; set; } = "";
+
+    public TextAlignment TextAlignment { get; set; } = TextAlignment.Left;
+    
+    public bool WrapText { get; set; } = true;
     
     public Color? TextColor { get; set; }
     
     public Color? BackgroundColor { get; set; }
     
-    public bool WrapText { get; set; } = false;
-    
-    public OverflowStyle OverflowStyle { get; set; } = OverflowStyle.Cutoff;
+    public OverflowStyle OverflowStyle { get; set; } = OverflowStyle.Ellipses;
     
     public override void Draw(Canvas canvas)
     {
@@ -21,39 +23,66 @@ public class TextBlock : Widget
         {
             return;
         }
-        
-        var lines = new string[(int) Height];
+
+        var lastLine = 0;
+        var width = (int)Width;
+        var height = (int)Height;
+        var lines = new string?[height];
+        lines[0] = Align(Substring(Text, 0, width), width, TextAlignment);
         if (WrapText)
         {
-            lines[0] = Text[..(int) Width];
-            var lineIndex = 1;
-            var textIndex = Width;
-            for (; textIndex < Text.Length && lineIndex < Height; textIndex += Width, lineIndex++)
+            var textIndex = width;
+            for (; textIndex < Text.Length && lastLine + 1 < height; textIndex += width, lastLine++)
             {
-                lines[lineIndex] = Text.Substring((int) (textIndex), (int) (textIndex + Width));
-            }
-        }
-        else
-        {
-            switch (OverflowStyle)
-            {
-                case OverflowStyle.Ellipses:
-                    lines[0] = Text[..((int)Width - 3)] + "...";
-                    break;
-                case OverflowStyle.Cutoff:
-                    lines[0] = Text[..(int)Width];
-                    break;
+                var endIndex = textIndex + width;
+                lines[lastLine + 1] = Align(Substring(Text, textIndex, endIndex > Text.Length ? Text.Length - 1 : textIndex + width), width, TextAlignment);
             }
         }
 
-        for (var i = 0; i < Height; i++)
+        if (Text.Length > width * height || !WrapText && Text.Length > width)
         {
-            if (i < lines.Length)
+            lines[^1] = OverflowStyle switch
             {
-                canvas.Draw(X, Y + i, lines[i], TextColor, BackgroundColor);
-            }
-            
+                OverflowStyle.Ellipses => $"{lines[lastLine]?[..(width - 3)]}...",
+                OverflowStyle.Cutoff => lines[lastLine]?[..width]
+            };
         }
+
+        for (var i = 0; i < lines.Length; i++)
+        {
+            canvas.Draw(X, Y + i, lines[i] is null ? new string(' ', width) : lines[i]!, TextColor, BackgroundColor);
+        }
+    }
+
+    private string Substring(string text, int from, int to)
+    {
+        return Text[from..(to > Text.Length ? Text.Length - 1 : to)];
+    }
+    
+    private string Align(string text, int width, TextAlignment alignment)
+    {
+        switch (alignment)
+        {
+            case TextAlignment.Right:
+            {
+                return text.PadLeft(width, ' ');
+            }
+
+            case TextAlignment.Center:
+            {
+                var leftPadding = width / 2 + text.Length / 2;
+                text = text.PadLeft(leftPadding, ' ');
+                text = text.PadRight(width, ' ');
+                return text;
+            }
+
+            case TextAlignment.Left:
+            {
+                return text.PadRight(width, ' ');
+            }
+        }
+
+        return text;
     }
 }
 
@@ -63,7 +92,7 @@ public enum OverflowStyle
     Cutoff
 }
 
-public enum TextAlign
+public enum TextAlignment
 {
     Left,
     Center,

@@ -1,13 +1,16 @@
-using Painter.Components;
 using Painter.Drawing;
 using Painter.Events;
-using Painter.Rendering;
 
 namespace Painter;
 
 public static class Application
 {
-    private static Window _mainWindow = new();
+    private static Window _mainWindow = new()
+    {
+        Width = Width,
+        Height = Height
+    };
+    
     private static int _targetFramerate = -1;
     private static int _timeBetweenFrames;
     private static Canvas _canvas;
@@ -51,8 +54,13 @@ public static class Application
     
     public static void Start()
     {
-        Console.Clear();
-        Console.CursorVisible = false;
+        Console.Write(
+            AnsiTerminalCodes.SaveScreen + 
+            AnsiTerminalCodes.SaveCursorPositon + 
+            AnsiTerminalCodes.HideCursor +
+            AnsiTerminalCodes.SetCursorPosition(0, 0) + 
+            AnsiTerminalCodes.ClearDisplay +
+            AnsiTerminalCodes.Reset);
         Console.CancelKeyPress += (sender, args) =>
         {
             OnQuitKeyPress?.Invoke(sender, args);
@@ -60,6 +68,12 @@ public static class Application
             {
                 State = ApplicationState.Killed;
                 Console.Clear();
+                Console.Write(
+                    AnsiTerminalCodes.Reset + 
+                    AnsiTerminalCodes.ClearDisplay + 
+                    AnsiTerminalCodes.ShowCursor + 
+                    AnsiTerminalCodes.RestoreCursorPositon + 
+                    AnsiTerminalCodes.RestoreScreen);
             }
         };
         
@@ -103,6 +117,15 @@ public static class Application
         _mainWindow.Width = Width;
         _mainWindow.Height = Height;
         _canvas.Resize(Width, Height);
+        Console.ResetColor();
+        Console.Write(AnsiTerminalCodes.ClearDisplay);
     }
     
+}
+
+public enum ApplicationState
+{
+    Inactive,
+    Running,
+    Killed
 }

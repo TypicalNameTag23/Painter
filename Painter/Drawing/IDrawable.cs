@@ -1,9 +1,9 @@
-using Painter.Drawing;
-
-namespace Painter;
+namespace Painter.Drawing;
 
 public interface IDrawable
 {
+    public IDrawable? Parent { get; set; }
+    
     public int? Width { get; set; }
     
     public int? Height { get; set; }

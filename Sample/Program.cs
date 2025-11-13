@@ -1,5 +1,6 @@
-﻿using Painter;
-using Painter.Components;
+﻿using System.Drawing;
+using Painter;
+using Painter.Widgets;
 
 namespace Sample;
 
@@ -12,14 +13,6 @@ static class Program
         {
             args.Cancel = false;
         };
-        
-        var mainWindow = new Window
-        {
-            Drawable = new FpsTacker()
-            {
-                Blinking = false
-            }
-        };
 
         Application.OnKeyPress += consoleKeyInfo =>
         {
@@ -29,8 +22,22 @@ static class Program
                 Console.Write("Pressed Space!");
             }
         };
+
+        // Application.Drawable = new TextBlock
+        // {
+            // Text = "This is a big block of text that will show me how bad of a developer I am! This is soooo much fun!!!!!",
+            // Width = 20,
+            // Height = 2,
+            // BackgroundColor = Color.IndianRed,
+            // TextColor = Color.DarkRed,
+            // WrapText = false
+        // };
+
+        Application.Drawable = new FpsTacker()
+        {
+            Blinking = false
+        };
         
-        Application.Window = mainWindow;
         Application.Start();
     }
 }
