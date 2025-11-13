@@ -10,11 +10,15 @@ public class FpsTacker : Widget
 {
     private TextBlock _textBlock = new()
     {
-        TextColor = Color.DarkGreen,
+        TextColor = Color.AliceBlue,
         BackgroundColor = Color.Black,
         TextAlignment = TextAlignment.Center,
-        Width = 30,
-        Height = 1
+        // MaxHeight = 10, todo: fix
+        // MaxWidth = 30,
+        // OverflowStyle = OverflowStyle.Cutoff,
+        WrapText = true,
+        // Width = 30,
+        // Height = 5
     };
     
     private int _frames;
@@ -46,7 +50,7 @@ public class FpsTacker : Widget
                 if (!Blinking)
                 {
                     show = true;
-                    _textBlock.Text = $"FPS: {_frames} | RT: {_renderTime}ms";// + "asddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddasddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddasddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddasdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd";
+                    _textBlock.Text = $"FPS: {_frames} | RT: {_renderTime}ms" + " aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"; // "asddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddasddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddasddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddasdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd";
                     _frames = 0;
                 }
                 else

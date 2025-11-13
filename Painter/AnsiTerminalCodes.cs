@@ -9,18 +9,18 @@ internal static class AnsiTerminalCodes
     internal const string ResetForegroundColor = $"{ControlSequenceIntroducer}39m";
     internal const string ResetBackgroundColor = $"{ControlSequenceIntroducer}49m";
     internal const string Reset = $"{ControlSequenceIntroducer}0";
-    
-    internal const string ClearDisplay = $"{ControlSequenceIntroducer}2J";
+
+    internal const string ClearDisplay = $"{ResetCursorPosition}{ControlSequenceIntroducer}J"; // windows \:
     
     internal const string HideCursor = $"{ControlSequenceIntroducer}?25l";
     internal const string ShowCursor = $"{ControlSequenceIntroducer}?25h";
+    internal const string ResetCursorPosition = $"{ControlSequenceIntroducer}H";
+    internal const string SaveCursorPositon = $"{ControlSequenceIntroducer}[s";
+    internal const string RestoreCursorPositon = $"{ControlSequenceIntroducer}[u";
 
     internal const string SaveScreen = $"{ControlSequenceIntroducer}?47h";
     internal const string RestoreScreen = $"{ControlSequenceIntroducer}?47l";
 
-    internal const string SaveCursorPositon = $"{ControlSequenceIntroducer}[s";
-    internal const string RestoreCursorPositon = $"{ControlSequenceIntroducer}[u";
-    
     internal static string SetForegroundColor(Color? color)
     {
         return color is null ? 
@@ -39,7 +39,7 @@ internal static class AnsiTerminalCodes
     {
         if (x <= 0 && y <= 0)
         {
-            return $"{ControlSequenceIntroducer}H";
+            return ResetCursorPosition;
         }
         
         return $"{ControlSequenceIntroducer}{y + 1};{x + 1}H";

@@ -57,9 +57,9 @@ public static class Application
         Console.Write(
             AnsiTerminalCodes.SaveScreen + 
             AnsiTerminalCodes.SaveCursorPositon + 
+            AnsiTerminalCodes.ClearDisplay +
             AnsiTerminalCodes.HideCursor +
             AnsiTerminalCodes.SetCursorPosition(0, 0) + 
-            AnsiTerminalCodes.ClearDisplay +
             AnsiTerminalCodes.Reset);
         Console.CancelKeyPress += (sender, args) =>
         {
@@ -67,16 +67,17 @@ public static class Application
             if (!args.Cancel)
             {
                 State = ApplicationState.Killed;
-                Console.Clear();
                 Console.Write(
                     AnsiTerminalCodes.Reset + 
                     AnsiTerminalCodes.ClearDisplay + 
+                    AnsiTerminalCodes.ResetForegroundColor +
+                    AnsiTerminalCodes.ResetBackgroundColor +
                     AnsiTerminalCodes.ShowCursor + 
                     AnsiTerminalCodes.RestoreCursorPositon + 
                     AnsiTerminalCodes.RestoreScreen);
             }
         };
-        
+
         _canvas = new Canvas(Width, Height);
         State = ApplicationState.Running;
         new Thread(_ =>
@@ -117,8 +118,7 @@ public static class Application
         _mainWindow.Width = Width;
         _mainWindow.Height = Height;
         _canvas.Resize(Width, Height);
-        Console.ResetColor();
-        Console.Write(AnsiTerminalCodes.ClearDisplay);
+        Console.Write(AnsiTerminalCodes.ClearDisplay); 
     }
     
 }
