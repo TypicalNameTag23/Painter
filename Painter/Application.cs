@@ -1,29 +1,37 @@
 using Painter.Drawing;
+using Painter.Elements;
 using Painter.Events;
 
 namespace Painter;
 
-public static class Application
+public class Application
 {
-    private static Window _mainWindow = new()
+    private MainWindow _mainWindow;
+    private int _timeBetweenFrames;
+    private Canvas _canvas;
+    private bool _needsRedraw = true;
+    private bool _needsFullRedraw = true;
+
+    public Application()
     {
-        Width = Width,
-        Height = Height
-    };
+        _canvas = new Canvas(Width, Height);
+        _mainWindow = new MainWindow
+        {
+            Application = this,
+            Width = Width,
+            Height = Height
+        };
+    }
     
-    private static int _targetFramerate = -1;
-    private static int _timeBetweenFrames;
-    private static Canvas _canvas;
-    
-    public static int TargetFramerate
+    public int TargetFramerate
     {
-        get => _targetFramerate;
+        get;
         set
         {
-            _targetFramerate = value;
+            field = value;
             if (value > 0)
             {
-                _timeBetweenFrames = 1000 / value;
+                TargetFramerate = 1000 / value;
             }
             else
             {
@@ -32,18 +40,19 @@ public static class Application
         }
     }
 
-    public static IDrawable? Drawable
+    public Element? Drawable
     {
         get => _mainWindow.Drawable;
         set => _mainWindow.Drawable = value;
     }
     
-    public static ApplicationState State { get; private set; } = ApplicationState.Inactive;
+    public ApplicationState State { get; private set; } = ApplicationState.Inactive;
     
-    public static int Width => Console.BufferWidth;
+    public int Width => Console.BufferWidth;
     
-    public static int Height => Console.BufferHeight;
+    public int Height => Console.BufferHeight;
     
+    // handle better
     public static event ConsoleCancelEventHandler? OnQuitKeyPress;
     
     public static event ConsoleKeyEventHandler? OnKeyPress;
@@ -52,7 +61,7 @@ public static class Application
     
     public static event FrameRenderEventHandler? AfterFrameRender;
     
-    public static void Start()
+    public void Start()
     {
         Console.Write(
             AnsiTerminalCodes.SaveScreen + 
@@ -61,24 +70,26 @@ public static class Application
             AnsiTerminalCodes.HideCursor +
             AnsiTerminalCodes.SetCursorPosition(0, 0) + 
             AnsiTerminalCodes.Reset);
+        
         Console.CancelKeyPress += (sender, args) =>
         {
             OnQuitKeyPress?.Invoke(sender, args);
-            if (!args.Cancel)
+            if (args.Cancel)
             {
-                State = ApplicationState.Killed;
-                Console.Write(
-                    AnsiTerminalCodes.Reset + 
-                    AnsiTerminalCodes.ClearDisplay + 
-                    AnsiTerminalCodes.ResetForegroundColor +
-                    AnsiTerminalCodes.ResetBackgroundColor +
-                    AnsiTerminalCodes.ShowCursor + 
-                    AnsiTerminalCodes.RestoreCursorPositon + 
-                    AnsiTerminalCodes.RestoreScreen);
+                return;
             }
+            
+            State = ApplicationState.Killed;
+            Console.Write(
+                AnsiTerminalCodes.Reset + 
+                AnsiTerminalCodes.ClearDisplay + 
+                AnsiTerminalCodes.ResetForegroundColor +
+                AnsiTerminalCodes.ResetBackgroundColor +
+                AnsiTerminalCodes.ShowCursor + 
+                AnsiTerminalCodes.RestoreCursorPositon + 
+                AnsiTerminalCodes.RestoreScreen);
         };
-
-        _canvas = new Canvas(Width, Height);
+        
         State = ApplicationState.Running;
         new Thread(_ =>
         {
@@ -94,23 +105,34 @@ public static class Application
         
         while (State == ApplicationState.Running)
         {
-            Display();
-            Thread.Sleep(_timeBetweenFrames); // is there a better way of doing this?
+            BeforeFrameRender?.Invoke();
+            CheckPrintableAreaChanged();
+            if (_needsRedraw || _needsFullRedraw)
+            {
+                Display();
+            }
+            AfterFrameRender?.Invoke();
+            
+            // Thread.Sleep(_timeBetweenFrames); // is there a better way of doing this?
         }
     }
 
-    private static void Display()
+    public void RequestRedraw(Element element)
     {
-        BeforeFrameRender?.Invoke();
-        CheckPrintableAreaChanged();
-        _mainWindow.Draw(_canvas);
-        _canvas.Display();
-        AfterFrameRender?.Invoke();
+        _needsRedraw = true;
     }
 
-    private static void CheckPrintableAreaChanged()
+    private void Display()
     {
-        if (_canvas.Width == Width && _canvas.Height == Height)
+        _mainWindow.Draw(_canvas, _needsFullRedraw);
+        _canvas.Display();
+        _needsRedraw = false;
+        _needsFullRedraw = false;
+    }
+
+    private void CheckPrintableAreaChanged()
+    {
+        if (_mainWindow.Width == Width && _mainWindow.Height == Height)
         {
             return;
         }
@@ -118,6 +140,7 @@ public static class Application
         _mainWindow.Width = Width;
         _mainWindow.Height = Height;
         _canvas.Resize(Width, Height);
+        _needsFullRedraw = true;
         Console.Write(AnsiTerminalCodes.ClearDisplay); 
     }
     

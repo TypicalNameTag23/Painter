@@ -8,5 +8,5 @@ public interface IDrawable
     
     public int? Height { get; set; }
     
-    public void Draw(Canvas canvas);
+    public void Draw(Canvas canvas, bool force);
 }

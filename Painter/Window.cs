@@ -1,10 +1,11 @@
 using Painter.Drawing;
+using Painter.Elements;
 
 namespace Painter;
 
 public class Window : IDrawable
 {
-    public IDrawable? Drawable
+    public Element? Drawable
     {
         get;
         set
@@ -15,14 +16,15 @@ public class Window : IDrawable
         }
     }
 
-    public IDrawable? Parent { get; set; }
+    public virtual IDrawable? Parent { get; set; }
     
     public int? Width { get; set; }
     
     public int? Height { get; set; }
 
-    public void Draw(Canvas canvas)
+    public void Draw(Canvas canvas, bool force)
     {
-        Drawable?.Draw(canvas);
+        Drawable?.Draw(canvas, force);
     }
+    
 }

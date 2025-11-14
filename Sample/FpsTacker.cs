@@ -2,11 +2,11 @@ using System.Diagnostics;
 using System.Drawing;
 using Painter;
 using Painter.Drawing;
-using Painter.Widgets;
+using Painter.Elements;
 
 namespace Sample;
 
-public class FpsTacker : Widget
+public sealed class FpsTacker : Element
 {
     private TextBlock _textBlock = new()
     {
@@ -17,8 +17,8 @@ public class FpsTacker : Widget
         // MaxWidth = 30,
         // OverflowStyle = OverflowStyle.Cutoff,
         WrapText = true,
-        // Width = 30,
-        // Height = 5
+        Width = null,
+        Height = 3
     };
     
     private int _frames;
@@ -49,20 +49,23 @@ public class FpsTacker : Widget
             {
                 if (!Blinking)
                 {
+                    Redraw();
                     show = true;
-                    _textBlock.Text = $"FPS: {_frames} | RT: {_renderTime}ms" + " aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"; // "asddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddasddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddasddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddasdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd";
+                    _textBlock.Text = /*$"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +*/ $"FPS: {_frames} | RT: {_renderTime}ms"; //+ " aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"; // "asddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddasddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddasddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddasdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd";
                     _frames = 0;
                 }
                 else
                 {
                     if (!show)
                     {
+                        Redraw();
                         _textBlock.Text = $"FPS: {_frames} | RT: {_renderTime}ms";
                         _frames = 0;
                         show = true;
                     }
                     else
                     {
+                        Redraw();
                         _textBlock.Text = "";
                         show = false;
                         _frames = 0;
@@ -74,8 +77,8 @@ public class FpsTacker : Widget
         }).Start();
     }
     
-    public override void Draw(Canvas canvas)
+    protected override void DrawElement(Canvas canvas, bool force)
     {
-        _textBlock.Draw(canvas);
+        _textBlock.Draw(canvas, force);
     }
 }
