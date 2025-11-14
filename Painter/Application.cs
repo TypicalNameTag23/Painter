@@ -8,6 +8,7 @@ namespace Painter;
 public class Application
 {
     private MainWindow _mainWindow;
+    private Terminal _terminal = Terminal.GetPlatformTerminal();
     private int _timeBetweenFrames;
     private Canvas _canvas;
     private bool _needsRedraw = true;
@@ -15,7 +16,7 @@ public class Application
 
     public Application()
     {
-        _canvas = new Canvas(Width, Height);
+        _canvas = new Canvas(_terminal, Width, Height);
         _mainWindow = new MainWindow
         {
             Application = this,
@@ -67,10 +68,10 @@ public class Application
         Console.Write(
             AnsiTerminalCodes.SaveScreen + 
             AnsiTerminalCodes.SaveCursorPositon + 
-            AnsiTerminalCodes.ClearDisplay +
+            AnsiTerminalCodes.ClearScreen +
             AnsiTerminalCodes.HideCursor +
-            AnsiTerminalCodes.SetCursorPosition(0, 0) + 
-            AnsiTerminalCodes.Reset);
+            AnsiTerminalCodes.ResetCursorPosition + 
+            AnsiTerminalCodes.ResetStyles);
         
         Console.CancelKeyPress += (sender, args) =>
         {
@@ -82,8 +83,8 @@ public class Application
             
             State = ApplicationState.Killed;
             Console.Write(
-                AnsiTerminalCodes.Reset + 
-                AnsiTerminalCodes.ClearDisplay + 
+                AnsiTerminalCodes.ResetStyles + 
+                AnsiTerminalCodes.ClearScreen + 
                 AnsiTerminalCodes.ResetForegroundColor +
                 AnsiTerminalCodes.ResetBackgroundColor +
                 AnsiTerminalCodes.ShowCursor + 
@@ -106,14 +107,16 @@ public class Application
         
         while (State == ApplicationState.Running)
         {
-            BeforeFrameRender?.Invoke();
+            
             CheckPrintableAreaChanged();
             if (_needsRedraw || _needsFullRedraw)
             {
+                BeforeFrameRender?.Invoke();
                 Display();
+                AfterFrameRender?.Invoke();
             }
             
-            AfterFrameRender?.Invoke();
+            
             // Thread.Sleep(_timeBetweenFrames); // is there a better way of doing this?
         }
     }
@@ -133,16 +136,22 @@ public class Application
 
     private void CheckPrintableAreaChanged()
     {
-        if (_mainWindow.Width == Width && _mainWindow.Height == Height)
+        var width = Width;
+        var height = Height;
+        if (_mainWindow.Width == width && _mainWindow.Height == height)
         {
             return;
         }
 
+        if (width < Width || height < Height)
+        {
+            Console.Write(AnsiTerminalCodes.ClearScreen); 
+        }
+        
         _mainWindow.Width = Width;
         _mainWindow.Height = Height;
         _canvas.Resize(Width, Height);
         _needsFullRedraw = true;
-        // Console.Write(AnsiTerminalCodes.ClearDisplay); 
     }
     
 }

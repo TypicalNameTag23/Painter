@@ -93,7 +93,13 @@ public class TextBlock : Element
         
         for (var i = 0; i < lines.Length; i++)
         {
-            canvas.Draw(X, Y + i, lines[i] is null ? new string(' ', width) : lines[i]!, TextColor, BackgroundColor);
+            var style = new Style
+            {
+                ForegroundColor = TextColor,
+                BackgroundColor = BackgroundColor,
+                // Bold = true
+            };
+            canvas.Draw(X, Y + i, lines[i] is null ? new string(' ', width) : lines[i]!, style);
         }
     }
 

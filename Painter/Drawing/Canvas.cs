@@ -1,81 +1,61 @@
-using System.Drawing;
-using System.Text;
 using Painter.Platform;
 
 namespace Painter.Drawing;
 
 public class Canvas
 {
-    private readonly StringBuilder _buffer;
-    private (int x, int y) _brushPosition = (0, 0);
     private FrameCache _frameCache;
-    
+    private readonly Terminal _terminal;
+
     public int Width { get; private set; }
-    
     public int Height { get; private set; }
-    
-    public Canvas(int width, int height)
+
+    public Canvas(Terminal terminal, int width, int height)
     {
         Width = width;
         Height = height;
-        _buffer = new StringBuilder(Width * Height);
+        _terminal = terminal;
         _frameCache = new FrameCache(Width, Height);
     }
-    
-    public void Draw(int x, int y, string text, Color? foregroundColor = null, Color? backgroundColor = null)
+
+    // todo: handle newline characters
+    public void Draw(int x, int y, string text, Style style)
     {
-        if (x >= Width || y >= Height)
+        // make sure we aren't trying to draw out of the bounds of the canvas
+        if (x >= Width || y >= Height || y < 0)
         {
             return;
         }
-        
-        if (x < 0 && x + text.Length >= 0) // trim text to console line 
+
+        // if the thing being drawn is placed off the left side of the canvas but still has some text that shows up 
+        if (x < 0 && x + text.Length >= 0)
         {
+            // trim the text to the parts that would be on the canvas
             text = text[-x..];
         }
 
-        if (x + text.Length > Width) // if placed off left side of console but some still shows up
+        // trim text to canvas' area if it goes outside the right side of the canvas
+        if (x + text.Length > Width)
         {
             text = text[..(Width - x)];
         }
         
-        _brushPosition.x += text.Length;
         for (var i = 0; i < text.Length; i++)
         {
-            if (_brushPosition != (x + i, y))
-            {
-                _brushPosition = (x, y);
-                _buffer.Append(AnsiTerminalCodes.SetCursorPosition(x, y));
-            }
-
-            var currentPixel = _frameCache.GetCachedPixel(x + i, y);
-            if (currentPixel is null && foregroundColor is not null || 
-                currentPixel is not null && currentPixel.Value.foregroundColor != foregroundColor)
-            {
-                _buffer.Append(AnsiTerminalCodes.SetForegroundColor(foregroundColor));
-            }
-
-            if (currentPixel is null && backgroundColor is not null || 
-                currentPixel is not null && currentPixel.Value.backgroundColor != backgroundColor)
-            {
-                _buffer.Append(AnsiTerminalCodes.SetBackgroundColor(backgroundColor));
-            }
-
-            if (currentPixel is null || currentPixel.Value.character != text[i])
-            {
-                _buffer.Append(text[i]);
-            }
-
-            _brushPosition.x++;
-            _buffer.Append(AnsiTerminalCodes.SetForegroundColor(null) +
-                           AnsiTerminalCodes.SetBackgroundColor(null));
+            
+            // if (!_frameCache.CachedPixelMatches(x + i, y, text[i], style))
+            // {
+                _frameCache.SetCachedPixel(x + i, y, text[i], style);
+                _terminal.SetCursorPosition(x + i, y)
+                    .SetStyle(style)
+                    .Write(text[i]);
+            // }
         }
     }
 
     public void Display()
     {
-        Console.Write(_buffer);
-        _buffer.Clear();
+        _terminal.Flush();
     }
 
     internal void Resize(int width, int height)

@@ -8,7 +8,7 @@ namespace Painter.Drawing;
 //todo: console abstraction that manages platform specific implementation details
 public class FrameCache
 {
-    private (char character, Color? foregroundColor, Color? backgroundColor)?[] _cachedFrame;
+    private (char character, Style style)?[] _cachedFrame;
     private int _width;
     private int _height;
     private int _frameArrayLength;
@@ -18,24 +18,42 @@ public class FrameCache
         _width = width;
         _height = height;
         _frameArrayLength = width * height;
-        _cachedFrame = new(char character, Color? foregroundColor, Color? backgroundColor)?[_frameArrayLength];
+        _cachedFrame = new(char character, Style style)?[_frameArrayLength];
     }
 
-    public (char character, Color? foregroundColor, Color? backgroundColor)? GetCachedPixel(int x, int y)
+    public bool CachedPixelMatches(int x, int y, char character, Style style)
     {
-        var pixelIndex = x + y * _width;
-        return pixelIndex >= _frameArrayLength ? null : _cachedFrame[pixelIndex];
-    }
+        var pixel = GetCachedPixel(x, y);
+        if (pixel is null)
+        { // todo: make better
+            // return character == ' ' && 
+                   // style.ForegroundColor is null &&
+                   // style.BackgroundColor is null &&
+                   // style is { Bold: false, Italic: false, Strikethrough: false, Underline: false };
+        }
 
-    public void SetCachedPixel(int x, int y, char character, Color? foregroundColor, Color? backgroundColor)
+        return pixel.Value.character == character && pixel.Value.style == style;
+    }
+    
+    public (char character, Style style)? GetCachedPixel(int x, int y)
     {
-        var pixelIndex = x + y * _width;
-        if (pixelIndex >= _frameArrayLength)
+        if (x > _width || y > _height)
+        {
+            return null;
+        }
+        
+        return _cachedFrame[x + y * _width];
+    }
+    
+
+    public void SetCachedPixel(int x, int y, char character, Style style)
+    {
+        if (x > _width || y > _height)
         {
             return;
         }
 
-        _cachedFrame[pixelIndex] = (character, foregroundColor, backgroundColor);
+        _cachedFrame[x + y * _width] = (character, style);
     }
 
     public void Resize(int width, int height)
@@ -46,7 +64,11 @@ public class FrameCache
         var frameArrayLength = width * height;
         if (frameArrayLength > _frameArrayLength)
         {
-            _cachedFrame = new(char character, Color? foregroundColor, Color? backgroundColor)?[frameArrayLength];
+            _cachedFrame = new(char character, Style style)?[frameArrayLength];
+        }
+        else
+        {
+            Array.Clear(_cachedFrame);
         }
 
         _frameArrayLength = frameArrayLength;

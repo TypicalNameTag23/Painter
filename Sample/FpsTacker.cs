@@ -17,12 +17,13 @@ public sealed class FpsTacker : Element
         // MaxWidth = 30,
         // OverflowStyle = OverflowStyle.Cutoff,
         WrapText = true,
-        Width = null,
-        Height = 3
+        // Width = null,
+        // Height = 3
     };
     
     private int _frames;
-    private long _renderTime;
+    private double _renderTime;
+    private double _maxRenderTime;
     private Stopwatch _renderStopwatch;
     private bool show;
 
@@ -40,7 +41,11 @@ public sealed class FpsTacker : Element
         {
             _frames += 1;
             _renderStopwatch!.Stop();
-            _renderTime = _renderStopwatch.ElapsedMilliseconds;
+            _renderTime = _renderStopwatch.Elapsed.TotalMilliseconds;
+            if (_renderTime > _maxRenderTime)
+            {
+                _maxRenderTime = _renderTime;
+            }
         };
 
         new Thread(_ =>
@@ -51,7 +56,7 @@ public sealed class FpsTacker : Element
                 {
                     Redraw();
                     show = true;
-                    _textBlock.Text = /*$"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +*/ $"FPS: {_frames} | RT: {_renderTime}ms"; //+ " aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"; // "asddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddasddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddasddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddasdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd";
+                    _textBlock.Text = $"FPS: {_frames} | RT: {(_renderTime * 0.000001):N10}ms | MRT: {(_maxRenderTime * 0.000001):N10}ms";
                     _frames = 0;
                 }
                 else
@@ -59,7 +64,7 @@ public sealed class FpsTacker : Element
                     if (!show)
                     {
                         Redraw();
-                        _textBlock.Text = $"FPS: {_frames} | RT: {_renderTime}ms";
+                        _textBlock.Text = $"FPS: {_frames} | RT: {_renderTime * 0.000001}ms | MRT: {_maxRenderTime * 0.000001}ms";
                         _frames = 0;
                         show = true;
                     }
