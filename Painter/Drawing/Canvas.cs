@@ -1,5 +1,6 @@
 using System.Drawing;
 using System.Text;
+using Painter.Platform;
 
 namespace Painter.Drawing;
 
@@ -7,6 +8,7 @@ public class Canvas
 {
     private readonly StringBuilder _buffer;
     private (int x, int y) _brushPosition = (0, 0);
+    private FrameCache _frameCache;
     
     public int Width { get; private set; }
     
@@ -16,7 +18,8 @@ public class Canvas
     {
         Width = width;
         Height = height;
-        _buffer = new StringBuilder(width * height);
+        _buffer = new StringBuilder(Width * Height);
+        _frameCache = new FrameCache(Width, Height);
     }
     
     public void Draw(int x, int y, string text, Color? foregroundColor = null, Color? backgroundColor = null)
@@ -35,19 +38,38 @@ public class Canvas
         {
             text = text[..(Width - x)];
         }
-
-        if (_brushPosition != (x, y))
-        {
-            _brushPosition = (x, y);
-            _buffer.Append(AnsiTerminalCodes.SetCursorPosition(x, y));
-        }
-
-        _buffer.Append(AnsiTerminalCodes.SetForegroundColor(foregroundColor) +
-                       AnsiTerminalCodes.SetBackgroundColor(backgroundColor) +
-                       text +
-                       AnsiTerminalCodes.SetForegroundColor(null) +
-                       AnsiTerminalCodes.SetBackgroundColor(null));
+        
         _brushPosition.x += text.Length;
+        for (var i = 0; i < text.Length; i++)
+        {
+            if (_brushPosition != (x + i, y))
+            {
+                _brushPosition = (x, y);
+                _buffer.Append(AnsiTerminalCodes.SetCursorPosition(x, y));
+            }
+
+            var currentPixel = _frameCache.GetCachedPixel(x + i, y);
+            if (currentPixel is null && foregroundColor is not null || 
+                currentPixel is not null && currentPixel.Value.foregroundColor != foregroundColor)
+            {
+                _buffer.Append(AnsiTerminalCodes.SetForegroundColor(foregroundColor));
+            }
+
+            if (currentPixel is null && backgroundColor is not null || 
+                currentPixel is not null && currentPixel.Value.backgroundColor != backgroundColor)
+            {
+                _buffer.Append(AnsiTerminalCodes.SetBackgroundColor(backgroundColor));
+            }
+
+            if (currentPixel is null || currentPixel.Value.character != text[i])
+            {
+                _buffer.Append(text[i]);
+            }
+
+            _brushPosition.x++;
+            _buffer.Append(AnsiTerminalCodes.SetForegroundColor(null) +
+                           AnsiTerminalCodes.SetBackgroundColor(null));
+        }
     }
 
     public void Display()
@@ -65,6 +87,7 @@ public class Canvas
         
         Width = width;
         Height = height;
+        _frameCache.Resize(Width, Height);
     }
     
 }

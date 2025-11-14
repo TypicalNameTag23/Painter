@@ -1,6 +1,7 @@
 using Painter.Drawing;
 using Painter.Elements;
 using Painter.Events;
+using Painter.Platform;
 
 namespace Painter;
 
@@ -111,8 +112,8 @@ public class Application
             {
                 Display();
             }
-            AfterFrameRender?.Invoke();
             
+            AfterFrameRender?.Invoke();
             // Thread.Sleep(_timeBetweenFrames); // is there a better way of doing this?
         }
     }
@@ -141,7 +142,7 @@ public class Application
         _mainWindow.Height = Height;
         _canvas.Resize(Width, Height);
         _needsFullRedraw = true;
-        Console.Write(AnsiTerminalCodes.ClearDisplay); 
+        // Console.Write(AnsiTerminalCodes.ClearDisplay); 
     }
     
 }
