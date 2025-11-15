@@ -5,7 +5,18 @@ namespace Painter.Layouts;
 
 public class Panel : Element
 {
-    public List<Element> Elements { private get; init; } = [];
+    public List<Element> Elements
+    {
+        private get;
+        init
+        {
+            field = value;
+            foreach (var element in value)
+            {
+                element.Parent = this;
+            }
+        }
+    } = [];
 
     public override bool NeedsRedraw => true;
 
