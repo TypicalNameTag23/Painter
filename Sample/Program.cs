@@ -17,66 +17,46 @@ static class Program
                     new TextBlock 
                     {
                         Text = "This is a big block of text that will show me how bad of a developer I am! This is soooo much fun!!!!!",
-                        Width = 20,
-                        Height = 2,
                         Y = 25,
-                        BackgroundColor = Color.IndianRed,
-                        TextColor = Color.DarkRed,
+                        Width = 20, Height = 2, 
+                        TextColor = Color.DarkRed, 
+                        BackgroundColor = Color.IndianRed, 
                         WrapText = false
                     },
                     new TextBlock
                     {
                         Text = "This another GIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANTTTTTTT BLOOOOOOOOOOOOOOCK OOOOOOOOOOFFFFFFFFFFFF TEEEEEEEEEEEEEEEEXXXXXXXXXXXXTTTTTTTTTTT!!!!!!!!!!!!!!!a",
-                        Width = 30,
-                        Height = null,
-                        X = 5,
-                        Y = 5,
+                        X = 5, Y = 5,
+                        Width = 30, 
                         MaxHeight = 8,
-                        BackgroundColor = Color.Cornsilk,
                         TextColor = Color.CadetBlue,
-                        WrapText = true
+                        BackgroundColor = Color.Cornsilk 
                     },
                     new TextBlock
                     {
                         Text = "When will Infurion upload his next video :thinking:",
-                        Width = null,
-                        Height = null,
-                        X = 20,
-                        Y = 20,
-                        MaxHeight = 8,
-                        MaxWidth = 40,
-                        BackgroundColor = Color.Coral,
+                        X = 20, Y = 20,
+                        MaxHeight = 8, MaxWidth = 40,
                         TextColor = Color.FloralWhite,
-                        TextAlignment = TextAlignment.Center,
-                        WrapText = true
+                        BackgroundColor = Color.Coral,
+                        TextAlignment = TextAlignment.Center
                     },
                     new TextBlock
                     {
-                        Text = "this text box is cut off to the right side of the screen lol",
-                        Width = null,
-                        Height = null,
-                        X = -10,
-                        Y = 3,
-                        MaxHeight = 8,
-                        MaxWidth = 40,
-                        BackgroundColor = Color.FromArgb(100, 60, 250),
+                        Text = "this text box is cut off to the right side of the screen lol", 
+                        X = -10, Y = 3, 
+                        MaxHeight = 8, MaxWidth = 40,
                         TextColor = Color.FloralWhite,
-                        TextAlignment = TextAlignment.Left,
-                        WrapText = true
+                        BackgroundColor = Color.FromArgb(100, 60, 250),
+                        TextAlignment = TextAlignment.Left
                     },
                     new TextBlock
                     {
                         Text = "and this one is cut off on the right side of the screen",
-                        // Width = null,
-                        Height = null,
-                        X = 70,
-                        Y = 3,
-                        MaxHeight = 8,
-                        Width = 40,
-                        BackgroundColor = Color.FromArgb(100, 60, 150),
+                        X = 70, Y = 3, MaxHeight = 8, Width = 40,
                         TextColor = Color.FloralWhite,
-                        TextAlignment = TextAlignment.Right,
-                        WrapText = true
+                        BackgroundColor = Color.FromArgb(100, 60, 150),
+                        TextAlignment = TextAlignment.Right
                     },
                     new FpsTacker()
                 ]

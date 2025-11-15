@@ -8,18 +8,7 @@ namespace Sample;
 
 public sealed class FpsTacker : Element
 {
-    private TextBlock _textBlock = new()
-    {
-        TextColor = Color.AliceBlue,
-        BackgroundColor = Color.Black,
-        TextAlignment = TextAlignment.Center,
-        // MaxHeight = 10,
-        // MaxWidth = 30,
-        // OverflowStyle = OverflowStyle.Cutoff,
-        WrapText = true,
-        // Width = null,
-        // Height = 3
-    };
+    private TextBlock _textBlock = new() { TextColor = Color.AliceBlue, BackgroundColor = Color.Black, TextAlignment = TextAlignment.Center, };
     
     private int _frames;
     private double _renderTime;
