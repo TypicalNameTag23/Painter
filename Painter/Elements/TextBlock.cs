@@ -97,7 +97,7 @@ public class TextBlock : Element
             {
                 ForegroundColor = TextColor,
                 BackgroundColor = BackgroundColor,
-                // Bold = true
+                Bold = true
             };
             canvas.Draw(X, Y + i, lines[i] is null ? new string(' ', width) : lines[i]!, style);
         }

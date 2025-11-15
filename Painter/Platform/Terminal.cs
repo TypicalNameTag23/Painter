@@ -69,25 +69,25 @@ public abstract class Terminal
             _buffer.Append(AnsiTerminalCodes.SetBackgroundColor(style.BackgroundColor));
         }
         
-        // if (_currentStyle.Bold != style.Bold)
-        // {
-            // _buffer.Append(AnsiTerminalCodes.SetBoldMode(style.Bold));
-        // }
+        if (_currentStyle.Bold != style.Bold)
+        {
+            _buffer.Append(AnsiTerminalCodes.SetBoldMode(style.Bold));
+        }
         
-        // if (_currentStyle.Italic != style.Italic)
-        // {
-            // _buffer.Append(AnsiTerminalCodes.SetItalicsMode(style.Italic));
-        // }
+        if (_currentStyle.Italic != style.Italic)
+        {
+            _buffer.Append(AnsiTerminalCodes.SetItalicsMode(style.Italic));
+        }
         
-        // if (_currentStyle.Strikethrough != style.Strikethrough)
-        // {
-            // _buffer.Append(AnsiTerminalCodes.SetStrikethroughMode(style.Strikethrough));
-        // }
+        if (_currentStyle.Strikethrough != style.Strikethrough)
+        {
+            _buffer.Append(AnsiTerminalCodes.SetStrikethroughMode(style.Strikethrough));
+        }
         
-        // if (_currentStyle.Underline != style.Underline)
-        // {
-            // _buffer.Append(AnsiTerminalCodes.SetUnderlineMode(style.Underline));
-        // }
+        if (_currentStyle.Underline != style.Underline)
+        {
+            _buffer.Append(AnsiTerminalCodes.SetUnderlineMode(style.Underline));
+        }
 
         return this;
     }

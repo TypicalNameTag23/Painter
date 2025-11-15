@@ -56,7 +56,7 @@ public sealed class FpsTacker : Element
                 {
                     Redraw();
                     show = true;
-                    _textBlock.Text = $"FPS: {_frames} | RT: {(_renderTime * 0.000001):N10}ms | MRT: {(_maxRenderTime * 0.000001):N10}ms";
+                    _textBlock.Text = $"FPS: {_frames} | RT: {(_renderTime):N4}ms | MRT: {(_maxRenderTime):N4}ms";
                     _frames = 0;
                 }
                 else

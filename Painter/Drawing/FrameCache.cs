@@ -26,10 +26,10 @@ public class FrameCache
         var pixel = GetCachedPixel(x, y);
         if (pixel is null)
         { // todo: make better
-            // return character == ' ' && 
-                   // style.ForegroundColor is null &&
-                   // style.BackgroundColor is null &&
-                   // style is { Bold: false, Italic: false, Strikethrough: false, Underline: false };
+            return character == ' ' && 
+                   style.ForegroundColor is null &&
+                   style.BackgroundColor is null &&
+                   style is { Bold: false, Italic: false, Strikethrough: false, Underline: false };
         }
 
         return pixel.Value.character == character && pixel.Value.style == style;

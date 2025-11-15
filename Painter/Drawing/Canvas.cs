@@ -43,13 +43,13 @@ public class Canvas
         for (var i = 0; i < text.Length; i++)
         {
             
-            // if (!_frameCache.CachedPixelMatches(x + i, y, text[i], style))
-            // {
+            if (!_frameCache.CachedPixelMatches(x + i, y, text[i], style))
+            {
                 _frameCache.SetCachedPixel(x + i, y, text[i], style);
                 _terminal.SetCursorPosition(x + i, y)
                     .SetStyle(style)
                     .Write(text[i]);
-            // }
+            }
         }
     }
 
