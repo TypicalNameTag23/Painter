@@ -13,7 +13,7 @@ public sealed class FpsTacker : Element
         TextColor = Color.AliceBlue,
         BackgroundColor = Color.Black,
         TextAlignment = TextAlignment.Center,
-        // MaxHeight = 10, todo: fix
+        // MaxHeight = 10,
         // MaxWidth = 30,
         // OverflowStyle = OverflowStyle.Cutoff,
         WrapText = true,
@@ -33,9 +33,6 @@ public sealed class FpsTacker : Element
     private Stopwatch _drawCStopwatch;
 #endif
     private Stopwatch _renderStopwatch;
-    private bool show;
-
-    public bool Blinking { get; set; } = true;
 
     public FpsTacker()
     {
@@ -90,7 +87,6 @@ public sealed class FpsTacker : Element
             while (true)
             {
                 Redraw();
-                show = true;
                 _textBlock.Text = $"FPS: {_frames} | RT: {(_renderTime):N4}ms | MRT: {(_maxRenderTime):N4}ms";
 #if DEBUG
                 _textBlock.Text += $" | DT: {_drawTime}ms | MDT: {_maxDrawTime}ms | PT: {_renderTime - _drawTime:N4} | CD: {_drawC:N4}ms | MCD: {_maxDrawC:N4}ms";

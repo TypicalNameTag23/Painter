@@ -33,7 +33,7 @@ internal static class AnsiTerminalCodes
 
     internal const string SaveScreen = $"{ControlSequenceIntroducer}?47h";
     internal const string RestoreScreen = $"{ControlSequenceIntroducer}?47l";
-    internal const string ClearScreen = $"{ControlSequenceIntroducer}3J";//$"{ResetCursorPosition}{ControlSequenceIntroducer}J"; // windows \:
+    internal const string ClearScreen = $"{ControlSequenceIntroducer}H{ControlSequenceIntroducer}0J";//$"{ResetCursorPosition}{ControlSequenceIntroducer}J"; // windows \:
 
     internal static string SetBoldMode(bool enabled)
     {

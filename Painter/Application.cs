@@ -115,15 +115,15 @@ public class Application
         
         while (State == ApplicationState.Running)
         {
-            // BeforeFrameRender?.Invoke();
+            BeforeFrameRender?.Invoke();
             CheckPrintableAreaChanged();
             if (_needsRedraw || _needsFullRedraw)
             {
-                BeforeFrameRender?.Invoke();
+                // BeforeFrameRender?.Invoke();
                 Display();
-                AfterFrameRender?.Invoke();
+                // AfterFrameRender?.Invoke();
             }
-            // AfterFrameRender?.Invoke();
+            AfterFrameRender?.Invoke();
             
             // Thread.Sleep(_timeBetweenFrames); // is there a better way of doing this?
         }
@@ -158,6 +158,7 @@ public class Application
         }
         
         Console.Write(AnsiTerminalCodes.ClearScreen);
+        // Console.Clear();
         _mainWindow.Width = Width;
         _mainWindow.Height = Height;
         _canvas.Resize(Width, Height);

@@ -5,13 +5,13 @@ namespace Painter.Layouts;
 
 public class Panel : Element
 {
-    private readonly List<Element> _elements = [];
+    public List<Element> Elements { private get; init; } = [];
 
     public override bool NeedsRedraw => true;
 
     public void Add(Element element)
     {
-        _elements.Add(element);
+        Elements.Add(element);
         element.Parent = this;
         Redraw();
     }
@@ -20,7 +20,7 @@ public class Panel : Element
     {
         foreach (var element in elements)
         {
-            _elements.Add(element);
+            Elements.Add(element);
             element.Parent = this;
         }
         
@@ -29,22 +29,22 @@ public class Panel : Element
 
     public void Remove(Element element)
     {
-        _elements.Remove(element);
+        Elements.Remove(element);
         element.Parent = null;
         Redraw();
     }
 
     public void RemoveAll()
     {
-        _elements.Clear();
+        Elements.Clear();
         Redraw();
     }
     
     protected override void DrawElement(Canvas canvas, bool force)
     {
-        for (var i = _elements.Count - 1; i >= 0; i--)
+        for (var i = Elements.Count - 1; i >= 0; i--)
         {
-            _elements[i].Draw(canvas, true); // todo: way to detect when elements intersect with each other and force redraw to retain ordering 
+            Elements[i].Draw(canvas, true); // todo: way to detect when elements intersect with each other and force redraw to retain ordering 
         }
     }
     
