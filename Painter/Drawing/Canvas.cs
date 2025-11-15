@@ -4,7 +4,6 @@ namespace Painter.Drawing;
 
 public class Canvas
 {
-    private FrameCache _frameCache;
     private readonly Terminal _terminal;
 
     public int Width { get; private set; }
@@ -15,12 +14,19 @@ public class Canvas
         Width = width;
         Height = height;
         _terminal = terminal;
-        _frameCache = new FrameCache(Width, Height);
     }
 
+#if DEBUG
+    public static event FrameRenderEventHandler? DrawStart;
+    public static event FrameRenderEventHandler? DrawEnd;
+#endif
+    
     // todo: handle newline characters
     public void Draw(int x, int y, string text, Style style)
     {
+#if DEBUG
+        DrawStart?.Invoke();
+#endif
         // make sure we aren't trying to draw out of the bounds of the canvas
         if (x >= Width || y >= Height || y < 0)
         {
@@ -40,17 +46,12 @@ public class Canvas
             text = text[..(Width - x)];
         }
         
-        for (var i = 0; i < text.Length; i++)
-        {
-            
-            if (!_frameCache.CachedPixelMatches(x + i, y, text[i], style))
-            {
-                _frameCache.SetCachedPixel(x + i, y, text[i], style);
-                _terminal.SetCursorPosition(x + i, y)
-                    .SetStyle(style)
-                    .Write(text[i]);
-            }
-        }
+        _terminal.SetCursorPosition(x, y);
+        _terminal.SetStyle(style);
+        _terminal.Write(text);
+#if DEBUG
+        DrawEnd?.Invoke();
+#endif
     }
 
     public void Display()
@@ -67,7 +68,6 @@ public class Canvas
         
         Width = width;
         Height = height;
-        _frameCache.Resize(Width, Height);
     }
     
 }

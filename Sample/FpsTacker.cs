@@ -24,6 +24,14 @@ public sealed class FpsTacker : Element
     private int _frames;
     private double _renderTime;
     private double _maxRenderTime;
+#if DEBUG
+    private double _drawTime;
+    private double _maxDrawTime;
+    private Stopwatch _drawStopwatch;
+    private double _drawC;
+    private double _maxDrawC;
+    private Stopwatch _drawCStopwatch;
+#endif
     private Stopwatch _renderStopwatch;
     private bool show;
 
@@ -48,35 +56,46 @@ public sealed class FpsTacker : Element
             }
         };
 
+#if DEBUG
+        Application.BeforeDraw += () =>
+        {
+            _drawStopwatch = Stopwatch.StartNew();
+        };
+        Application.AfterDraw += () =>
+        {
+            _drawStopwatch!.Stop();
+            _drawTime = _drawStopwatch.Elapsed.TotalMilliseconds;
+            if (_drawTime > _maxDrawTime)
+            {
+                _maxDrawTime = _drawTime;
+            }
+        };
+        Canvas.DrawStart += () =>
+        {
+            _drawCStopwatch = Stopwatch.StartNew();
+        };
+        Canvas.DrawEnd += () =>
+        {
+            _drawCStopwatch!.Stop();
+            _drawC = _drawCStopwatch.Elapsed.TotalMilliseconds;
+            if (_drawC > _maxDrawC)
+            {
+                _maxDrawC = _drawC;
+            }
+        };
+#endif
+
         new Thread(_ =>
         {
             while (true)
             {
-                if (!Blinking)
-                {
-                    Redraw();
-                    show = true;
-                    _textBlock.Text = $"FPS: {_frames} | RT: {(_renderTime):N4}ms | MRT: {(_maxRenderTime):N4}ms";
-                    _frames = 0;
-                }
-                else
-                {
-                    if (!show)
-                    {
-                        Redraw();
-                        _textBlock.Text = $"FPS: {_frames} | RT: {_renderTime * 0.000001}ms | MRT: {_maxRenderTime * 0.000001}ms";
-                        _frames = 0;
-                        show = true;
-                    }
-                    else
-                    {
-                        Redraw();
-                        _textBlock.Text = "";
-                        show = false;
-                        _frames = 0;
-                    }
-                }
-                
+                Redraw();
+                show = true;
+                _textBlock.Text = $"FPS: {_frames} | RT: {(_renderTime):N4}ms | MRT: {(_maxRenderTime):N4}ms";
+#if DEBUG
+                _textBlock.Text += $" | DT: {_drawTime}ms | MDT: {_maxDrawTime}ms | PT: {_renderTime - _drawTime:N4} | CD: {_drawC:N4}ms | MCD: {_maxDrawC:N4}ms";
+#endif
+                _frames = 0;
                 Thread.Sleep(1000);
             }
         }).Start();

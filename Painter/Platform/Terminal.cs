@@ -24,39 +24,25 @@ public abstract class Terminal
         return new GenericTerminal();
     }
     
-    public Terminal Write(string text)
+    public void Write(string text)
     {
         _buffer.Append(text);
-
-        var newX = _cursorX + text.Length;
-        if (newX > Width)
-        {
-            _cursorY = newX / Width;
-            newX %= Width; // guh
-        }
-        
-        _cursorX += newX;
-        return this;
+        _cursorX += text.Length;
     }
     
-    public Terminal Write(char character)
-    {
-        Write(character.ToString());
-        return this;
-    }
-
-    public Terminal SetCursorPosition(int x, int y)
+    public void SetCursorPosition(int x, int y)
     {
         if (_cursorX == x && _cursorY == y)
         {
-            return this;
+            return;
         }
 
         _buffer.Append(AnsiTerminalCodes.SetCursorPosition(x, y));
-        return this;
+        _cursorX = x;
+        _cursorY = y;
     }
 
-    public Terminal SetStyle(Style style)
+    public void SetStyle(Style style)
     {
         // lol trash
         if (_currentStyle.ForegroundColor != style.ForegroundColor)
@@ -89,25 +75,26 @@ public abstract class Terminal
             _buffer.Append(AnsiTerminalCodes.SetUnderlineMode(style.Underline));
         }
 
-        return this;
+        _currentStyle = style;
+        return;
     }
 
-    public Terminal ResetStyle()
+    public void ResetStyle()
     {
         // _buffer.Append(AnsiTerminalCodes.ResetStyles);
         _buffer.Append(AnsiTerminalCodes.ResetBackgroundColor);
         _buffer.Append(AnsiTerminalCodes.ResetForegroundColor);
         _currentStyle = new Style();
 
-        return this;
+        return;
     }
 
-    public Terminal Flush()
+    public void Flush()
     {
         ResetStyle();
         Console.Write(_buffer);
         _buffer.Clear();
 
-        return this;
+        return;
     }
 }

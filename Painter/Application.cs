@@ -60,8 +60,16 @@ public class Application
     public static event ConsoleKeyEventHandler? OnKeyPress;
     
     public static event FrameRenderEventHandler? BeforeFrameRender;
-    
+
     public static event FrameRenderEventHandler? AfterFrameRender;
+
+#if DEBUG
+    public static event FrameRenderEventHandler? BeforeDraw;
+    
+    public static event FrameRenderEventHandler? AfterDraw;
+#endif
+    
+    
     
     public void Start()
     {
@@ -107,15 +115,15 @@ public class Application
         
         while (State == ApplicationState.Running)
         {
-            
+            BeforeFrameRender?.Invoke();
             CheckPrintableAreaChanged();
             if (_needsRedraw || _needsFullRedraw)
             {
-                BeforeFrameRender?.Invoke();
+                // BeforeFrameRender?.Invoke();
                 Display();
-                AfterFrameRender?.Invoke();
+                // AfterFrameRender?.Invoke();
             }
-            
+            AfterFrameRender?.Invoke();
             
             // Thread.Sleep(_timeBetweenFrames); // is there a better way of doing this?
         }
@@ -128,7 +136,13 @@ public class Application
 
     private void Display()
     {
+#if DEBUG
+        BeforeDraw?.Invoke();
+#endif
         _mainWindow.Draw(_canvas, _needsFullRedraw);
+#if DEBUG
+        AfterDraw?.Invoke();
+#endif
         _canvas.Display();
         _needsRedraw = false;
         _needsFullRedraw = false;
@@ -143,9 +157,9 @@ public class Application
             return;
         }
 
-        if (width < Width || height < Height)
+        if (width < _mainWindow.Width || height < _mainWindow.Height)
         {
-            Console.Write(AnsiTerminalCodes.ClearScreen); 
+            Console.Write(AnsiTerminalCodes.ClearScreen);
         }
         
         _mainWindow.Width = Width;
