@@ -6,7 +6,7 @@ internal static class AnsiTerminalCodes
 {
     private const string ControlSequenceIntroducer = "\x1b[";
 
-    internal const string EnableBoldMode = $"{ControlSequenceIntroducer}2m";
+    internal const string EnableBoldMode = $"{ControlSequenceIntroducer}1m";
     internal const string EnableItalicMode = $"{ControlSequenceIntroducer}3m";
     internal const string EnableUnderlineMode = $"{ControlSequenceIntroducer}4m";
     internal const string EnableDoubleUnderlineMode = $"{ControlSequenceIntroducer}21m"; // linux only? found randomly, not in docs i am using?

@@ -3,6 +3,7 @@ using Painter.Drawing;
 
 namespace Painter.Elements;
 
+// todo: dont allow strike through on empty space
 public class TextBlock : Element
 {
     public string Text
@@ -87,7 +88,8 @@ public class TextBlock : Element
             {
                 ForegroundColor = TextColor,
                 BackgroundColor = BackgroundColor,
-                Bold = true
+                Bold = true,
+                // Strikethrough = true
             };
             canvas.Draw(X, Y + i, lines[i] is null ? new string(' ', width) : lines[i]!, style);
         }

@@ -64,12 +64,12 @@ static class Program
             new TextBlock
             {
                 Text = "and this one is cut off on the right side of the screen",
-                Width = null,
+                // Width = null,
                 Height = null,
                 X = 70,
                 Y = 3,
                 MaxHeight = 8,
-                MaxWidth = 40,
+                Width = 40,
                 BackgroundColor = Color.FromArgb(100, 60, 150),
                 TextColor = Color.FloralWhite,
                 TextAlignment = TextAlignment.Right,
