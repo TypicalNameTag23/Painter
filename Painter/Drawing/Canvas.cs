@@ -1,7 +1,10 @@
+using Painter.Events;
 using Painter.Platform;
 
 namespace Painter.Drawing;
 
+// todo: is there a way to check what the current pixel at some index is without having that be slower than just printing that pixel again?
+// todo: fix tearing issues with resizing on windows
 public class Canvas
 {
     private readonly Terminal _terminal;
@@ -38,6 +41,7 @@ public class Canvas
         {
             // trim the text to the parts that would be on the canvas
             text = text[-x..];
+            x = 0;
         }
 
         // trim text to canvas' area if it goes outside the right side of the canvas

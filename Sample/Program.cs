@@ -31,8 +31,7 @@ static class Program
                 MaxHeight = 8,
                 BackgroundColor = Color.Cornsilk,
                 TextColor = Color.CadetBlue,
-                WrapText = true,
-                ShowDebugInfo = true
+                WrapText = true
             },
             new TextBlock
             {
@@ -46,6 +45,34 @@ static class Program
                 BackgroundColor = Color.Coral,
                 TextColor = Color.FloralWhite,
                 TextAlignment = TextAlignment.Center,
+                WrapText = true
+            },
+            new TextBlock
+            {
+                Text = "this text box is cut off to the right side of the screen lol",
+                Width = null,
+                Height = null,
+                X = -10,
+                Y = 3,
+                MaxHeight = 8,
+                MaxWidth = 40,
+                BackgroundColor = Color.FromArgb(100, 60, 250),
+                TextColor = Color.FloralWhite,
+                TextAlignment = TextAlignment.Left,
+                WrapText = true
+            },
+            new TextBlock
+            {
+                Text = "and this one is cut off on the right side of the screen",
+                Width = null,
+                Height = null,
+                X = 70,
+                Y = 3,
+                MaxHeight = 8,
+                MaxWidth = 40,
+                BackgroundColor = Color.FromArgb(100, 60, 150),
+                TextColor = Color.FloralWhite,
+                TextAlignment = TextAlignment.Right,
                 WrapText = true
             },
             new FpsTacker

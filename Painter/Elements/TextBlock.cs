@@ -5,12 +5,6 @@ namespace Painter.Elements;
 
 public class TextBlock : Element
 {
-    public bool ShowDebugInfo
-    {
-        private get;
-        init;
-    } = false;
-    
     public string Text
     {
         get => field;
@@ -65,30 +59,26 @@ public class TextBlock : Element
 
         var width = (int)Width;
         var height = (int)Height;
+        var text = Text;
+        if (OverflowStyle == OverflowStyle.Ellipses)
+        {
+            var ellipsesStartIndex = width * height - 3;
+            if (ellipsesStartIndex > 0 && text.Length > ellipsesStartIndex)
+            {
+                text = text[..ellipsesStartIndex] + "...";
+            }
+        }
+        
         var lines = new string?[height];
         var lastLine = -1;
         var textIndex = 0;
         for (; lastLine + 1 < height && 
-               textIndex < Text.Length && 
+               textIndex < text.Length && 
                (WrapText || lastLine == -1); 
              textIndex += width, lastLine++)
         {
             var endIndex = textIndex + width;
-            lines[lastLine + 1] = Align(Substring(Text, textIndex, endIndex), width, TextAlignment);
-        }
-
-        if (lastLine != -1 && (Text.Length > width * height || !WrapText && Text.Length > width))
-        {
-            lines[lastLine] = OverflowStyle switch
-            {
-                OverflowStyle.Ellipses => $"{lines[lastLine]?[..(width - 3)]}...",
-                OverflowStyle.Cutoff => lines[lastLine]?[..width]
-            };
-        }
-
-        if (ShowDebugInfo && lastLine != -1)
-        {
-            lines[^1] = $"H: {Height} | W: {Width} | IH: {Parent?.Height} | IW: {Parent?.Width}";
+            lines[lastLine + 1] = Align(Substring(text, textIndex, endIndex), width, TextAlignment);
         }
         
         for (var i = 0; i < lines.Length; i++)

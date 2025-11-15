@@ -156,12 +156,8 @@ public class Application
         {
             return;
         }
-
-        if (width < _mainWindow.Width || height < _mainWindow.Height)
-        {
-            Console.Write(AnsiTerminalCodes.ClearScreen);
-        }
         
+        Console.Write(AnsiTerminalCodes.ClearScreen);
         _mainWindow.Width = Width;
         _mainWindow.Height = Height;
         _canvas.Resize(Width, Height);
