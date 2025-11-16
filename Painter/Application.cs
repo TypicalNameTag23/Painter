@@ -7,39 +7,14 @@ namespace Painter;
 
 public class Application
 {
-    private MainWindow _mainWindow;
-    private Terminal _terminal = Terminal.GetPlatformTerminal();
-    private int _timeBetweenFrames;
-    private Canvas _canvas;
-    private bool _needsRedraw = true;
-    private bool _needsFullRedraw = true;
+    private readonly ApplicationContext _context = new();
+    private readonly MainWindow _mainWindow;
+    private readonly Canvas _canvas;
 
     public Application()
     {
-        _canvas = new Canvas(_terminal, Width, Height);
-        _mainWindow = new MainWindow
-        {
-            Application = this,
-            Width = Width,
-            Height = Height
-        };
-    }
-    
-    public int TargetFramerate
-    {
-        get;
-        set
-        {
-            field = value;
-            if (value > 0)
-            {
-                TargetFramerate = 1000 / value;
-            }
-            else
-            {
-                _timeBetweenFrames = 0;
-            }
-        }
+        _canvas = new Canvas(_context.Terminal, _context.Width, _context.Height);
+        _mainWindow = new MainWindow(_context);
     }
 
     public Element? Drawable
@@ -47,12 +22,6 @@ public class Application
         get => _mainWindow.Drawable;
         set => _mainWindow.Drawable = value;
     }
-    
-    public ApplicationState State { get; private set; } = ApplicationState.Inactive;
-    
-    public int Width => Console.BufferWidth;
-    
-    public int Height => Console.BufferHeight;
     
     // handle better
     public static event ConsoleCancelEventHandler? OnQuitKeyPress;
@@ -62,17 +31,14 @@ public class Application
     public static event FrameRenderEventHandler? BeforeFrameRender;
 
     public static event FrameRenderEventHandler? AfterFrameRender;
-
-#if DEBUG
-    public static event FrameRenderEventHandler? BeforeDraw;
-    
-    public static event FrameRenderEventHandler? AfterDraw;
-#endif
-    
-    
     
     public void Start()
     {
+        if (_context.ApplicationState != ApplicationState.Inactive)
+        {
+            return;
+        }
+        
         Console.Write(
             AnsiTerminalCodes.SaveScreen + 
             AnsiTerminalCodes.SaveCursorPositon + 
@@ -89,7 +55,7 @@ public class Application
                 return;
             }
             
-            State = ApplicationState.Killed;
+            _context.ApplicationState = ApplicationState.Killed;
             Console.Write(
                 AnsiTerminalCodes.ResetStyles + 
                 AnsiTerminalCodes.ClearScreen + 
@@ -100,10 +66,10 @@ public class Application
                 AnsiTerminalCodes.RestoreScreen);
         };
         
-        State = ApplicationState.Running;
+        _context.ApplicationState = ApplicationState.Running;
         new Thread(_ =>
         {
-            while (State == ApplicationState.Running)
+            while (_context.ApplicationState == ApplicationState.Running)
             {
                 if (Console.KeyAvailable)
                 {
@@ -113,58 +79,41 @@ public class Application
             }
         }).Start();
         
-        while (State == ApplicationState.Running)
+        while (_context.ApplicationState == ApplicationState.Running)
         {
             BeforeFrameRender?.Invoke();
             CheckPrintableAreaChanged();
-            if (_needsRedraw || _needsFullRedraw)
+            if (_context.NeedsPartialRedraw || _context.NeedsFullRedraw)
             {
-                // BeforeFrameRender?.Invoke();
                 Display();
-                // AfterFrameRender?.Invoke();
             }
             AfterFrameRender?.Invoke();
-            
-            // Thread.Sleep(_timeBetweenFrames); // is there a better way of doing this?
         }
-    }
-
-    public void RequestRedraw(Element element)
-    {
-        _needsRedraw = true;
     }
 
     private void Display()
     {
-#if DEBUG
-        BeforeDraw?.Invoke();
-#endif
-        _mainWindow.Draw(_canvas, _needsFullRedraw);
-#if DEBUG
-        AfterDraw?.Invoke();
-#endif
+        _mainWindow.Draw(_canvas, _context.NeedsFullRedraw);
         _canvas.Display();
-        _needsRedraw = false;
-        _needsFullRedraw = false;
+        _context.NeedsPartialRedraw = false;
+        _context.NeedsFullRedraw = false;
     }
 
     private void CheckPrintableAreaChanged()
     {
-        var width = Width;
-        var height = Height;
+        var width = _context.Width;
+        var height = _context.Height;
         if (_mainWindow.Width == width && _mainWindow.Height == height)
         {
             return;
         }
         
         Console.Write(AnsiTerminalCodes.ClearScreen);
-        // Console.Clear();
-        _mainWindow.Width = Width;
-        _mainWindow.Height = Height;
-        _canvas.Resize(Width, Height);
-        _needsFullRedraw = true;
+        _mainWindow.Width = _context.Width;
+        _mainWindow.Height = _context.Height;
+        _canvas.Resize(_context.Width, _context.Height);
+        _context.NeedsFullRedraw = true;
     }
-    
 }
 
 public enum ApplicationState

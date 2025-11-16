@@ -11,8 +11,8 @@ public abstract class Terminal
     private int _cursorX;
     private int _cursorY;
 
-    public int Width => Console.BufferWidth;
-    public int Height => Console.BufferHeight;
+    public static int Width => Console.BufferWidth;
+    public static int Height => Console.BufferHeight;
 
     public static Terminal GetPlatformTerminal()
     {
@@ -76,17 +76,14 @@ public abstract class Terminal
         }
 
         _currentStyle = style;
-        return;
     }
 
     public void ResetStyle()
     {
-        // _buffer.Append(AnsiTerminalCodes.ResetStyles);
+        _buffer.Append(AnsiTerminalCodes.ResetStyles);
         _buffer.Append(AnsiTerminalCodes.ResetBackgroundColor);
         _buffer.Append(AnsiTerminalCodes.ResetForegroundColor);
         _currentStyle = new Style();
-
-        return;
     }
 
     public void Flush()
@@ -94,7 +91,5 @@ public abstract class Terminal
         ResetStyle();
         Console.Write(_buffer);
         _buffer.Clear();
-
-        return;
     }
 }

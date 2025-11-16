@@ -5,7 +5,14 @@ namespace Painter;
 
 public class MainWindow : Window
 {
-    public Application Application { private get; init; }
+    public ApplicationContext ApplicationContext { get; }
+
+    public MainWindow(ApplicationContext context)
+    {
+        ApplicationContext = context;
+        Width = ApplicationContext.Width;
+        Height = ApplicationContext.Height;
+    }
     
     public override IDrawable? Parent
     {
@@ -15,6 +22,6 @@ public class MainWindow : Window
     
     public void RequestRedraw(Element element)
     {
-        Application.RequestRedraw(element);
+        ApplicationContext.NeedsPartialRedraw = true;
     }
 }
