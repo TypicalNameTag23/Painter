@@ -1,26 +1,31 @@
 using System.Diagnostics;
+using System.Drawing;
 using Painter;
-using Painter.Components;
 using Painter.Drawing;
+using Painter.Elements;
 
 namespace Sample;
 
-public class FpsTacker : IDrawable
+public sealed class FpsTacker : Element
 {
-    private TextBlock _textBlock = new()
-    {
-        TextColor = ConsoleColor.DarkGreen,
-        BackgroundColor = ConsoleColor.Black
-    };
+    private TextBlock _textBlock = new() { TextColor = Color.AliceBlue, BackgroundColor = Color.Black, TextAlignment = TextAlignment.Center, };
+    
     private int _frames;
-    private long _renderTime;
+    private double _renderTime;
+    private double _maxRenderTime;
+#if DEBUG
+    private double _drawTime;
+    private double _maxDrawTime;
+    private Stopwatch _drawStopwatch;
+    private double _drawC;
+    private double _maxDrawC;
+    private Stopwatch _drawCStopwatch;
+#endif
     private Stopwatch _renderStopwatch;
-    private bool show;
-
-    public bool Blinking { get; set; } = true;
 
     public FpsTacker()
     {
+        _textBlock.Parent = this;
         Application.BeforeFrameRender += () =>
         {
             _renderStopwatch = Stopwatch.StartNew();
@@ -30,46 +35,59 @@ public class FpsTacker : IDrawable
         {
             _frames += 1;
             _renderStopwatch!.Stop();
-            _renderTime = _renderStopwatch.ElapsedMilliseconds;
+            _renderTime = _renderStopwatch.Elapsed.TotalMilliseconds;
+            if (_renderTime > _maxRenderTime)
+            {
+                _maxRenderTime = _renderTime;
+            }
         };
+
+#if DEBUG
+        Application.BeforeDraw += () =>
+        {
+            _drawStopwatch = Stopwatch.StartNew();
+        };
+        Application.AfterDraw += () =>
+        {
+            _drawStopwatch!.Stop();
+            _drawTime = _drawStopwatch.Elapsed.TotalMilliseconds;
+            if (_drawTime > _maxDrawTime)
+            {
+                _maxDrawTime = _drawTime;
+            }
+        };
+        Canvas.DrawStart += () =>
+        {
+            _drawCStopwatch = Stopwatch.StartNew();
+        };
+        Canvas.DrawEnd += () =>
+        {
+            _drawCStopwatch!.Stop();
+            _drawC = _drawCStopwatch.Elapsed.TotalMilliseconds;
+            if (_drawC > _maxDrawC)
+            {
+                _maxDrawC = _drawC;
+            }
+        };
+#endif
 
         new Thread(_ =>
         {
             while (true)
             {
-                if (!Blinking)
-                {
-                    show = true;
-                    _textBlock.Text = $"FPS: {_frames} | RT: {_renderTime}ms";
-                    _frames = 0;
-                }
-                else
-                {
-                    if (!show)
-                    {
-                        _textBlock.Text = $"FPS: {_frames} | RT: {_renderTime}ms";
-                        _frames = 0;
-                        show = true;
-                    }
-                    else
-                    {
-                        show = false;
-                        _frames = 0;
-                    }
-                }
-                
-                
-                
+                Redraw();
+                _textBlock.Text = $"FPS: {_frames} | RT: {(_renderTime):N4}ms | MRT: {(_maxRenderTime):N4}ms";
+#if DEBUG
+                _textBlock.Text += $" | DT: {_drawTime}ms | MDT: {_maxDrawTime}ms | PT: {_renderTime - _drawTime:N4} | CD: {_drawC:N4}ms | MCD: {_maxDrawC:N4}ms";
+#endif
+                _frames = 0;
                 Thread.Sleep(1000);
             }
         }).Start();
     }
     
-    public void DrawOnto(Canvas canvas)
+    protected override void DrawElement(Canvas canvas, bool force)
     {
-        if (show)
-        {
-            _textBlock.DrawOnto(canvas);
-        }
+        _textBlock.Draw(canvas, force);
     }
 }
