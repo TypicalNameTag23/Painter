@@ -53,13 +53,8 @@ public class TextBlock : Element
     
     protected override void DrawElement(Canvas canvas, bool force)
     {
-        if (Width is null || Height is null)
-        {
-            return;
-        }
-
-        var width = (int)Width;
-        var height = (int)Height;
+        var width = Width;
+        var height = Height;
         var text = Text;
         if (OverflowStyle == OverflowStyle.Ellipses)
         {

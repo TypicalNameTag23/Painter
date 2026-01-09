@@ -18,9 +18,9 @@ public class Window : IDrawable
 
     public virtual IDrawable? Parent { get; set; }
     
-    public int? Width { get; set; }
+    public int Width { get; set; }
     
-    public int? Height { get; set; }
+    public int Height { get; set; }
 
     public void Draw(Canvas canvas, bool force)
     {

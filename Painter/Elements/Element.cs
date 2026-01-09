@@ -5,6 +5,9 @@ namespace Painter.Elements;
 //todo: horizontal and vertical alignments in respect to parent
 public abstract class Element : IDrawable
 {
+    private int? _width;
+    private int? _height;
+    
     public virtual bool NeedsRedraw { get; private set; }
 
     public IDrawable? Parent
@@ -53,22 +56,22 @@ public abstract class Element : IDrawable
         }
     } = 0;
 
-    public int? Width
+    public int Width
     {
         get
         {
-            var width = field ?? Parent?.Width - X;
+            var width = _width ?? Parent?.Width - X;
             if (width is null)
             {
-                return null;
+                return MinWidth;
             }
 
-            if (width > MaxWidth)
+            if (MaxWidth is not null && width.Value > MaxWidth.Value)
             {
-                return MaxWidth;
+                return MaxWidth.Value;
             }
 
-            return width < MinWidth ? MinWidth : width;
+            return width.Value < MinWidth ? MinWidth : width.Value;
         }
         set
         {
@@ -80,10 +83,10 @@ public abstract class Element : IDrawable
 
             if (value > MaxWidth)
             {
-                newValue = MaxWidth;
+                newValue = MaxWidth.Value;
             }
 
-            SetAndRedrawIfChanged(ref field, newValue);
+            SetAndRedrawIfChanged(ref _width, newValue);
         }
     }
 
@@ -115,22 +118,22 @@ public abstract class Element : IDrawable
         }
     } = 0;
 
-    public int? Height 
+    public int Height 
     {
         get 
         {
-            var height = field ?? Parent?.Height - Y;
+            var height = _height ?? Parent?.Height - Y;
             if (height is null)
             {
-                return null;
+                return MinHeight;
             }
 
-            if (height > MaxHeight)
+            if (MaxHeight is not null && height.Value > MaxHeight.Value)
             {
-                return MaxHeight;
+                return MaxHeight.Value;
             }
 
-            return height < MinHeight ? MinHeight : height;
+            return height.Value < MinHeight ? MinHeight : height.Value;
         }
         set
         {
@@ -142,7 +145,7 @@ public abstract class Element : IDrawable
 
             if (value > MaxWidth)
             {
-                field = MaxWidth;
+                field = MaxWidth.Value;
                 return;
             }
 
