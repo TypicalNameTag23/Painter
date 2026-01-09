@@ -137,19 +137,18 @@ public abstract class Element : IDrawable
         }
         set
         {
+            var newValue = value;
             if (value < MinHeight)
             {
-                field = MinHeight;
-                return;
+                newValue = MinHeight;
             }
 
             if (value > MaxWidth)
             {
-                field = MaxWidth.Value;
-                return;
+                newValue = MaxWidth.Value;
             }
 
-            field = value;
+            SetAndRedrawIfChanged(ref _height, newValue);
         }
     }
 
