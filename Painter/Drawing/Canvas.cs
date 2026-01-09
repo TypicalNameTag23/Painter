@@ -17,11 +17,6 @@ public class Canvas
         Height = height;
         _terminal = terminal;
     }
-
-#if DEBUG
-    public static event FrameRenderEventHandler? DrawStart;
-    public static event FrameRenderEventHandler? DrawEnd;
-#endif
     
     // todo: handle newline characters
     public void Draw(int x, int y, string text, Style style)
