@@ -1,6 +1,5 @@
 using Painter.Drawing;
 using Painter.Elements;
-using Painter.Events;
 using Painter.Platform;
 
 namespace Painter;
@@ -23,14 +22,7 @@ public class Application
         set => _mainWindow.Drawable = value;
     }
     
-    // handle better
     public static event ConsoleCancelEventHandler? OnQuitKeyPress;
-    
-    public static event ConsoleKeyEventHandler? OnKeyPress;
-    
-    public static event FrameRenderEventHandler? BeforeFrameRender;
-
-    public static event FrameRenderEventHandler? AfterFrameRender;
     
     public void Start()
     {
@@ -67,27 +59,13 @@ public class Application
         };
         
         _context.ApplicationState = ApplicationState.Running;
-        new Thread(_ =>
-        {
-            while (_context.ApplicationState == ApplicationState.Running)
-            {
-                if (Console.KeyAvailable)
-                {
-                    var key = Console.ReadKey(true);
-                    OnKeyPress?.Invoke(key);
-                }
-            }
-        }).Start();
-        
         while (_context.ApplicationState == ApplicationState.Running)
         {
-            BeforeFrameRender?.Invoke();
             CheckPrintableAreaChanged();
             if (_context.NeedsPartialRedraw || _context.NeedsFullRedraw)
             {
                 Display();
             }
-            AfterFrameRender?.Invoke();
         }
     }
 

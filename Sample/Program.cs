@@ -58,7 +58,7 @@ static class Program
                         BackgroundColor = Color.FromArgb(100, 60, 150),
                         TextAlignment = TextAlignment.Right
                     },
-                    new FpsTacker()
+                    // new FpsTacker()
                 ]
             }
         };

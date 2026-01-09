@@ -1,4 +1,3 @@
-using Painter.Events;
 using Painter.Platform;
 
 namespace Painter.Drawing;
@@ -27,9 +26,6 @@ public class Canvas
     // todo: handle newline characters
     public void Draw(int x, int y, string text, Style style)
     {
-#if DEBUG
-        DrawStart?.Invoke();
-#endif
         // make sure we aren't trying to draw out of the bounds of the canvas
         if (x >= Width || y >= Height || y < 0)
         {
@@ -53,9 +49,6 @@ public class Canvas
         _terminal.SetCursorPosition(x, y);
         _terminal.SetStyle(style);
         _terminal.Write(text);
-#if DEBUG
-        DrawEnd?.Invoke();
-#endif
     }
 
     public void Display()
