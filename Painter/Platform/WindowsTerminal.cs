@@ -18,10 +18,10 @@ public class WindowsTerminal : Terminal
     
     public WindowsTerminal()
     {
-        // var handle = GetStdHandle(STD_OUTPUT_HANDLE);
-        // GetConsoleMode(handle, out var mode);
-        // mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-        // SetConsoleMode(handle, mode);
+        var handle = GetStdHandle(STD_OUTPUT_HANDLE);
+        GetConsoleMode(handle, out var mode);
+        mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+        SetConsoleMode(handle, mode);
     }
     
 }

@@ -42,34 +42,34 @@ public sealed class FpsTacker : Element
             }
         };
 
-#if DEBUG
-        Application.BeforeDraw += () =>
-        {
-            _drawStopwatch = Stopwatch.StartNew();
-        };
-        Application.AfterDraw += () =>
-        {
-            _drawStopwatch!.Stop();
-            _drawTime = _drawStopwatch.Elapsed.TotalMilliseconds;
-            if (_drawTime > _maxDrawTime)
-            {
-                _maxDrawTime = _drawTime;
-            }
-        };
-        Canvas.DrawStart += () =>
-        {
-            _drawCStopwatch = Stopwatch.StartNew();
-        };
-        Canvas.DrawEnd += () =>
-        {
-            _drawCStopwatch!.Stop();
-            _drawC = _drawCStopwatch.Elapsed.TotalMilliseconds;
-            if (_drawC > _maxDrawC)
-            {
-                _maxDrawC = _drawC;
-            }
-        };
-#endif
+// #if DEBUG
+//         Application.BeforeDraw += () =>
+//         {
+//             _drawStopwatch = Stopwatch.StartNew();
+//         };
+//         Application.AfterDraw += () =>
+//         {
+//             _drawStopwatch!.Stop();
+//             _drawTime = _drawStopwatch.Elapsed.TotalMilliseconds;
+//             if (_drawTime > _maxDrawTime)
+//             {
+//                 _maxDrawTime = _drawTime;
+//             }
+//         };
+//         Canvas.DrawStart += () =>
+//         {
+//             _drawCStopwatch = Stopwatch.StartNew();
+//         };
+//         Canvas.DrawEnd += () =>
+//         {
+//             _drawCStopwatch!.Stop();
+//             _drawC = _drawCStopwatch.Elapsed.TotalMilliseconds;
+//             if (_drawC > _maxDrawC)
+//             {
+//                 _maxDrawC = _drawC;
+//             }
+//         };
+// #endif
 
         new Thread(_ =>
         {

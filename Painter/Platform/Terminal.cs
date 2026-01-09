@@ -6,7 +6,7 @@ namespace Painter.Platform;
 
 public abstract class Terminal
 {
-    private readonly StringBuilder _buffer = new();
+    private readonly StringBuilder _buffer = new(AnsiTerminalCodes.ResetCursorPosition);
     private Style _currentStyle = new();
     private int _cursorX;
     private int _cursorY;
