@@ -41,15 +41,9 @@ public interface IAudioPlayer : IDisposable, IAsyncDisposable
     /// <summary>
     /// Gets the amount of time that the <see cref="CurrentTrack"/> has been played for 
     /// </summary>
-    public TimeSpan TrackPlayTime { get; }
-    
-    /// <summary>
-    /// Gets the current time that the player will seek to after the seek delay is up
-    /// </summary>
-    public TimeSpan? SeekTime { get; protected set; }
+    public TimeSpan TrackTime { get; }
 
     event PlaybackTimeChangedEvent PlaybackTimeChangedEvent;
-    public event SeekTimeChangedEvent? SeekTimeChangedEvent;
     event TrackChangedEvent TrackChangedEvent; 
     event LoopTypeChangedEvent? LoopTypeChangedEvent;
     event PlayerStateChangedEvent? PlayerStateChangedEvent;
@@ -88,16 +82,22 @@ public interface IAudioPlayer : IDisposable, IAsyncDisposable
     /// Clears the <see cref="Tracks"/> list
     /// </summary>
     public void ClearQueue();
-    
+
     /// <summary>
     /// Plays the first <see cref="AudioTrack"/> in the <see cref="Tracks"/> queue if the <see cref="PlayerState"/> is <see cref="PlayerState.Stopped"/>, resumes the <see cref="CurrentTrack"/> if the <see cref="PlayerState"/> is <see cref="PlayerState.Paused"/>
     /// </summary>
-    public void Play();
+    /// <param name="force">Force the player to play the current track, even if <see cref="PlayerState"/> is <see cref="PlayerState.Playing"/></param>
+    public void Play(bool force = false);
     
     /// <summary>
     /// Pauses the player
     /// </summary>
     public void Pause();
+    
+    /// <summary>
+    /// Restarts the currently playing track
+    /// </summary>
+    public void Replay();
     
     /// <summary>
     /// Stops the player

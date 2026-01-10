@@ -8,7 +8,7 @@ namespace MusicPlayer;
 
 class Program
 {
-    private const string AudioFolder = @"/home/typicalnametag23/Music/Portugual. The Man/Evil Friends";
+    private const string AudioFolder = @"/home/typicalnametag23/Music/Celeste OST/Celeste Original Soundtrack";
     private static IAudioPlayer _player = new SoundFlowAudioPlayer();
     private static readonly TimeSpan SeekSmall = TimeSpan.FromSeconds(5);
     private static readonly TimeSpan SeekMedium = TimeSpan.FromSeconds(30);
@@ -45,8 +45,7 @@ class Program
                     new PlayerTracksViewer(_player)
                     {
                         Y = 6
-                    },
-                    // new HsvColorSpaceVisualizer()
+                    }
                 ]
             }
         };
@@ -55,6 +54,7 @@ class Program
         application.AddGlobalKeyBind(new Key(ConsoleKey.Spacebar), TogglePlay);
         application.AddGlobalKeyBind(new Key(ConsoleKey.UpArrow), _player.SkipBack);
         application.AddGlobalKeyBind(new Key(ConsoleKey.DownArrow), _player.Skip);
+        application.AddGlobalKeyBind(new Key(ConsoleKey.UpArrow, ConsoleModifiers.Control), _player.PreviousTrack);
         application.AddGlobalKeyBind(new Key(ConsoleKey.L), SwitchLoopType);
         application.AddGlobalKeyBind(new Key(ConsoleKey.RightArrow), 
             () => _player.Seek(SeekSmall));
@@ -68,8 +68,38 @@ class Program
             () => _player.Seek(-SeekMedium));
         application.AddGlobalKeyBind(new Key(ConsoleKey.LeftArrow, ConsoleModifiers.Control), 
             () => _player.Seek(-SeekLarge));
-
+        application.AddGlobalKeyBind(new Key(ConsoleKey.D0), () => _player.SeekTo(TimeSpan.Zero));
+        application.AddGlobalKeyBind(new Key(ConsoleKey.D1), () => _player.SeekTo(TimeSpan.FromMinutes(1)));
+        application.AddGlobalKeyBind(new Key(ConsoleKey.D2), () => _player.SeekTo(TimeSpan.FromMinutes(2)));
+        application.AddGlobalKeyBind(new Key(ConsoleKey.D3), () => _player.SeekTo(TimeSpan.FromMinutes(3)));
+        application.AddGlobalKeyBind(new Key(ConsoleKey.D4), () => _player.SeekTo(TimeSpan.FromMinutes(4)));
+        application.AddGlobalKeyBind(new Key(ConsoleKey.D5), () => _player.SeekTo(TimeSpan.FromMinutes(5)));
+        application.AddGlobalKeyBind(new Key(ConsoleKey.D6), () => _player.SeekTo(TimeSpan.FromMinutes(6)));
+        application.AddGlobalKeyBind(new Key(ConsoleKey.D7), () => _player.SeekTo(TimeSpan.FromMinutes(7)));
+        application.AddGlobalKeyBind(new Key(ConsoleKey.D8), () => _player.SeekTo(TimeSpan.FromMinutes(8)));
+        application.AddGlobalKeyBind(new Key(ConsoleKey.D9), () => _player.SeekTo(TimeSpan.FromMinutes(9)));
+        application.AddGlobalKeyBind(new Key(ConsoleKey.Subtract), SeekToStart);
         application.Start();
+    }
+
+    private static void SeekToStart()
+    {
+        Task.Run(async () =>
+        {
+            const int duration = 5;
+            const int iterations = 5000;
+            
+            _player.Pause();
+            var step = _player.TrackTime.TotalSeconds / iterations;
+            var delayPerIteration = (1000 * duration) / iterations;
+            for (var i = 1; i <= iterations; i++)
+            {
+                _player.SeekTo(_player.TrackTime - TimeSpan.FromSeconds(step));
+                await Task.Delay(delayPerIteration);
+            }
+
+            _player.Play();
+        });
     }
 
     private static void SwitchLoopType()

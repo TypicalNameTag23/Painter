@@ -3,14 +3,13 @@ using SoundFlow.Abstracts;
 using SoundFlow.Abstracts.Devices;
 using SoundFlow.Backends.MiniAudio;
 using SoundFlow.Components;
-using SoundFlow.Enums;
 using SoundFlow.Interfaces;
 using SoundFlow.Providers;
 using SoundFlow.Structs;
 
 namespace MusicPlayer.Player;
 
-public class SoundFlowAudioPlayer : AudioPlayerBase
+public sealed class SoundFlowAudioPlayer : AudioPlayerBase
 {
     private readonly AudioEngine _engine;
     private readonly AudioFormat _format;
@@ -21,67 +20,125 @@ public class SoundFlowAudioPlayer : AudioPlayerBase
     public SoundFlowAudioPlayer()
     {
         _engine = new MiniAudioEngine();
-        _format = new()
-        {
-            Format = SampleFormat.F32,
-            SampleRate = 48000,
-            Channels = 2
-        };
+        _format = AudioFormat.StudioHq;
         
         var defaultPlaybackDevice = _engine.PlaybackDevices.FirstOrDefault(d => d.IsDefault);
         _device = _engine.InitializePlaybackDevice(defaultPlaybackDevice, _format);
         _device.Start();
+        PlayerStateChangedEvent += () =>
+        {
+            if (PlayerState == PlayerState.Playing)
+            {
+                PlaybackTimeUpdater = new Timer(_ =>
+                {
+                    if (_player is null)
+                    {
+                        return;
+                    }
+                    
+                    TrackTime = TimeSpan.FromSeconds(_player.Time);
+                }, null, 250, 250);
+            }
+            else
+            {
+                PlaybackTimeUpdater?.Change(-1, -1);
+                PlaybackTimeUpdater?.DisposeAsync();
+                PlaybackTimeUpdater = null;
+            }
+
+            if (PlayerState == PlayerState.Stopped)
+            {
+                TrackTime = TimeSpan.Zero;
+            }
+        };
     }
 
-    public override TimeSpan TrackPlayTime => _player is not null ? 
-        TimeSpan.FromSeconds(_player.Time) : TimeSpan.Zero;
-    
-    public override void Play()
+    public override TimeSpan TrackTime 
+    { 
+        get;
+        protected set
+        {
+            var time = value;
+            if (time > TrackLength)
+            {
+                time = TrackLength;
+            } 
+            else if (time < TimeSpan.Zero)
+            {
+                time = TimeSpan.Zero;
+            }
+            
+            if (time == field)
+            {
+                return;
+            }
+
+            field = time;
+            OnPlaybackTimeChanged();
+        } 
+    }
+
+    public override void Play(bool force = false)
     {
         switch (PlayerState)
         {
             case PlayerState.Playing:
             {
-                return;
-            }
-            case PlayerState.Paused:
-            {
-                _player?.Play();
-                PlayerState = PlayerState.Playing;
+                if (!force)
+                {
+                    return;
+                }
+                
                 break;
             }
             case PlayerState.Stopped:
             {
-                if (CurrentTrack is null)
-                {
-                    break;
-                }
-
-                _audioStream = CurrentTrack.TrackSource switch
-                {
-                    TrackSource.File => new StreamDataProvider(_engine, _format, File.OpenRead(CurrentTrack.Path)),
-                    TrackSource.Network => new NetworkDataProvider(_engine, _format, CurrentTrack.Path)
-                };
-                
-                _player = new SoundPlayer(_engine, _format, _audioStream);
-                _player.PlaybackEnded += (_, _) => OnTrackEnd();
-                _device.MasterMixer.AddComponent(_player);
-                _player.Play();
-                
-                PlayerState = PlayerState.Playing;
+                ReadyTrack(TrackTime);
                 break;
             }
+        }
+
+        if (_player is not null)
+        {
+            _player.Play();
+            PlayerState = PlayerState.Playing;
         }
     }
 
     public override void Pause()
     {
+        if (PlayerState == PlayerState.Stopped)
+        {
+            return;
+        }
+        
         _player?.Pause();
         PlayerState = PlayerState.Paused;
     }
-    
+
+    public override void Replay()
+    {
+        if (PlayerState == PlayerState.Stopped)
+        {
+            return;
+        }
+        
+        ReadyTrack();
+        if (_player is not null)
+        {
+            _player.Play();
+            PlayerState = PlayerState.Playing;
+        }
+    }
+
     public override void Stop()
     {
+        if (PlayerState == PlayerState.Stopped)
+        {
+            return;
+        }
+        
+        ResetSeekTimer();
         if (_player is not null)
         {
             _player.Stop();
@@ -93,32 +150,6 @@ public class SoundFlowAudioPlayer : AudioPlayerBase
         _audioStream?.Dispose();
         _audioStream = null;
         PlayerState = PlayerState.Stopped;
-        OnPlaybackTimeChanged();
-    }
-    
-    public override void SeekTo(TimeSpan time)
-    {
-        if (PlayerState == PlayerState.Stopped)
-        {
-            return;
-        }
-
-        ResetSeekTimer();
-        Pause();
-        if (time >= TrackLength)
-        {
-            OnTrackEnd();
-            return;
-        }
-
-        if (time < TimeSpan.Zero)
-        {
-            time = TimeSpan.Zero;
-        }
-
-        _player?.Seek(time);
-        OnPlaybackTimeChanged();
-        Play();
     }
 
     public override void Dispose()
@@ -139,5 +170,70 @@ public class SoundFlowAudioPlayer : AudioPlayerBase
         _engine.Dispose();
         
         await base.DisposeAsync();
+    }
+
+    protected override void StartSeekTimer()
+    {
+        var currentState = PlayerState;
+        if (PlayerState == PlayerState.Playing)
+        {
+            Pause();
+        }
+        
+        SeekDelayTimer = new Timer(_ =>
+        {
+            // Don't allow seeking while playing, must pause player
+            if (PlayerState == PlayerState.Playing)
+            {
+                ResetSeekTimer();
+                return;
+            }
+            
+            if (SeekDelayMilliseconds > 0)
+            {
+                SeekDelayMilliseconds -= 25;
+                return;
+            }
+
+            ResetSeekTimer();
+            _player?.Seek(TrackTime);
+            OnPlaybackTimeChanged();
+            if (currentState == PlayerState.Playing)
+            {
+                Play();
+            }
+        }, null, 25, 25);
+    }
+
+    protected override void ReadyTrack(TimeSpan? startTime = null)
+    {
+        if (CurrentTrack is null)
+        {
+            return;
+        }
+                
+        _audioStream?.Dispose();
+        _audioStream = CurrentTrack.TrackSource switch
+        {
+            TrackSource.File => new StreamDataProvider(_engine, _format, File.OpenRead(CurrentTrack.Path)),
+            TrackSource.Network => new NetworkDataProvider(_engine, _format, CurrentTrack.Path)
+        };
+
+        if (_player is not null)
+        {
+            _device.MasterMixer.RemoveComponent(_player);
+            _player.Dispose();
+        }
+                
+        _player = new SoundPlayer(_engine, _format, _audioStream);
+        _player.PlaybackEnded += (_, _) => OnTrackEnd();
+        _device.MasterMixer.AddComponent(_player);
+        if (startTime is not null)
+        {
+            _player.Seek(startTime.Value);
+            TrackTime = startTime.Value;
+        }
+
+        TrackTime = TimeSpan.Zero;
     }
 }

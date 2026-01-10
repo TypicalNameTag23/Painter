@@ -5,25 +5,38 @@ namespace MusicPlayer.Player;
 
 public abstract class AudioPlayerBase : IAudioPlayer
 {
-    protected const int DefaultSeekDelayMilliseconds = 75;
-    protected readonly List<AudioTrack> _tracks = [];
-    protected int _seekDelayMilliseconds = DefaultSeekDelayMilliseconds;
-    protected Timer? _playbackTimeUpdater;
-    protected Timer? _seekDelayTimer;
+    private const int DefaultInitialSeekDelayMilliseconds = 50;
+    // ReSharper disable once MemberCanBePrivate.Global
+    protected readonly List<AudioTrack> TrackList = [];
+    protected int SeekDelayMilliseconds = DefaultInitialSeekDelayMilliseconds;
+    protected Timer? PlaybackTimeUpdater;
+    protected Timer? SeekDelayTimer;
 
-    public virtual event PlaybackTimeChangedEvent? PlaybackTimeChangedEvent;
-    public virtual event SeekTimeChangedEvent? SeekTimeChangedEvent;
-    public virtual event TrackChangedEvent? TrackChangedEvent;
-    public virtual event LoopTypeChangedEvent? LoopTypeChangedEvent;
-    public virtual event PlayerStateChangedEvent? PlayerStateChangedEvent;
+    public event PlaybackTimeChangedEvent? PlaybackTimeChangedEvent;
+    public event TrackChangedEvent? TrackChangedEvent;
+    public event LoopTypeChangedEvent? LoopTypeChangedEvent;
+    public event PlayerStateChangedEvent? PlayerStateChangedEvent;
 
     public virtual int CurrentTrackIndex
     {
         get;
         set
         {
-            Stop();
+            if (field == value)
+            {
+                return;
+            }
+
             field = value;
+            // Seek timer might be buffering inputs when trying to navigate tracks and will cause issues
+            // Reset the seek timer to disable this
+            ResetSeekTimer();
+            if (PlayerState != PlayerState.Stopped)
+            {
+                ReadyTrack();
+                Play(force: true);
+            }
+
             TrackChangedEvent?.Invoke();
         }
     }
@@ -33,20 +46,13 @@ public abstract class AudioPlayerBase : IAudioPlayer
         get;
         set
         {
+            if (field == value)
+            {
+                return;
+            }
+            
             field = value;
             PlayerStateChangedEvent?.Invoke();
-            if (field == PlayerState.Playing && _playbackTimeUpdater is null)
-            {
-                _playbackTimeUpdater = new Timer(_ =>
-                {
-                    PlaybackTimeChangedEvent?.Invoke();
-                }, null, 0, 1000);
-            }
-            else
-            {
-                _playbackTimeUpdater?.DisposeAsync();
-                _playbackTimeUpdater = null;
-            }
         }
     } = PlayerState.Stopped;
 
@@ -55,28 +61,35 @@ public abstract class AudioPlayerBase : IAudioPlayer
         get;
         set
         {
+            if (field == value)
+            {
+                return;
+            }
+            
             field = value;
             LoopTypeChangedEvent?.Invoke();
         }
+        
     } = LoopType.Disabled;
     
-    public virtual IReadOnlyList<AudioTrack> Tracks => _tracks.AsReadOnly();
-    public virtual AudioTrack? CurrentTrack => _tracks.Count == 0 ? null : Tracks[CurrentTrackIndex];
+    public virtual IReadOnlyList<AudioTrack> Tracks => TrackList.AsReadOnly();
+    public virtual AudioTrack? CurrentTrack => TrackList.Count == 0 ? null : Tracks[CurrentTrackIndex];
     public virtual TimeSpan TrackLength => CurrentTrack is null ? TimeSpan.Zero : CurrentTrack.TrackMeta.Duration;
-    public abstract TimeSpan TrackPlayTime { get; }
-    public virtual TimeSpan? SeekTime { get; set; }
-    
-    public abstract void Play();
+    public abstract TimeSpan TrackTime { get; protected set; }
+
+    public abstract void Play(bool force = false);
     
     public abstract void Pause();
     
+    public abstract void Replay();
+    
     public abstract void Stop();
     
-    public abstract void SeekTo(TimeSpan time);
+    protected abstract void ReadyTrack(TimeSpan? startTime = null);
     
     public virtual void Queue(AudioTrack track)
     {
-        _tracks.Add(track);
+        TrackList.Add(track);
     }
 
     public virtual void Queue(List<AudioTrack> tracks)
@@ -89,22 +102,22 @@ public abstract class AudioPlayerBase : IAudioPlayer
 
     public virtual void QueueNext(AudioTrack track)
     {
-        _tracks.Insert(0, track);
+        TrackList.Insert(0, track);
     }
 
     public virtual void Dequeue(int trackIndex)
     {
-        if (trackIndex >= _tracks.Count)
+        if (trackIndex >= TrackList.Count)
         {
             return;
         }
 
-        _tracks.RemoveAt(trackIndex);
+        TrackList.RemoveAt(trackIndex);
     }
 
     public virtual void Dequeue(AudioTrack track)
     {
-        var trackIndex = _tracks.IndexOf(track);
+        var trackIndex = TrackList.IndexOf(track);
         if (trackIndex == -1)
         {
             return;
@@ -115,51 +128,21 @@ public abstract class AudioPlayerBase : IAudioPlayer
 
     public virtual void ClearQueue()
     {
-        _tracks.Clear();
+        TrackList.Clear();
+    }
+    
+    public virtual void SeekTo(TimeSpan time)
+    {
+        SetSeekTime(time);
     }
     
     public virtual void Seek(TimeSpan time)
     {
-        if (PlayerState == PlayerState.Stopped)
-        {
-            return;
-        }
-        
-        if (SeekTime is not null)
-        {
-            _seekDelayMilliseconds = DefaultSeekDelayMilliseconds;
-            if (SeekTime.Value == TrackLength || SeekTime.Value == TimeSpan.Zero)
-            {
-                return;
-            }
-            
-            AddSeekTime(time);
-            return;
-        }
-
-        Pause();
-        AddSeekTime(time);
-        _seekDelayTimer = new Timer(_ =>
-        {
-            if (SeekTime is null)
-            {
-                return;
-            }
-            
-            if (_seekDelayMilliseconds > 0)
-            {
-                _seekDelayMilliseconds -= 25;
-                return;
-            }
-
-            var seekTime = SeekTime.Value;
-            ResetSeekTimer();
-            SeekTo(seekTime);
-        }, null, 25, 25);
+        SeekTo(TrackTime + time);
     }
 
     public virtual void NextTrack()
-    {
+    {        
         ResetSeekTimer();
         if (CurrentTrackIndex + 1 >= Tracks.Count)
         {
@@ -168,7 +151,6 @@ public abstract class AudioPlayerBase : IAudioPlayer
         }
 
         CurrentTrackIndex++;
-        Play();
     }
 
     public virtual void PreviousTrack()
@@ -181,17 +163,17 @@ public abstract class AudioPlayerBase : IAudioPlayer
         }
 
         CurrentTrackIndex--;
-        Play();
     }
     
     public virtual void Skip()
     {
         ResetSeekTimer();
+        PlayerState = PlayerState.Playing;
         switch (LoopType)
         {
             case LoopType.LoopQueue:
             {
-                if (CurrentTrackIndex == _tracks.Count - 1)
+                if (CurrentTrackIndex == TrackList.Count - 1)
                 {
                     CurrentTrackIndex = 0;
                     break;
@@ -203,7 +185,7 @@ public abstract class AudioPlayerBase : IAudioPlayer
             case LoopType.LoopTrack:
             case LoopType.Disabled:
             {
-                if (CurrentTrackIndex == _tracks.Count - 1)
+                if (CurrentTrackIndex == TrackList.Count - 1)
                 {
                     return;
                 }
@@ -217,8 +199,6 @@ public abstract class AudioPlayerBase : IAudioPlayer
                 break;
             }
         }
-
-        Play();
     }
 
     public virtual void SkipBack()
@@ -231,50 +211,40 @@ public abstract class AudioPlayerBase : IAudioPlayer
             {
                 if (CurrentTrackIndex > 0)
                 {
+                    PlayerState = PlayerState.Playing;
                     CurrentTrackIndex--;
-                    break;
+                    return;
                 }
                 
-                Stop();
                 break;
             }
-            case LoopType.LoopTrack:
-            {
-                Stop();
-                break;   
-            }
         }
-
-        Play();
+        
+        Replay();
     }
 
     public virtual void Dispose()
     {
-        _playbackTimeUpdater?.Dispose();
-        _seekDelayTimer?.Dispose();
+        PlaybackTimeUpdater?.Dispose();
+        SeekDelayTimer?.Dispose();
     }
 
     public virtual async ValueTask DisposeAsync()
     {
-        if (_playbackTimeUpdater is not null)
+        if (PlaybackTimeUpdater is not null)
         {
-            await _playbackTimeUpdater.DisposeAsync();
+            await PlaybackTimeUpdater.DisposeAsync();
         }
         
-        if (_seekDelayTimer is not null)
+        if (SeekDelayTimer is not null)
         {
-            await _seekDelayTimer.DisposeAsync();
+            await SeekDelayTimer.DisposeAsync();
         }
     }
 
     protected void OnPlaybackTimeChanged()
     {
         PlaybackTimeChangedEvent?.Invoke();
-    }
-    
-    protected void OnSeekTimeChanged()
-    {
-        SeekTimeChangedEvent?.Invoke();
     }
     
     protected void OnTrackChanged()
@@ -298,7 +268,7 @@ public abstract class AudioPlayerBase : IAudioPlayer
         {
             case LoopType.LoopQueue:
             {
-                if (CurrentTrackIndex == _tracks.Count - 1)
+                if (CurrentTrackIndex == TrackList.Count - 1)
                 {
                     CurrentTrackIndex = 0;
                     break;
@@ -307,10 +277,16 @@ public abstract class AudioPlayerBase : IAudioPlayer
                 CurrentTrackIndex++;
                 break;
             }
+            case LoopType.LoopTrack:
+            {
+                Replay();
+                break;
+            }
             case LoopType.Disabled:
             {
-                if (CurrentTrackIndex == _tracks.Count - 1)
+                if (CurrentTrackIndex == TrackList.Count - 1)
                 {
+                    Stop();
                     CurrentTrackIndex = 0;
                     return;
                 }
@@ -319,33 +295,30 @@ public abstract class AudioPlayerBase : IAudioPlayer
                 break;
             }
         }
+    }
 
-        Stop();
-        Play();
+    protected void SetSeekTime(TimeSpan time)
+    {
+        TrackTime = time;
+        SeekDelayMilliseconds = DefaultInitialSeekDelayMilliseconds;
+        if (SeekDelayTimer is null)
+        {
+            StartSeekTimer();
+        }
     }
 
     protected void ResetSeekTimer()
     {
-        _seekDelayTimer?.Change(-1, -1);
-        _seekDelayTimer?.Dispose();
-        _seekDelayTimer = null;
-        SeekTime = null;
-        _seekDelayMilliseconds = DefaultSeekDelayMilliseconds;
-    }
-    
-    private void AddSeekTime(TimeSpan time)
-    {
-        SeekTime ??= TrackPlayTime;
-        SeekTime += time;
-        if (SeekTime.Value >= TrackLength)
+        if (SeekDelayTimer is null)
         {
-            SeekTime = TrackLength;
-        }
-        else if (SeekTime.Value < TimeSpan.Zero)
-        {
-            SeekTime = TimeSpan.Zero;
+            return;
         }
         
-        SeekTimeChangedEvent?.Invoke();
-    } 
+        SeekDelayTimer.Change(-1, -1);
+        SeekDelayTimer.Dispose();
+        SeekDelayTimer = null;
+        SeekDelayMilliseconds = DefaultInitialSeekDelayMilliseconds;
+    }
+
+    protected abstract void StartSeekTimer();
 }

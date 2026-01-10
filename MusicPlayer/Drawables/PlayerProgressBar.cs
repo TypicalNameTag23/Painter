@@ -12,44 +12,48 @@ public class PlayerProgressBar : Element
     {
         _player = player;
         _player.PlaybackTimeChangedEvent += Redraw;
-        _player.SeekTimeChangedEvent += Redraw;
     }
     
     protected override void DrawElement(Canvas canvas, bool force)
     {
         var width = Width;
 
-        var progressTime = _player.SeekTime ?? _player.TrackPlayTime;
-        canvas.Draw(X, Y, $"[{progressTime:mm':'ss}]", new Style());
+        canvas.Draw(X, Y, $"[{_player.TrackTime:mm':'ss}]", new Style());
         canvas.Draw(X + width - 7, Y, $"[{_player.TrackLength:mm':'ss}]", new Style());
 
         width -= 16;
-        var trackProgress = (int) Math.Ceiling(width * (progressTime / _player.TrackLength));
+        var trackProgress = (int) Math.Ceiling(width * (_player.TrackTime / _player.TrackLength));
         var hueStep = 359d / width;
         for (var x = 0; x < trackProgress; x++)
         {
             try
             {
+                var hue = hueStep * x;
+                if (hue > 359)
+                {
+                    Console.WriteLine("a");
+                }
+                
                 canvas.Draw(X + x + 8, Y, " ", new Style
                 {
-                    BackgroundColor = ColorHelper.FromHsv(hueStep * x, 1, 1)
+                    BackgroundColor = ColorHelper.FromHsv(hue, 1, 1)
                 });
             }
-            catch (ArgumentOutOfRangeException e)
+            catch (Exception e)
             {
-                Console.WriteLine(progressTime);
-                Console.WriteLine(_player.TrackLength);
-                throw e;
+                Console.WriteLine(trackProgress);
+                Console.WriteLine(_player.CurrentTrackIndex);
+                Console.WriteLine(width);
+                Console.WriteLine($"{_player.TrackTime:mm':'ss}");
             }
-            
         }
 
-        var brightnessStep = 0.8d / width;
+        var brightnessStep = 0.2d / width;
         for (var x = trackProgress; x < width; x++)
         {
             canvas.Draw(X + x + 8, Y, " ", new Style
             {
-                BackgroundColor = ColorHelper.FromHsv(285, 0.2 + brightnessStep * x, 0.5)
+                BackgroundColor = ColorHelper.FromHsv(0, 0, 0.15 + brightnessStep * x)
             });
         }
     }
