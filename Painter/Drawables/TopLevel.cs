@@ -1,66 +1,47 @@
+using System.Runtime.InteropServices;
+
 namespace Painter.Drawables;
 
 public abstract class TopLevel
 {
-    private readonly List<KeyBind> _windowKeyBinds = [];
+    private readonly Dictionary<Key, List<Action>> _windowKeyBinds = [];
 
     public void AddWindowKeyBind(Key key, Action action)
     {
-        _windowKeyBinds.Add(new KeyBind(key, action));
-    }
-    
-    public void RemoveWindowKeyBind(KeyBind keyBind)
-    {
-        _windowKeyBinds.Remove(keyBind);
-    }
-    
-    public void RemoveWindowKeyBind(Key key)
-    {
-        for (var i = 0; i < _windowKeyBinds.Count; i++)
+        if (!_windowKeyBinds.TryGetValue(key, out var actions))
         {
-            if (_windowKeyBinds[i].Key.Equals(key))
-            {
-                continue;
-            }
-
-            _windowKeyBinds.RemoveAt(i);
+            actions = [];
+            _windowKeyBinds.Add(key, actions);
+        }
+        
+        actions.Add(action);
+    }
+    
+    public void RemoveWindowKeyBinds(Key key)
+    {
+        _windowKeyBinds.Remove(key);
+    }
+    
+    public void ExecuteWindowKeyBinds(Key key)
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            key = new Key(key.KeyType, key.KeyModifiers ^ ConsoleModifiers.Shift);
+        }
+        
+        if (!_windowKeyBinds.TryGetValue(key, out var actions))
+        {
+            return;
+        }
+        
+        foreach (var action in actions)
+        {
+            action();
         }
     }
     
-    public IReadOnlyList<KeyBind> GetWindowKeyBinds(Key key)
+    public IReadOnlyList<Key> GetWindowBoundKeys()
     {
-        var keyBinds = new List<KeyBind>();
-        foreach (var keyBind in _windowKeyBinds)
-        {
-            if (keyBind.Key.Equals(key))
-            {
-                continue;
-            }
-
-            keyBinds.Add(keyBind);
-        }
-
-        return keyBinds.AsReadOnly();
-    }
-    
-    public List<KeyBind> GetWindowKeyBinds(ConsoleKeyInfo key)
-    {
-        var keyBinds = new List<KeyBind>();
-        foreach (var keyBind in _windowKeyBinds)
-        {
-            if (keyBind.Key.Equals(key))
-            {
-                continue;
-            }
-
-            keyBinds.Add(keyBind);
-        }
-
-        return keyBinds;
-    }
-    
-    public IReadOnlyList<KeyBind> GetWindowKeyBinds()
-    {
-        return _windowKeyBinds.AsReadOnly();
+        return _windowKeyBinds.Keys.ToList();
     }
 }

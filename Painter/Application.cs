@@ -29,17 +29,12 @@ public class Application
     
     public void RemoveGlobalKeyBind(Key key)
     {
-        _mainWindow.RemoveWindowKeyBind(key);
+        _mainWindow.RemoveWindowKeyBinds(key);
     }
     
-    public IReadOnlyList<KeyBind> GetGlobalKeyBinds(Key key)
+    public IReadOnlyList<Key> GetGlobalBoundKeys()
     {
-        return _mainWindow.GetWindowKeyBinds(key);
-    }
-    
-    public IReadOnlyList<KeyBind> GetGlobalKeyBinds()
-    {
-        return _mainWindow.GetWindowKeyBinds();
+        return _mainWindow.GetWindowBoundKeys();
     }
     
     public void Start()
@@ -56,36 +51,15 @@ public class Application
             AnsiTerminalCodes.HideCursor +
             AnsiTerminalCodes.ResetCursorPosition + 
             AnsiTerminalCodes.ResetStyles);
-        
-        Console.CancelKeyPress += (_, args) =>
-        {
-            args.Cancel = true;
-            // _context.ApplicationState = ApplicationState.Killed;
-            // Console.Write(
-            //     AnsiTerminalCodes.ResetStyles + 
-            //     AnsiTerminalCodes.ClearScreen + 
-            //     AnsiTerminalCodes.ResetForegroundColor +
-            //     AnsiTerminalCodes.ResetBackgroundColor +
-            //     AnsiTerminalCodes.ShowCursor + 
-            //     AnsiTerminalCodes.RestoreCursorPositon + 
-            //     AnsiTerminalCodes.RestoreScreen);
-        };
-        
-        new Thread(_ =>
-        {
-            while (_context.ApplicationState == ApplicationState.Running)
-            {
-                if (!Console.KeyAvailable)
-                {
-                    continue;
-                }
-                
-                foreach (var keyBind in _mainWindow.GetWindowKeyBinds(Console.ReadKey(true)))
-                {
-                    keyBind.Run();
-                }
-            }
-        }).Start();
+
+        Console.TreatControlCAsInput = true;
+        // new Thread(_ =>
+        // {
+        //     while (_context.ApplicationState == ApplicationState.Running)
+        //     {
+        //         
+        //     }
+        // }).Start();
         
         _context.ApplicationState = ApplicationState.Running;
         while (_context.ApplicationState == ApplicationState.Running)
@@ -95,7 +69,18 @@ public class Application
             {
                 Display();
             }
+            
+            while (Console.KeyAvailable)
+            {
+                var key = Console.ReadKey(true);
+                _mainWindow.ExecuteWindowKeyBinds(new Key(key.Key, key.Modifiers));
+            }
         }
+    }
+
+    public void Kill()
+    {
+        _context.ApplicationState = ApplicationState.Killed;
     }
 
     private void Display()

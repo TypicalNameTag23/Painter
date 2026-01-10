@@ -1,47 +1,36 @@
 namespace Painter;
 
-public class Key
+public record Key
 {
-    public Key(ConsoleKey key, params ConsoleModifiers[] modifiers)
+    public Key(ConsoleKey key, ConsoleModifiers modifier = ConsoleModifiers.None)
     {
         KeyType = key;
-        foreach (var modifier in modifiers)
-        {
-            KeyModifiers |= modifier;
-        }
-    }
+        KeyModifiers = modifier;
+        // foreach (var modifier in modifiers)
+        // {
+        //     KeyModifiers |= modifier;
+        //     // switch (modifier)
+        //     // {
+        //     //     case ConsoleModifiers.Alt:
+        //     //     {
+        //     //         KeyModifiers |= ConsoleModifiers.Alt;
+        //     //         break;
+        //     //     }
+        //     //     case ConsoleModifiers.Shift:
+        //     //     {
+        //     //         KeyModifiers |= ConsoleModifiers.Shift;
+        //     //         break;
+        //     //     }
+        //     //     case ConsoleModifiers.Control:
+        //     //     {
+        //     //         KeyModifiers |= ConsoleModifiers.Control;
+        //     //         break;
+        //     //     }
+        //     // }
+        // }
+    }    
 
     public ConsoleKey KeyType { get; }
     
     public ConsoleModifiers KeyModifiers { get; } = ConsoleModifiers.None;
-
-    public override bool Equals(object? other)
-    {
-        if (other is null)
-        {
-            return false;
-        }
-        
-        if (ReferenceEquals(this, other))
-        {
-            return true;
-        }
-
-        return other switch
-        {
-            Key key => key.KeyType == KeyType && key.KeyModifiers == KeyModifiers,
-            ConsoleKeyInfo keyInfo => keyInfo.Key == KeyType && keyInfo.Modifiers == KeyModifiers,
-            _ => false
-        };
-    }
-
-    protected bool Equals(Key other)
-    {
-        return KeyType == other.KeyType && KeyModifiers == other.KeyModifiers;
-    }
-
-    public override int GetHashCode()
-    {
-        return HashCode.Combine((int) KeyType, (int) KeyModifiers);
-    }
 }
