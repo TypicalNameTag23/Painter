@@ -22,7 +22,25 @@ public class Application
         set => _mainWindow.Drawable = value;
     }
     
-    public static event ConsoleCancelEventHandler? OnQuitKeyPress;
+    public void AddGlobalKeyBind(Key key, Action run)
+    {
+        _mainWindow.AddWindowKeyBind(key, run);
+    }
+    
+    public void RemoveGlobalKeyBind(Key key)
+    {
+        _mainWindow.RemoveWindowKeyBind(key);
+    }
+    
+    public IReadOnlyList<KeyBind> GetGlobalKeyBinds(Key key)
+    {
+        return _mainWindow.GetWindowKeyBinds(key);
+    }
+    
+    public IReadOnlyList<KeyBind> GetGlobalKeyBinds()
+    {
+        return _mainWindow.GetWindowKeyBinds();
+    }
     
     public void Start()
     {
@@ -39,24 +57,35 @@ public class Application
             AnsiTerminalCodes.ResetCursorPosition + 
             AnsiTerminalCodes.ResetStyles);
         
-        Console.CancelKeyPress += (sender, args) =>
+        Console.CancelKeyPress += (_, args) =>
         {
-            OnQuitKeyPress?.Invoke(sender, args);
-            if (args.Cancel)
-            {
-                return;
-            }
-            
-            _context.ApplicationState = ApplicationState.Killed;
-            Console.Write(
-                AnsiTerminalCodes.ResetStyles + 
-                AnsiTerminalCodes.ClearScreen + 
-                AnsiTerminalCodes.ResetForegroundColor +
-                AnsiTerminalCodes.ResetBackgroundColor +
-                AnsiTerminalCodes.ShowCursor + 
-                AnsiTerminalCodes.RestoreCursorPositon + 
-                AnsiTerminalCodes.RestoreScreen);
+            args.Cancel = true;
+            // _context.ApplicationState = ApplicationState.Killed;
+            // Console.Write(
+            //     AnsiTerminalCodes.ResetStyles + 
+            //     AnsiTerminalCodes.ClearScreen + 
+            //     AnsiTerminalCodes.ResetForegroundColor +
+            //     AnsiTerminalCodes.ResetBackgroundColor +
+            //     AnsiTerminalCodes.ShowCursor + 
+            //     AnsiTerminalCodes.RestoreCursorPositon + 
+            //     AnsiTerminalCodes.RestoreScreen);
         };
+        
+        new Thread(_ =>
+        {
+            while (_context.ApplicationState == ApplicationState.Running)
+            {
+                if (!Console.KeyAvailable)
+                {
+                    continue;
+                }
+                
+                foreach (var keyBind in _mainWindow.GetWindowKeyBinds(Console.ReadKey(true)))
+                {
+                    keyBind.Run();
+                }
+            }
+        }).Start();
         
         _context.ApplicationState = ApplicationState.Running;
         while (_context.ApplicationState == ApplicationState.Running)
@@ -92,11 +121,4 @@ public class Application
         _canvas.Resize(_context.Width, _context.Height);
         _context.NeedsFullRedraw = true;
     }
-}
-
-public enum ApplicationState
-{
-    Inactive,
-    Running,
-    Killed
 }

@@ -1,9 +1,10 @@
+using Painter.Drawables;
 using Painter.Drawing;
 using Painter.Elements;
 
 namespace Painter;
 
-public class Window : IDrawable
+public class Window : TopLevel, IDrawable
 {
     public Element? Drawable
     {
