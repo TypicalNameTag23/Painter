@@ -1,7 +1,3 @@
-using Painter.Drawables.DrawableImpl;
-using Painter.Drawing;
-using Painter.Events;
-
 namespace Painter.Drawables;
 
 public class ContentControl : Drawable

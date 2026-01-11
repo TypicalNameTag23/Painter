@@ -1,7 +1,6 @@
 ﻿using System.Drawing;
 using MusicPlayer.Player;
-using Painter.Drawables.DrawableImpl;
-using Painter.Drawables.TextBlock;
+using Painter.Drawables;
 
 namespace MusicPlayer.Drawables;
 

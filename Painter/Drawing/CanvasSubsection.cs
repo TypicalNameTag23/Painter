@@ -23,17 +23,27 @@ public class CanvasSubsection : ICanvas
 
     public void Draw(int x, int y, char character, Style style)
     {
+        if (x >= Width || x < 0 || y >= Height || y < 0)
+        {
+            return;
+        }
+        
         _fullCanvas.Draw(x + XOffset, y + YOffset, character, style);
     }
 
     public void Draw(int x, int y, Style style)
     {
-        _fullCanvas.Draw(x + XOffset, y + YOffset, style);
+        Draw(x + XOffset, y + YOffset, ' ', style);
     }
 
     public void Draw(int x, int y, object obj, Style style)
     {
-        _fullCanvas.Draw(x + XOffset, y + YOffset, obj, style);
+        var text = obj.ToString();
+        text = text?.Replace(Environment.NewLine, "");
+        for (var i = 0; i < text?.Length; i++)
+        {
+            Draw(x + i, y, text[i], style);
+        }
     }
 
     public ICanvas Subsection(int x, int y, int width, int height)

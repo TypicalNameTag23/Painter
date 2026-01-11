@@ -10,4 +10,5 @@ public record Style
     public bool Italic { get; init; }
     public bool Underline { get; init; }
     public bool Strikethrough { get; init; }
+    public bool Blinking { get; init; }
 }

@@ -1,8 +1,5 @@
-﻿using System;
-using Painter;
+﻿using Painter;
 using Painter.Drawables;
-using Painter.Drawables.Button;
-using Painter.Drawables.TextBlock;
 
 namespace Sample;
 
@@ -16,6 +13,18 @@ static class Program
             {
                 Content =
                 [
+                    new HsvColorSpaceVisualizer
+                    {
+                        FocusOrder = 4
+                    },
+                    new TextBox
+                    {
+                        Height = 2,
+                        Width = 20,
+                        X = 15,
+                        Y = 30,
+                        FocusOrder = 5
+                    },
                     new Button
                     {
                         Height = 4,
@@ -43,13 +52,13 @@ static class Program
                         FocusOrder = 3,
                         Content = new HsvColorSpaceVisualizer
                         {
-                            Focusable = false
+                            Focusable = false,
+                            Height = 20
                         }
-                    },
-                    new HsvColorSpaceVisualizer
+                    }.OnClick((button, _) =>
                     {
-                        FocusOrder = 4
-                    }
+                        ((HsvColorSpaceVisualizer)button.Content!).SaturationOffset += 0.01;
+                    })
                 ]
             }
         };

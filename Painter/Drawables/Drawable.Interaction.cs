@@ -1,13 +1,13 @@
-using System.Diagnostics;
+using Painter.Drawables.DrawableImpl;
 using Painter.Events;
 
-namespace Painter.Drawables.DrawableImpl;
+namespace Painter.Drawables;
 
 public abstract partial class Drawable
 {
     public virtual bool Focusable { get; set; }
 
-    public uint FocusOrder { get; set; }
+    public int FocusOrder { get; set; } = int.MaxValue;
 
     public virtual bool Focused
     {
@@ -36,7 +36,7 @@ public abstract partial class Drawable
         return null;
     }
 
-    internal void CycleFocus(CycleDirection cycleDirection)
+    internal void CycleFocus(Direction direction)
     {
         var focused = GetFocusedChild();
         var focusableChildren = GetFocusableChildren();
@@ -47,14 +47,14 @@ public abstract partial class Drawable
                 return;
             }
             
-            switch (cycleDirection)
+            switch (direction)
             {
-                case CycleDirection.Next:
+                case Direction.Backward:
                 {
                     focusableChildren[0].Focused = true;
                     break;
                 }
-                case CycleDirection.Previous:
+                case Direction.Forward:
                 {
                     focusableChildren[^1].Focused = true;
                     break;
@@ -66,9 +66,9 @@ public abstract partial class Drawable
 
         
         focused.Focused = false;
-        switch (cycleDirection)
+        switch (direction)
         {
-            case CycleDirection.Next:
+            case Direction.Backward:
             {
                 var nextIndex = focusableChildren.IndexOf(focused) + 1;
                 if (nextIndex == focusableChildren.Count)
@@ -79,7 +79,7 @@ public abstract partial class Drawable
                 focusableChildren[nextIndex].Focused = true;
                 break;
             }
-            case CycleDirection.Previous:
+            case Direction.Forward:
             {
                 var nextIndex = focusableChildren.IndexOf(focused) - 1;
                 if (nextIndex == -1)

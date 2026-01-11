@@ -2,7 +2,7 @@ using System.Drawing;
 using Painter.Drawing;
 using Painter.Events;
 
-namespace Painter.Drawables.Button;
+namespace Painter.Drawables;
 
 public class Button : ContentControl
 {

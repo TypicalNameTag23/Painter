@@ -1,24 +1,22 @@
 using System.Drawing;
-using Painter.Drawables.DrawableImpl;
 using Painter.Drawing;
-using Painter.Utils;
+using Painter.Utilities;
 
-namespace Painter.Drawables.TextBlock;
+namespace Painter.Drawables;
 
-// todo: dont allow strike through on empty space
 public class TextBlock : Drawable
 {
     public string Text
     {
-        get => field;
+        get;
         set => SetAndRedrawIfChanged(ref field, value);
     } = "";
 
-    public TextAlignment TextAlignment
+    public Alignment Alignment
     {
         get;
         set => SetAndRedrawIfChanged(ref field, value);
-    } = TextAlignment.Left;
+    } = Alignment.Left;
 
     public bool WrapText
     {
@@ -32,7 +30,7 @@ public class TextBlock : Drawable
         set => SetAndRedrawIfChanged(ref field, value);
     }
 
-    public Color? BackgroundColor
+    public virtual Color? BackgroundColor
     {
         get;
         set => SetAndRedrawIfChanged(ref field, value);
@@ -67,7 +65,7 @@ public class TextBlock : Drawable
              textIndex += width, lastLine++)
         {
             var endIndex = textIndex + width;
-            lines[lastLine + 1] = text.SubstringSafely(textIndex, endIndex).Align(width, TextAlignment);
+            lines[lastLine + 1] = text.SubstringSafely(textIndex, endIndex).Align(width, Alignment);
         }
         
         for (var i = 0; i < lines.Length; i++)

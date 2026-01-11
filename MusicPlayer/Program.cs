@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using MusicPlayer.Drawables;
+﻿using MusicPlayer.Drawables;
 using MusicPlayer.Models;
 using MusicPlayer.Player;
 using Painter;
@@ -33,22 +30,22 @@ class Program
         _player.Queue(tracks);
         var application = new Application
         {
-            Content = new Panel
+            Content = new StackPanel
             {
                 Content = [
-                    new PlayerTrackInfo(_player),
+                    new PlayerTrackInfo(_player)
+                    {
+                        Height = 1
+                    },
                     new PlayerProgressBar(_player)
                     {
-                        Y = 2
+                        Height = 1
                     },
                     new PlaybackInformation(_player)
                     {
-                        Y = 3
+                        Height = 1
                     },
                     new PlayerTracksViewer(_player)
-                    {
-                        Y = 6
-                    }
                 ]
             }
         };

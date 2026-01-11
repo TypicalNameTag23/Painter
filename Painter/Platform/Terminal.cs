@@ -80,6 +80,11 @@ internal abstract class Terminal
         {
             _buffer.Append(AnsiTerminalCodes.SetUnderlineMode(style.Underline));
         }
+        
+        if (_currentStyle.Blinking != style.Blinking)
+        {
+            _buffer.Append(AnsiTerminalCodes.SetBlinkingMode(style.Blinking));
+        }
 
         _currentStyle = style;
     }

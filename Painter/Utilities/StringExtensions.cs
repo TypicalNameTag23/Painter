@@ -1,7 +1,4 @@
-using Painter.Drawables;
-using Painter.Drawables.TextBlock;
-
-namespace Painter.Utils;
+namespace Painter.Utilities;
 
 public static class StringExtensions
 {
@@ -29,16 +26,16 @@ public static class StringExtensions
     /// <param name="width"></param>
     /// <param name="alignment"></param>
     /// <returns></returns>
-    public static string Align(this string text, int width, TextAlignment alignment)
+    public static string Align(this string text, int width, Alignment alignment)
     {
         switch (alignment)
         {
-            case TextAlignment.Right:
+            case Alignment.Right:
             {
                 return text.PadLeft(width, ' ');
             }
 
-            case TextAlignment.Center:
+            case Alignment.Center:
             {
                 var leftPadding = width / 2 + text.Length / 2;
                 text = text.PadLeft(leftPadding, ' ');
@@ -46,7 +43,7 @@ public static class StringExtensions
                 break;
             }
 
-            case TextAlignment.Left:
+            case Alignment.Left:
             {
                 return text.PadRight(width, ' ');
             }

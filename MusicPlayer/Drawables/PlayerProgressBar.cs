@@ -1,7 +1,6 @@
-﻿using System;
-using MusicPlayer.Player;
+﻿using MusicPlayer.Player;
 using MusicPlayer.Utilities;
-using Painter.Drawables.DrawableImpl;
+using Painter.Drawables;
 using Painter.Drawing;
 
 namespace MusicPlayer.Drawables;

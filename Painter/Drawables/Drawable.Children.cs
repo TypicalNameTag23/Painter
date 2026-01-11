@@ -1,24 +1,23 @@
 using Painter.Drawing;
-using Painter.Events;
 
-namespace Painter.Drawables.DrawableImpl;
+namespace Painter.Drawables;
 
 public abstract partial class Drawable
 {
     internal readonly List<Drawable> _children = [];
 
     /// <summary>
-    /// Returns a <see cref="IReadOnlyList"/> of the current <see cref="Drawable"/>s that are attached to this <see cref="Drawable"/>
+    /// Returns a <see cref="IReadOnlyList"/> of the current <see cref="Drawables.Drawable"/>s that are attached to this <see cref="Drawables.Drawable"/>
     /// </summary>
     protected IReadOnlyList<Drawable> Children => _children.AsReadOnly();
 
     /// <summary>
-    /// Attaches a child <see cref="Drawable"/> to this <see cref="Drawable"/>
+    /// Attaches a child <see cref="index"/> to this <see cref="Painter.Drawables.Drawable"/>
     /// </summary>
     /// <param name="index">The index to attach this drawable at</param>
     /// <param name="drawable">The drawable to attach</param>
     /// <remarks>
-    /// The <see cref="Drawable"/> will not be attached if it is already attached to another <see cref="Drawable"/>
+    /// The <see cref="Drawables.Drawable"/> will not be attached if it is already attached to another <see cref="Drawables.Drawable"/>
     /// <br/>
     /// Lower indexes get rendered first
     /// </remarks>

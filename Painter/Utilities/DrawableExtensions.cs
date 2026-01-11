@@ -1,6 +1,6 @@
-using Painter.Drawing;
+using Painter.Drawables;
 
-namespace Painter.Drawables.DrawableImpl;
+namespace Painter.Utilities;
 
 public static class DrawableExtensions
 {

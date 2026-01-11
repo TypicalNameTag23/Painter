@@ -1,7 +1,6 @@
 using Painter.Drawing;
-using Painter.Events;
 
-namespace Painter.Drawables.DrawableImpl;
+namespace Painter.Drawables;
 
 public abstract partial class Drawable : IComparable
 {
@@ -175,7 +174,7 @@ public abstract partial class Drawable : IComparable
         }
     }
 
-    public void DrawImpl(ICanvas canvas)
+    public virtual void DrawImpl(ICanvas canvas)
     {
         Draw(canvas);
         DrawChildren(canvas);

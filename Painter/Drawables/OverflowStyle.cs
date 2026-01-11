@@ -1,4 +1,4 @@
-namespace Painter.Drawables.TextBlock;
+namespace Painter.Drawables;
 
 public enum OverflowStyle
 {

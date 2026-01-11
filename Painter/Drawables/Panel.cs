@@ -1,4 +1,3 @@
-using Painter.Drawables.DrawableImpl;
 using Painter.Events;
 
 namespace Painter.Drawables;
@@ -19,7 +18,7 @@ public class Panel : Drawable
 
     public void Add(Drawable drawable)
     {
-        AttachFirst(drawable);
+        Attach(drawable);
     }
 
     public void Add(params Drawable[] drawables)

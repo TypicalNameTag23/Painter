@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading;
-using Painter.Drawables.DrawableImpl;
+﻿using Painter.Drawables;
 using Painter.Drawing;
 using Painter.Events;
 

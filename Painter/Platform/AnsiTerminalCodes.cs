@@ -40,6 +40,11 @@ internal static class AnsiTerminalCodes
         return enabled ? EnableBoldMode : DisableBoldMode;
     }
     
+    internal static string SetBlinkingMode(bool enabled)
+    {
+        return enabled ? EnableBlinkingMode : DisableBlinkingMode;
+    }
+    
     internal static string SetItalicsMode(bool enabled)
     {
         return enabled ? EnableItalicMode : DisableItalicMode;

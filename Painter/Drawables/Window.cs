@@ -1,5 +1,4 @@
 using Painter.Drawables.DrawableImpl;
-using Painter.Drawing;
 using Painter.Events;
 
 namespace Painter.Drawables;
@@ -8,24 +7,28 @@ public class Window : TopLevel
 {
     public override void Interact(KeyPressedEventArgs args)
     {
+        ExecuteWindowKeyBinds(args);
+        if (args.Handled)
+        {
+            return;
+        }
+        
         switch (args.Key)
         {
             case { KeyType: ConsoleKey.Tab, KeyModifiers: ConsoleModifiers.None }:
             {
-                CycleFocus(CycleDirection.Next);
+                CycleFocus(Direction.Backward);
+                args.Handled = true;
                 return;
             }
             case { KeyType: ConsoleKey.Tab, KeyModifiers: ConsoleModifiers.Shift }:
             {
-                CycleFocus(CycleDirection.Previous);
+                CycleFocus(Direction.Forward);
+                args.Handled = true;
                 return;
             }
         }
 
         GetFocusedChild()?.Interact(args);
-        if (!args.Handled)
-        {
-            ExecuteWindowKeyBinds(args.Key);
-        }
     }
 }

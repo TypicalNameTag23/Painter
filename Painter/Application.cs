@@ -1,5 +1,4 @@
 using Painter.Drawables;
-using Painter.Drawables.DrawableImpl;
 using Painter.Drawing;
 using Painter.Events;
 using Painter.Platform;
@@ -85,7 +84,7 @@ public class Application
             while (Console.KeyAvailable)
             {
                 var key = Console.ReadKey(true);
-                _mainWindow.Interact(new KeyPressedEventArgs(new Key(key.Key, key.Modifiers)));
+                _mainWindow.Interact(new KeyPressedEventArgs(new Key(key.Key, key.Modifiers), key.KeyChar));
             }
         }
     }
