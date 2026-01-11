@@ -73,8 +73,8 @@ static class Program
 
         var grid = new Grid
         {
-            RowDefinitions = RowDefinition.Of("2*, 2*, 8*"),
-            ColumnDefinitions = ColumnDefinition.Of("3*, 1*, 6*")
+            RowDefinitions = RowDefinition.Of("2*, 20, 4*"),
+            ColumnDefinitions = ColumnDefinition.Of("3*, 1*, 100")
         };
 
         for (var i = 0; i < 3; i++)
@@ -90,7 +90,7 @@ static class Program
         }
 
         var x = 0;
-        grid.SetContent(2, 0, new HsvColorSpaceVisualizer
+        grid.SetContent(1, 0, new HsvColorSpaceVisualizer
             {
                 FocusOrder = 2
             })

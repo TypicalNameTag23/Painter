@@ -94,14 +94,16 @@ public class Grid : Drawable
         }
         
         var availableWidth = MeasureAbsoluteColumns();
+        var finalStarWidth = Width;
         var starColumns = GetStarColumns();
         var columnPercentage = 1 / starColumns.Sum(column => column.Item2.Length.Value);
         foreach (var (index, column) in starColumns)
         {
             var width = index == _columnDefinitions.Length - 1 
-                ? availableWidth 
+                ? finalStarWidth 
                 : (int) (availableWidth * column.Length.Value * columnPercentage);
             
+            finalStarWidth -= width;
             for (var row = 0; row < _columnDefinitions.Length; row++)
             {
                 _content[row, index].Width = width;
@@ -109,14 +111,16 @@ public class Grid : Drawable
         }
 
         var availableHeight = MeasureAbsoluteRows();
+        var finalStarHeight = Height;
         var starRows = GetStarRows();
         var rowPercentage = 1 / starRows.Sum(row => row.Item2.Length.Value);
         foreach (var (index, row) in starRows)
         {
             var height = index == _rowDefinitions.Length - 1
-                ? availableHeight
+                ? finalStarHeight
                 : (int)(availableHeight * row.Length.Value * rowPercentage);
             
+            finalStarHeight -= height;
             for (var column = 0; column < _columnDefinitions.Length; column++)
             {
                 _content[index, column].Height = height;
