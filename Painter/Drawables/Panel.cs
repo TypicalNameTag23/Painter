@@ -1,5 +1,4 @@
 using Painter.Drawables.DrawableImpl;
-using Painter.Drawing;
 using Painter.Events;
 
 namespace Painter.Drawables;
@@ -48,6 +47,4 @@ public class Panel : Drawable
     {
         DetachAll();
     }
-
-    protected override void DrawImpl(Canvas canvas) { }
 }

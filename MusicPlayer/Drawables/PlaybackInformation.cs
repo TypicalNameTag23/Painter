@@ -15,9 +15,8 @@ public class PlaybackInformation : Drawable
         var textBlock = new TextBlock
         {
             Text = DisplayText(),
-            Height = 1, // jank, please fix
             TextColor = Color.Aquamarine,
-            Y = 3
+            Height = 1
         };
         
         Attach(textBlock);

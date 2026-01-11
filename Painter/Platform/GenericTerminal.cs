@@ -1,3 +1,3 @@
 namespace Painter.Platform;
 
-public class GenericTerminal : Terminal;
+internal class GenericTerminal : Terminal;

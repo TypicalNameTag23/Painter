@@ -4,7 +4,7 @@ using Painter.Drawing;
 
 namespace Painter.Platform;
 
-public abstract class Terminal
+internal abstract class Terminal
 {
     private readonly StringBuilder _buffer = new(AnsiTerminalCodes.ResetCursorPosition);
     private Style _currentStyle = new();

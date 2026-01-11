@@ -44,7 +44,7 @@ public class TextBlock : Drawable
         set => SetAndRedrawIfChanged(ref field, value);
     } = OverflowStyle.Ellipses;
     
-    protected override void DrawImpl(Canvas canvas)
+    protected override void Draw(ICanvas canvas)
     {
         var width = Width;
         var height = Height;

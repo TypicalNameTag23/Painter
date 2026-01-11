@@ -19,7 +19,7 @@ public abstract partial class Drawable : IComparable
     public bool NeedsRedraw
     {
         get;
-        set
+        internal set
         {
             if (field == value)
             {
@@ -175,26 +175,11 @@ public abstract partial class Drawable : IComparable
         }
     }
 
-    public void Draw(Canvas canvas)
+    public void DrawImpl(ICanvas canvas)
     {
-        DrawImpl(canvas);
-        
-        foreach (var drawable in _children)
-        {
-            drawable.Draw(canvas);
-        }
+        Draw(canvas);
+        DrawChildren(canvas);
     }
-
-    public void RequestRedraw()
-    {
-        NeedsRedraw = true;
-    }
-
-    /// <summary>
-    /// Draws this drawable to the canvas
-    /// </summary>
-    /// <param name="canvas"></param>
-    protected virtual void DrawImpl(Canvas canvas) { }
 
     public int CompareTo(object? obj)
     {
@@ -215,7 +200,15 @@ public abstract partial class Drawable : IComparable
             
         return FocusOrder > other.FocusOrder ? 1 : 0;
     }
-    
+
+    protected virtual void Draw(ICanvas canvas) { }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="field"></param>
+    /// <param name="value"></param>
+    /// <typeparam name="T"></typeparam>
     protected void SetAndRedrawIfChanged<T>(ref T field, T value)
     {
         if (EqualityComparer<T>.Default.Equals(field, value))
@@ -224,6 +217,14 @@ public abstract partial class Drawable : IComparable
         }
 
         field = value;
+        NeedsRedraw = true;
+    }
+
+    /// <summary>
+    /// Request that this <see cref="Drawable"/> be redrawn on the next render pass
+    /// </summary>
+    protected void RequestRedraw()
+    {
         NeedsRedraw = true;
     }
 }

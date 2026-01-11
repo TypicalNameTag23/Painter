@@ -14,7 +14,7 @@ public class PlayerProgressBar : Drawable
         _player.PlaybackTimeChangedEvent += RequestRedraw;
     }
     
-    protected override void DrawImpl(Canvas canvas)
+    protected override void Draw(ICanvas canvas)
     {
         var width = Width;
 

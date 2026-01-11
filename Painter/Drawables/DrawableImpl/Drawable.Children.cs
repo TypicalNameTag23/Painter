@@ -111,4 +111,13 @@ public abstract partial class Drawable
         focusableChildren.Sort();
         return focusableChildren;
     }
+
+    protected void DrawChildren(ICanvas canvas)
+    {
+        var canvasSubsection = canvas.Subsection(X, Y, Width, Height);
+        foreach (var drawable in _children)
+        {
+            drawable.DrawImpl(canvasSubsection);
+        }
+    }
 }

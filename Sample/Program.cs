@@ -39,14 +39,12 @@ static class Program
                         Height = 2,
                         X = 10,
                         Y = 5,
-                        FocusOrder = 3
-                    }.OnClick((button, _) =>
+                        FocusOrder = 3,
+                        Content = new HsvColorSpaceVisualizer
                         {
-                            if (button.Content != null)
-                            {
-                                
-                            }
-                        }),
+                            Focusable = false
+                        }
+                    },
                     new HsvColorSpaceVisualizer
                     {
                         FocusOrder = 4

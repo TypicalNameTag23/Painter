@@ -16,6 +16,7 @@ public class PlayerTracksViewer : Drawable
     public PlayerTracksViewer(IAudioPlayer player)
     {
         _player = player;
+        UpdateRows();
         player.TrackChangedEvent += UpdateRows;
     }
 
@@ -28,7 +29,7 @@ public class PlayerTracksViewer : Drawable
                 var textBlock = new TextBlock
                 {
                     Height = 1,
-                    Y = Y + i,
+                    Y = i,
                     OverflowStyle = OverflowStyle.Ellipses,
                     TextColor = Color.Wheat
                 };

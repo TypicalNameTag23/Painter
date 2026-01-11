@@ -10,11 +10,11 @@ public class Application
 {
     private readonly Terminal _terminal = Terminal.GetPlatformTerminal();
     private readonly Window _mainWindow;
-    private readonly Canvas _canvas;
+    private readonly TerminalCanvas _canvas;
 
     public Application()
     {
-        _canvas = new Canvas(_terminal, Width, Height);
+        _canvas = new TerminalCanvas(_terminal, Width, Height);
         _mainWindow = new Window();
     }
 
@@ -97,7 +97,7 @@ public class Application
 
     private void DrawAndDisplay()
     {
-        _mainWindow.Draw(_canvas);
+        _mainWindow.DrawImpl(_canvas);
         _canvas.Display();
         _mainWindow.NeedsRedraw = false;
     }
@@ -117,4 +117,11 @@ public class Application
         _canvas.Resize(width, height);
         _mainWindow.NeedsRedraw = true;
     }
+}
+
+public enum ApplicationState
+{
+    Inactive,
+    Running,
+    Killed
 }

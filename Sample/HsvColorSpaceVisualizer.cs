@@ -6,9 +6,7 @@ namespace Sample;
 
 public class HsvColorSpaceVisualizer : Drawable
 {
-    // Here to prevent GC (?) from cleaning it up
-    // ReSharper disable once NotAccessedField.Local
-    private Timer _timer;
+    private readonly Timer _timer;
 
     public HsvColorSpaceVisualizer()
     {
@@ -19,8 +17,6 @@ public class HsvColorSpaceVisualizer : Drawable
             {
                 HueOffset = 0;
             }
-            
-            NeedsRedraw = true;
         }, null , 250, 50);
     }
 
@@ -30,11 +26,7 @@ public class HsvColorSpaceVisualizer : Drawable
         set
         {
             var offset = value;
-            if (offset > 359)
-            {
-                offset = 0;
-            }
-            else if (offset < 0)
+            if (offset is > 359 or < 0)
             {
                 offset = 0;
             }
@@ -49,15 +41,11 @@ public class HsvColorSpaceVisualizer : Drawable
         set
         {
             var offset = value;
-            if (offset > 1)
-            {
-                offset = 0;
-            } 
-            else if (offset < 0)
+            if (offset is > 1 or < 0)
             {
                 offset = 0;
             }
-            
+
             SetAndRedrawIfChanged(ref field, offset);
         }
     }
@@ -93,7 +81,7 @@ public class HsvColorSpaceVisualizer : Drawable
         }
     }
 
-    protected override void DrawImpl(Canvas canvas)
+    protected override void Draw(ICanvas canvas)
     {
         var width = Width;
         var height = Height;
@@ -133,6 +121,6 @@ public class HsvColorSpaceVisualizer : Drawable
         
         args.Handled = true;
         SaturationOffset += 0.1;
-        NeedsRedraw = true;
+        RequestRedraw();
     }
 }

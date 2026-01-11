@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace Painter.Platform;
 
-public class WindowsTerminal : Terminal
+internal class WindowsTerminal : Terminal
 {
     const int STD_OUTPUT_HANDLE = -11;
     private const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4;
