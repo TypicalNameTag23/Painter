@@ -1,4 +1,7 @@
-﻿using MusicPlayer.Drawables;
+﻿using System;
+using System.IO;
+using System.Threading.Tasks;
+using MusicPlayer.Drawables;
 using MusicPlayer.Models;
 using MusicPlayer.Player;
 using Painter;
@@ -16,7 +19,7 @@ class Program
     
     static async Task Main()
     {
-        var tracks = new List<AudioTrack>();
+        var tracks = new System.Collections.Generic.List<AudioTrack>();
         foreach (var filePath in Directory.GetFiles(AudioFolder))
         {
             var track = await AudioTrackFactory.CreateFromFileAsync(filePath);

@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Collections.Generic;
+using System.Drawing;
 using MusicPlayer.Player;
 using Painter.Drawables.DrawableImpl;
 using Painter.Drawables.TextBlock;

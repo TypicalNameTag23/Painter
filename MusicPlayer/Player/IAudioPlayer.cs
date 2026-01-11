@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using MusicPlayer.Events;
 using MusicPlayer.Models;
 

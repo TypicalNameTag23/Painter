@@ -1,3 +1,5 @@
+using System;
+
 namespace MusicPlayer.Models;
 
 public record AudioTrack(string Path, TrackSource TrackSource, TrackMeta TrackMeta) : IComparable

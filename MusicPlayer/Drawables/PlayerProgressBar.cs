@@ -1,4 +1,5 @@
-﻿using MusicPlayer.Player;
+﻿using System;
+using MusicPlayer.Player;
 using MusicPlayer.Utilities;
 using Painter.Drawables.DrawableImpl;
 using Painter.Drawing;
