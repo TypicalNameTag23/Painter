@@ -1,36 +1,30 @@
 ﻿using System.Drawing;
 using MusicPlayer.Player;
-using Painter.Drawing;
-using Painter.Elements;
+using Painter.Drawables.DrawableImpl;
+using Painter.Drawables.TextBlock;
 
 namespace MusicPlayer.Drawables;
 
-public class PlayerTrackInfo : Element
+public class PlayerTrackInfo : Drawable
 {
-    private readonly TextBlock _textBlock;
     private readonly IAudioPlayer _player;
 
     public PlayerTrackInfo(IAudioPlayer player)
     {
         _player = player;
-        _textBlock = new TextBlock
+        var textBlock = new TextBlock
         {
-            Parent = this,
             Height = 1,
             OverflowStyle = OverflowStyle.Ellipses,
             Text = GetDisplayTitle(),
             TextColor = Color.Aquamarine
         };
         
+        Attach(textBlock);
         player.TrackChangedEvent += () =>
         {
-            _textBlock.Text = GetDisplayTitle();
+            textBlock.Text = GetDisplayTitle();
         };
-    }
-    
-    protected override void DrawElement(Canvas canvas, bool force)
-    {
-        _textBlock.Draw(canvas, force);
     }
 
     private string GetDisplayTitle()

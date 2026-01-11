@@ -2,11 +2,10 @@ using Painter.Platform;
 
 namespace Painter.Drawing;
 
-// todo: is there a way to check what the current pixel at some index is without having that be slower than just printing that pixel again?
-// todo: fix tearing issues with resizing on windows
 public class Canvas
 {
     private readonly Terminal _terminal;
+    private Dictionary<(int, int), (char, Style)> _pixels = [];
 
     public int Width { get; private set; }
     public int Height { get; private set; }
@@ -17,37 +16,61 @@ public class Canvas
         Height = height;
         _terminal = terminal;
     }
-    
-    // todo: handle newline characters
-    public void Draw(int x, int y, string text, Style style)
+
+    public void Draw(int x, int y, char character, Style style)
     {
-        // make sure we aren't trying to draw out of the bounds of the canvas
-        if (x >= Width || y >= Height || y < 0)
+        if (x >= Width || x < 0 || y >= Height || y < 0)
         {
             return;
         }
 
-        // if the thing being drawn is placed off the left side of the canvas but still has some text that shows up 
-        if (x < 0 && x + text.Length >= 0)
-        {
-            // trim the text to the parts that would be on the canvas
-            text = text[-x..];
-            x = 0;
-        }
+        _pixels[(x, y)] = (character, style);
+    }
 
-        // trim text to canvas' area if it goes outside the right side of the canvas
-        if (x + text.Length > Width)
+    public void Draw(int x, int y, Style style)
+    {
+        Draw(x, y, ' ', style);
+    }
+    
+    // todo: handle newline characters
+    public void Draw(int x, int y, object obj, Style style)
+    {
+        // // make sure we aren't trying to draw out of the bounds of the canvas
+        // if (x >= Width || y >= Height || y < 0)
+        // {
+        //     return;
+        // }
+        //
+        // // if the thing being drawn is placed off the left side of the canvas but still has some text that shows up 
+        // if (x < 0 && x + text.Length >= 0)
+        // {
+        //     // trim the text to the parts that would be on the canvas
+        //     text = text[-x..];
+        //     x = 0;
+        // }
+        //
+        // // trim text to canvas' area if it goes outside the right side of the canvas
+        // if (x + text.Length > Width)
+        // {
+        //     text = text[..(Width - x)];
+        // }
+        var text = obj.ToString();
+        for (var i = 0; i < text?.Length; i++)
         {
-            text = text[..(Width - x)];
+            Draw(x + i, y, text[i], style);
         }
-        
-        _terminal.SetCursorPosition(x, y);
-        _terminal.SetStyle(style);
-        _terminal.Write(text);
     }
 
     public void Display()
     {
+        foreach (var ((x, y), (character, style)) in _pixels)
+        {
+            _terminal.SetCursorPosition(x, y);
+            _terminal.SetStyle(style);
+            _terminal.Write(character);
+        }
+
+        _pixels.Clear();
         _terminal.Flush();
     }
 
@@ -58,6 +81,7 @@ public class Canvas
             return;
         }
         
+        _pixels.Clear();
         Width = width;
         Height = height;
     }

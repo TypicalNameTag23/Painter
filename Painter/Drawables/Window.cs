@@ -1,31 +1,31 @@
-using Painter.Drawables;
+using Painter.Drawables.DrawableImpl;
 using Painter.Drawing;
-using Painter.Elements;
+using Painter.Events;
 
-namespace Painter;
+namespace Painter.Drawables;
 
-public class Window : TopLevel, IDrawable
+public class Window : TopLevel
 {
-    public Element? Drawable
+    public override void Interact(KeyPressedEventArgs args)
     {
-        get;
-        set
+        switch (args.Key)
         {
-            field?.Parent = null;
-            field = value;
-            field?.Parent = this;
+            case { KeyType: ConsoleKey.Tab, KeyModifiers: ConsoleModifiers.None }:
+            {
+                CycleFocus(CycleDirection.Next);
+                return;
+            }
+            case { KeyType: ConsoleKey.Tab, KeyModifiers: ConsoleModifiers.Shift }:
+            {
+                CycleFocus(CycleDirection.Previous);
+                return;
+            }
+        }
+
+        GetFocusedChild()?.Interact(args);
+        if (!args.Handled)
+        {
+            ExecuteWindowKeyBinds(args.Key);
         }
     }
-
-    public virtual IDrawable? Parent { get; set; }
-    
-    public int Width { get; set; }
-    
-    public int Height { get; set; }
-
-    public void Draw(Canvas canvas, bool force)
-    {
-        Drawable?.Draw(canvas, force);
-    }
-    
 }

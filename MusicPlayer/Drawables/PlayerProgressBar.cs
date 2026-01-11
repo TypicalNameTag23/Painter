@@ -1,20 +1,20 @@
 ﻿using MusicPlayer.Player;
 using MusicPlayer.Utilities;
+using Painter.Drawables.DrawableImpl;
 using Painter.Drawing;
-using Painter.Elements;
 
 namespace MusicPlayer.Drawables;
 
-public class PlayerProgressBar : Element
+public class PlayerProgressBar : Drawable
 {
     private readonly IAudioPlayer _player;
     public PlayerProgressBar(IAudioPlayer player)
     {
         _player = player;
-        _player.PlaybackTimeChangedEvent += Redraw;
+        _player.PlaybackTimeChangedEvent += RequestRedraw;
     }
     
-    protected override void DrawElement(Canvas canvas, bool force)
+    protected override void DrawImpl(Canvas canvas)
     {
         var width = Width;
 
@@ -26,26 +26,10 @@ public class PlayerProgressBar : Element
         var hueStep = 359d / width;
         for (var x = 0; x < trackProgress; x++)
         {
-            try
+            canvas.Draw(X + x + 8, Y, " ", new Style
             {
-                var hue = hueStep * x;
-                if (hue > 359)
-                {
-                    Console.WriteLine("a");
-                }
-                
-                canvas.Draw(X + x + 8, Y, " ", new Style
-                {
-                    BackgroundColor = ColorHelper.FromHsv(hue, 1, 1)
-                });
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(trackProgress);
-                Console.WriteLine(_player.CurrentTrackIndex);
-                Console.WriteLine(width);
-                Console.WriteLine($"{_player.TrackTime:mm':'ss}");
-            }
+                BackgroundColor = ColorHelper.FromHsv(hueStep * x, 1, 1)
+            });
         }
 
         var brightnessStep = 0.2d / width;

@@ -1,10 +1,12 @@
 using System.Drawing;
+using Painter.Drawables.DrawableImpl;
 using Painter.Drawing;
+using Painter.Utils;
 
-namespace Painter.Elements;
+namespace Painter.Drawables.TextBlock;
 
 // todo: dont allow strike through on empty space
-public class TextBlock : Element
+public class TextBlock : Drawable
 {
     public string Text
     {
@@ -20,17 +22,8 @@ public class TextBlock : Element
 
     public bool WrapText
     {
-        get => field;
-        set
-        {
-            if (WrapText == value)
-            {
-                return;
-            }
-
-            field = value;
-            Redraw();
-        }
+        get;
+        set => SetAndRedrawIfChanged(ref field, value);
     } = true;
 
     public Color? TextColor
@@ -51,7 +44,7 @@ public class TextBlock : Element
         set => SetAndRedrawIfChanged(ref field, value);
     } = OverflowStyle.Ellipses;
     
-    protected override void DrawElement(Canvas canvas, bool force)
+    protected override void DrawImpl(Canvas canvas)
     {
         var width = Width;
         var height = Height;
@@ -74,7 +67,7 @@ public class TextBlock : Element
              textIndex += width, lastLine++)
         {
             var endIndex = textIndex + width;
-            lines[lastLine + 1] = Align(Substring(text, textIndex, endIndex), width, TextAlignment);
+            lines[lastLine + 1] = text.SubstringSafely(textIndex, endIndex).Align(width, TextAlignment);
         }
         
         for (var i = 0; i < lines.Length; i++)
@@ -83,55 +76,8 @@ public class TextBlock : Element
             {
                 ForegroundColor = TextColor,
                 BackgroundColor = BackgroundColor,
-                Bold = true,
-                // Strikethrough = true
             };
             canvas.Draw(X, Y + i, lines[i] is null ? new string(' ', width) : lines[i]!, style);
         }
     }
-
-    private string Substring(string text, int from, int to)
-    {
-        return text[from..(to > text.Length ? text.Length : to)];
-    }
-    
-    //todo: fix right align
-    private string Align(string text, int width, TextAlignment alignment)
-    {
-        switch (alignment)
-        {
-            case TextAlignment.Right:
-            {
-                return text.PadLeft(width, ' ');
-            }
-
-            case TextAlignment.Center:
-            {
-                var leftPadding = width / 2 + text.Length / 2;
-                text = text.PadLeft(leftPadding, ' ');
-                text = text.PadRight(width, ' ');
-                return text;
-            }
-
-            case TextAlignment.Left:
-            {
-                return text.PadRight(width, ' ');
-            }
-        }
-
-        return text;
-    }
-}
-
-public enum OverflowStyle
-{
-    Ellipses,
-    Cutoff
-}
-
-public enum TextAlignment
-{
-    Left,
-    Center,
-    Right
 }

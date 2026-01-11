@@ -1,19 +1,42 @@
 using Painter.Drawing;
+using Painter.Events;
 
-namespace Painter.Elements;
+namespace Painter.Drawables.DrawableImpl;
 
-//todo: horizontal and vertical alignments in respect to parent
-public abstract class Element : IDrawable
+public abstract partial class Drawable : IComparable
 {
     private int? _width;
     private int? _height;
-    
-    public virtual bool NeedsRedraw { get; private set; }
 
-    public IDrawable? Parent
+    public bool Visible { get; set; } = true;
+
+    public Drawable? Parent
     {
-        get; 
-        set => SetAndRedrawIfChanged(ref field, value);
+        get;
+        internal set;
+    }
+
+    public bool NeedsRedraw
+    {
+        get;
+        set
+        {
+            if (field == value)
+            {
+                return;
+            }
+            
+            field = value;
+            foreach (var drawable in Children)
+            {
+                drawable.NeedsRedraw = field;
+            }
+            
+            if (field)
+            {
+                Parent?.NeedsRedraw = true;
+            }
+        }
     }
 
     public int X
@@ -152,35 +175,47 @@ public abstract class Element : IDrawable
         }
     }
 
-    public void Draw(Canvas canvas, bool force)
+    public void Draw(Canvas canvas)
     {
-        if (!NeedsRedraw && !force)
-        {
-            return;
-        }
+        DrawImpl(canvas);
         
-        DrawElement(canvas, force);
-        NeedsRedraw = false;
+        foreach (var drawable in _children)
+        {
+            drawable.Draw(canvas);
+        }
     }
 
-    protected void Redraw()
+    public void RequestRedraw()
     {
         NeedsRedraw = true;
-        var mainWindow = GetMainWindow();
-        mainWindow?.RequestRedraw(this);
     }
 
-    protected MainWindow? GetMainWindow()
+    /// <summary>
+    /// Draws this drawable to the canvas
+    /// </summary>
+    /// <param name="canvas"></param>
+    protected virtual void DrawImpl(Canvas canvas) { }
+
+    public int CompareTo(object? obj)
     {
-        var ancestor = Parent;
-        while (ancestor is not null && ancestor is not Window)
+        if (obj is Drawable other)
         {
-            ancestor = ancestor.Parent;
+            return CompareTo(other);
         }
 
-        return (MainWindow?)ancestor;
+        return -1;
     }
 
+    public int CompareTo(Drawable? other)
+    {
+        if (other is null || FocusOrder < other.FocusOrder)
+        {
+            return -1;
+        }
+            
+        return FocusOrder > other.FocusOrder ? 1 : 0;
+    }
+    
     protected void SetAndRedrawIfChanged<T>(ref T field, T value)
     {
         if (EqualityComparer<T>.Default.Equals(field, value))
@@ -189,8 +224,6 @@ public abstract class Element : IDrawable
         }
 
         field = value;
-        Redraw();
+        NeedsRedraw = true;
     }
-    
-    protected abstract void DrawElement(Canvas canvas, bool force);
 }

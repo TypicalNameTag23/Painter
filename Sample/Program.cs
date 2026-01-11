@@ -1,7 +1,7 @@
-﻿using System.Drawing;
-using Painter;
-using Painter.Elements;
-using Painter.Layouts;
+﻿using Painter;
+using Painter.Drawables;
+using Painter.Drawables.Button;
+using Painter.Drawables.TextBlock;
 
 namespace Sample;
 
@@ -11,9 +11,56 @@ static class Program
     {
         var app = new Application
         {
-            Drawable = new Panel
+            Content = new Panel
             {
-                Elements = [
+                Content =
+                [
+                    new Button
+                    {
+                        Height = 4,
+                        Width = 10,
+                        FocusOrder = 2,
+                        Content = new Button
+                        {
+                            Width = 2,
+                            Height = 2,
+                            FocusOrder = 1,
+                        }.OnClick((button, _) =>
+                            {
+                                button.Content = new TextBlock
+                                {
+                                    Text = "asd"
+                                };
+                            })
+                    },
+                    new Button
+                    {
+                        Width = 30,
+                        Height = 2,
+                        X = 10,
+                        Y = 5,
+                        FocusOrder = 3
+                    }.OnClick((button, _) =>
+                        {
+                            if (button.Content != null)
+                            {
+                                
+                            }
+                        }),
+                    new HsvColorSpaceVisualizer
+                    {
+                        FocusOrder = 4
+                    }
+                ]
+            }
+        };
+        
+        app.AddGlobalKeyBind(new Key(ConsoleKey.C, ConsoleModifiers.Control), app.Kill);
+        app.Start();
+    }
+}
+
+
                     // new TextBlock 
                     // {
                         // Text = "This is a big block of text that will show me how bad of a developer I am! This is soooo much fun!!!!!",
@@ -58,12 +105,3 @@ static class Program
                         // BackgroundColor = Color.FromArgb(100, 60, 150),
                         // TextAlignment = TextAlignment.Right
                     // },
-                    new HsvColorSpaceVisualizer()
-                ]
-            }
-        };
-        
-        app.AddGlobalKeyBind(new Key(ConsoleKey.Escape), app.Kill);
-        app.Start();
-    }
-}

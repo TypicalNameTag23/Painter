@@ -2,7 +2,7 @@
 using MusicPlayer.Models;
 using MusicPlayer.Player;
 using Painter;
-using Painter.Layouts;
+using Painter.Drawables;
 
 namespace MusicPlayer;
 
@@ -30,9 +30,9 @@ class Program
         _player.Queue(tracks);
         var application = new Application
         {
-            Drawable = new Panel
+            Content = new Panel
             {
-                Elements = [
+                Content = [
                     new PlayerTrackInfo(_player),
                     new PlayerProgressBar(_player)
                     {

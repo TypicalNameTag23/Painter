@@ -1,11 +1,12 @@
 ﻿using System.Drawing;
 using MusicPlayer.Player;
-using Painter.Drawing;
-using Painter.Elements;
+using Painter.Drawables.DrawableImpl;
+using Painter.Drawables.TextBlock;
 
 namespace MusicPlayer.Drawables;
 
-public class PlayerTracksViewer : Element
+// todo: kinda jank broken rn, will come back and make changes to improve this later
+public class PlayerTracksViewer : Drawable
 {
     private static readonly Color SecondaryRowColor = Color.FromArgb(39, 39, 39);
     private static readonly Color SelectedRowColor = Color.FromArgb(186, 0, 91);
@@ -15,23 +16,25 @@ public class PlayerTracksViewer : Element
     public PlayerTracksViewer(IAudioPlayer player)
     {
         _player = player;
-        player.TrackChangedEvent += Redraw;
+        player.TrackChangedEvent += UpdateRows;
     }
-    
-    protected override void DrawElement(Canvas canvas, bool force)
+
+    private void UpdateRows()
     {
         for (var i = 0; i < _player.Tracks.Count; i++)
         {
             if (_rows.Count <= i)
             {
-                _rows.Add(new TextBlock
+                var textBlock = new TextBlock
                 {
-                    Parent = this,
                     Height = 1,
                     Y = Y + i,
                     OverflowStyle = OverflowStyle.Ellipses,
                     TextColor = Color.Wheat
-                });
+                };
+                
+                _rows.Add(textBlock);
+                Attach(textBlock);
             }
 
             var row = _rows[i];
@@ -47,7 +50,6 @@ public class PlayerTracksViewer : Element
             }
             
             row.Text = $"{trackMeta.Title} - {trackMeta.Artist} ({trackMeta.Album})";
-            row.Draw(canvas, force);
         }
 
         if (_rows.Count <= _player.Tracks.Count)
@@ -57,7 +59,7 @@ public class PlayerTracksViewer : Element
         
         for (var i = _player.Tracks.Count; i < _rows.Count; i++)
         {
-            _rows[i].Parent = null;
+            Detach(_rows[i]);
             _rows.RemoveAt(i);
         }
     }

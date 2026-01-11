@@ -1,8 +1,9 @@
 using System.Runtime.InteropServices;
+using Painter.Drawables.DrawableImpl;
 
 namespace Painter.Drawables;
 
-public abstract class TopLevel
+public abstract class TopLevel : ContentControl
 {
     private readonly Dictionary<Key, List<Action>> _windowKeyBinds = [];
 

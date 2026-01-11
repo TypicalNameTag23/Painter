@@ -30,6 +30,12 @@ public abstract class Terminal
         _cursorX += text.Length;
     }
     
+    public void Write(char character)
+    {
+        _buffer.Append(character);
+        _cursorX += 1;
+    }
+    
     public void SetCursorPosition(int x, int y)
     {
         if (_cursorX == x && _cursorY == y)

@@ -1,35 +1,99 @@
-﻿using Painter.Drawing;
-using Painter.Elements;
+﻿using Painter.Drawables.DrawableImpl;
+using Painter.Drawing;
+using Painter.Events;
 
 namespace Sample;
 
-public class HsvColorSpaceVisualizer : Element
+public class HsvColorSpaceVisualizer : Drawable
 {
-    private int _hueOffset = 0;
-    private double _saturationOffset = 0;
+    // Here to prevent GC (?) from cleaning it up
+    // ReSharper disable once NotAccessedField.Local
     private Timer _timer;
-    
+
     public HsvColorSpaceVisualizer()
     {
         _timer = new Timer(_ =>
         {
-            _hueOffset += 1;
-            // _saturationOffset += 0.01;
-            if (_hueOffset > 359)
+            HueOffset += 1;
+            if (HueOffset > 359)
             {
-                _hueOffset = 0;
+                HueOffset = 0;
             }
             
-            // if (_saturationOffset > 1)
-            // {
-                // _saturationOffset = 0;
-            // }
-            
-            Redraw();
+            NeedsRedraw = true;
         }, null , 250, 50);
     }
-    
-    protected override void DrawElement(Canvas canvas, bool force)
+
+    public double HueOffset
+    {
+        get;
+        set
+        {
+            var offset = value;
+            if (offset > 359)
+            {
+                offset = 0;
+            }
+            else if (offset < 0)
+            {
+                offset = 0;
+            }
+
+            SetAndRedrawIfChanged(ref field, offset);
+        }
+    }
+
+    public double SaturationOffset
+    {
+        get;
+        set
+        {
+            var offset = value;
+            if (offset > 1)
+            {
+                offset = 0;
+            } 
+            else if (offset < 0)
+            {
+                offset = 0;
+            }
+            
+            SetAndRedrawIfChanged(ref field, offset);
+        }
+    }
+
+    public double Value
+    {
+        get;
+        set
+        {
+            var offset = value;
+            if (offset > 1)
+            {
+                offset = 1;
+            }
+            else if (offset < 0)
+            {
+                offset = 0;
+            }
+
+            SetAndRedrawIfChanged(ref field, offset);
+        }
+    } = 1;
+
+    public override bool Focusable { get; set; } = true;
+
+    public override bool Focused
+    {
+        get;
+        set
+        {
+            SetAndRedrawIfChanged(ref field, value);
+            Value = Focused ? 0.7 : 1;
+        }
+    }
+
+    protected override void DrawImpl(Canvas canvas)
     {
         var width = Width;
         var height = Height;
@@ -40,13 +104,13 @@ public class HsvColorSpaceVisualizer : Element
         {
             for (var x = 0; x < width; x++)
             {
-                var hue = hueStep * x + _hueOffset;
+                var hue = hueStep * x + HueOffset;
                 if (hue > 359)
                 {
                     hue -= 359;
                 }
                 
-                var saturation = saturationStep * y + _saturationOffset;
+                var saturation = saturationStep * y + SaturationOffset;
                 if (saturation > 1)
                 {
                     saturation -= 1;
@@ -54,9 +118,21 @@ public class HsvColorSpaceVisualizer : Element
                 
                 canvas.Draw(x, y, " ", new Style
                 {
-                    BackgroundColor = ColorHelper.FromHsv(hue, saturation, 1)
+                    BackgroundColor = ColorHelper.FromHsv(hue, saturation, Value)
                 });
             }
         }
+    }
+
+    public override void Interact(KeyPressedEventArgs args)
+    {
+        if (args.Key.KeyType != ConsoleKey.Spacebar)
+        {
+            return;
+        }
+        
+        args.Handled = true;
+        SaturationOffset += 0.1;
+        NeedsRedraw = true;
     }
 }

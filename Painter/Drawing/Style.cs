@@ -4,11 +4,10 @@ namespace Painter.Drawing;
 
 public record Style
 {
-    public Color? ForegroundColor { get; set; }
-    public Color? BackgroundColor { get; set; }
-    public bool Bold { get; set; }
-    public bool Italic { get; set; }
-    public bool Underline { get; set; }
-    public bool DoubleUnderline { get; init; } // ?
-    public bool Strikethrough { get; set; }
+    public Color? ForegroundColor { get; init; }
+    public Color? BackgroundColor { get; init; }
+    public bool Bold { get; init; }
+    public bool Italic { get; init; }
+    public bool Underline { get; init; }
+    public bool Strikethrough { get; init; }
 }

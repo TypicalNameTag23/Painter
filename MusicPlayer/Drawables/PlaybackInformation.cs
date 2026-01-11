@@ -1,34 +1,28 @@
 using System.Drawing;
 using MusicPlayer.Player;
-using Painter.Drawing;
-using Painter.Elements;
+using Painter.Drawables.DrawableImpl;
+using Painter.Drawables.TextBlock;
 
 namespace MusicPlayer.Drawables;
 
-public class PlaybackInformation : Element
+public class PlaybackInformation : Drawable
 {
     private readonly IAudioPlayer _player;
-    private readonly TextBlock _textBlock;
 
     public PlaybackInformation(IAudioPlayer player)
     {
         _player = player;
-        _textBlock = new TextBlock
+        var textBlock = new TextBlock
         {
-            Parent = this,
             Text = DisplayText(),
             Height = 1, // jank, please fix
             TextColor = Color.Aquamarine,
             Y = 3
         };
-
-        _player.LoopTypeChangedEvent += () => _textBlock.Text = DisplayText();
-        _player.PlayerStateChangedEvent += () => _textBlock.Text = DisplayText();
-    }
-    
-    protected override void DrawElement(Canvas canvas, bool force)
-    {
-        _textBlock.Draw(canvas, force);
+        
+        Attach(textBlock);
+        _player.LoopTypeChangedEvent += () => textBlock.Text = DisplayText();
+        _player.PlayerStateChangedEvent += () => textBlock.Text = DisplayText();
     }
 
     private string DisplayText()
