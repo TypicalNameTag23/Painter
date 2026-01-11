@@ -14,8 +14,6 @@ public class Panel : Drawable
         }
     }
 
-    public override void Interact(KeyPressedEventArgs args) { }
-
     public void Add(Drawable drawable)
     {
         Attach(drawable);

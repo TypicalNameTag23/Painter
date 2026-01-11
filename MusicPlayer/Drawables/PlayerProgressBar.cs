@@ -2,6 +2,7 @@
 using MusicPlayer.Utilities;
 using Painter.Drawables;
 using Painter.Drawing;
+using Painter.Drawing.Canvas;
 
 namespace MusicPlayer.Drawables;
 
@@ -14,19 +15,19 @@ public class PlayerProgressBar : Drawable
         _player.PlaybackTimeChangedEvent += RequestRedraw;
     }
     
-    protected override void Draw(ICanvas canvas)
+    public override void Draw(ICanvas canvas)
     {
         var width = Width;
 
-        canvas.Draw(X, Y, $"[{_player.TrackTime:mm':'ss}]", new Style());
-        canvas.Draw(X + width - 7, Y, $"[{_player.TrackLength:mm':'ss}]", new Style());
+        canvas.Draw(X, Y, $"[{_player.TrackTime:mm':'ss}]", new Brush());
+        canvas.Draw(X + width - 7, Y, $"[{_player.TrackLength:mm':'ss}]", new Brush());
 
         width -= 16;
         var trackProgress = (int) Math.Ceiling(width * (_player.TrackTime / _player.TrackLength));
         var hueStep = 359d / width;
         for (var x = 0; x < trackProgress; x++)
         {
-            canvas.Draw(X + x + 8, Y, " ", new Style
+            canvas.Draw(X + x + 8, Y, " ", new Brush
             {
                 BackgroundColor = ColorHelper.FromHsv(hueStep * x, 1, 1)
             });
@@ -35,7 +36,7 @@ public class PlayerProgressBar : Drawable
         var brightnessStep = 0.2d / width;
         for (var x = trackProgress; x < width; x++)
         {
-            canvas.Draw(X + x + 8, Y, " ", new Style
+            canvas.Draw(X + x + 8, Y, " ", new Brush
             {
                 BackgroundColor = ColorHelper.FromHsv(0, 0, 0.15 + brightnessStep * x)
             });

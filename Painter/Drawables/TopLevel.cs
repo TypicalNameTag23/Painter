@@ -8,7 +8,7 @@ public abstract class TopLevel : ContentControl
 {
     private readonly Dictionary<Key, List<Action>> _windowKeyBinds = [];
 
-    public void AddWindowKeyBind(Key key, Action action)
+    public void AddKeyBind(Key key, Action action)
     {
         if (!_windowKeyBinds.TryGetValue(key, out var actions))
         {
@@ -19,12 +19,12 @@ public abstract class TopLevel : ContentControl
         actions.Add(action);
     }
     
-    public void RemoveWindowKeyBinds(Key key)
+    public void RemoveBoundKey(Key key)
     {
         _windowKeyBinds.Remove(key);
     }
     
-    public void ExecuteWindowKeyBinds(KeyPressedEventArgs args)
+    public void ExecuteKeyBinds(KeyPressedEventArgs args)
     {
         var key = args.Key;
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -45,7 +45,7 @@ public abstract class TopLevel : ContentControl
         args.Handled = true;
     }
     
-    public IReadOnlyList<Key> GetWindowBoundKeys()
+    public IReadOnlyList<Key> GetBoundKeys()
     {
         return _windowKeyBinds.Keys.ToList();
     }

@@ -1,5 +1,6 @@
 ﻿using Painter.Drawables;
 using Painter.Drawing;
+using Painter.Drawing.Canvas;
 using Painter.Events;
 
 namespace Sample;
@@ -81,7 +82,7 @@ public class HsvColorSpaceVisualizer : Drawable
         }
     }
 
-    protected override void Draw(ICanvas canvas)
+    public override void Draw(ICanvas canvas)
     {
         var width = Width;
         var height = Height;
@@ -104,7 +105,7 @@ public class HsvColorSpaceVisualizer : Drawable
                     saturation -= 1;
                 }
                 
-                canvas.Draw(x, y, " ", new Style
+                canvas.Draw(x, y, " ", new Brush
                 {
                     BackgroundColor = ColorHelper.FromHsv(hue, saturation, Value)
                 });

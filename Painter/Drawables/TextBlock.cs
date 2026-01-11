@@ -1,5 +1,6 @@
 using System.Drawing;
 using Painter.Drawing;
+using Painter.Drawing.Canvas;
 using Painter.Utilities;
 
 namespace Painter.Drawables;
@@ -42,7 +43,7 @@ public class TextBlock : Drawable
         set => SetAndRedrawIfChanged(ref field, value);
     } = OverflowStyle.Ellipses;
     
-    protected override void Draw(ICanvas canvas)
+    public override void Draw(ICanvas canvas)
     {
         var width = Width;
         var height = Height;
@@ -70,7 +71,7 @@ public class TextBlock : Drawable
         
         for (var i = 0; i < lines.Length; i++)
         {
-            var style = new Style
+            var style = new Brush
             {
                 ForegroundColor = TextColor,
                 BackgroundColor = BackgroundColor,

@@ -1,5 +1,5 @@
 using Painter.Drawables;
-using Painter.Drawing;
+using Painter.Drawing.Canvas;
 using Painter.Events;
 using Painter.Platform;
 
@@ -7,19 +7,31 @@ namespace Painter;
 
 public class Application
 {
-    private readonly Terminal _terminal = Terminal.GetPlatformTerminal();
+    private readonly Terminal _terminal;
     private readonly Window _mainWindow;
     private readonly TerminalCanvas _canvas;
 
     public Application()
     {
+        _terminal = Terminal.GetPlatformTerminal();
+        _mainWindow = new Window
+        {
+            Width = _terminal.Width,
+            Height = _terminal.Height
+        };
+        
         _canvas = new TerminalCanvas(_terminal, Width, Height);
-        _mainWindow = new Window();
+        _terminal.TerminalSizeChangedEvent += (_, args) =>
+        {
+            Console.Write(AnsiTerminalCodes.ClearScreen);
+            _mainWindow.Width = args.Width;
+            _mainWindow.Height = args.Height;
+            _mainWindow.NeedsRedraw = true;
+        };
     }
 
-    public static int Width => Terminal.Width;
-
-    public static int Height => Terminal.Height;
+    public int Width => _mainWindow.Width;
+    public int Height => _mainWindow.Height;
 
     public ApplicationState ApplicationState
     {
@@ -43,17 +55,17 @@ public class Application
     
     public void AddGlobalKeyBind(Key key, Action run)
     {
-        _mainWindow.AddWindowKeyBind(key, run);
+        _mainWindow.AddKeyBind(key, run);
     }
     
-    public void RemoveGlobalKeyBind(Key key)
+    public void RemoveGlobalBoundKey(Key key)
     {
-        _mainWindow.RemoveWindowKeyBinds(key);
+        _mainWindow.RemoveBoundKey(key);
     }
     
     public IReadOnlyList<Key> GetGlobalBoundKeys()
     {
-        return _mainWindow.GetWindowBoundKeys();
+        return _mainWindow.GetBoundKeys();
     }
     
     public void Start()
@@ -75,10 +87,12 @@ public class Application
         ApplicationState = ApplicationState.Running;
         while (ApplicationState == ApplicationState.Running)
         {
-            CheckPrintableAreaChanged();
+            _terminal.PollSizeChange();
             if (_mainWindow.NeedsRedraw)
             {
-                DrawAndDisplay();
+                _mainWindow.Draw(_canvas);
+                _canvas.Display();
+                _mainWindow.NeedsRedraw = false;
             }
             
             while (Console.KeyAvailable)
@@ -93,34 +107,4 @@ public class Application
     {
         ApplicationState = ApplicationState.Killed;
     }
-
-    private void DrawAndDisplay()
-    {
-        _mainWindow.DrawImpl(_canvas);
-        _canvas.Display();
-        _mainWindow.NeedsRedraw = false;
-    }
-
-    private void CheckPrintableAreaChanged()
-    {
-        var width = Width;
-        var height = Height;
-        if (_mainWindow.Width == width && _mainWindow.Height == height)
-        {
-            return;
-        }
-        
-        Console.Write(AnsiTerminalCodes.ClearScreen);
-        _mainWindow.Width = width;
-        _mainWindow.Height = height;
-        _canvas.Resize(width, height);
-        _mainWindow.NeedsRedraw = true;
-    }
-}
-
-public enum ApplicationState
-{
-    Inactive,
-    Running,
-    Killed
 }

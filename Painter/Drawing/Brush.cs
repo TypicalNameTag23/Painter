@@ -2,7 +2,7 @@ using System.Drawing;
 
 namespace Painter.Drawing;
 
-public record Style
+public record Brush
 {
     public Color? ForegroundColor { get; init; }
     public Color? BackgroundColor { get; init; }

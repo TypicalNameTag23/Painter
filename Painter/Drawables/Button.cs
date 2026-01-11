@@ -1,5 +1,6 @@
 using System.Drawing;
 using Painter.Drawing;
+using Painter.Drawing.Canvas;
 using Painter.Events;
 
 namespace Painter.Drawables;
@@ -34,18 +35,20 @@ public class Button : ContentControl
         OnClickEvent?.Invoke(this, new ButtonClickedEventArgs());
     }
 
-    protected override void Draw(ICanvas canvas)
+    public override void Draw(ICanvas canvas)
     {
         var backgroundColor = Focused ? FocusedColor : BackgroundColor;
         for (var y = 0; y < Height; y++)
         {
             for (var x = 0; x < Width; x++)
             {
-                canvas.Draw(x + X, y + Y, new Style
+                canvas.Draw(x + X, y + Y, new Brush
                 {
                     BackgroundColor = backgroundColor
                 });
             }
         }
+        
+        base.Draw(canvas);
     }
 }

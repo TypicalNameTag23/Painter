@@ -1,4 +1,5 @@
 using Painter.Drawing;
+using Painter.Drawing.Canvas;
 
 namespace Painter.Drawables;
 
@@ -116,7 +117,7 @@ public abstract partial class Drawable
         var canvasSubsection = canvas.Subsection(X, Y, Width, Height);
         foreach (var drawable in _children)
         {
-            drawable.DrawImpl(canvasSubsection);
+            drawable.Draw(canvasSubsection);
         }
     }
 }

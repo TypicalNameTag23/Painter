@@ -1,4 +1,5 @@
-﻿using Painter;
+﻿using System.Drawing;
+using Painter;
 using Painter.Drawables;
 
 namespace Sample;
@@ -7,60 +8,107 @@ static class Program
 {
     static void Main()
     {
+        // var app = new Application
+        // {
+        //     Content = new Panel
+        //     {
+        //         Content =
+        //         [
+        //             new HsvColorSpaceVisualizer
+        //             {
+        //                 FocusOrder = 4
+        //             },
+        //             new TextBox
+        //             {
+        //                 Height = 2,
+        //                 Width = 20,
+        //                 X = 15,
+        //                 Y = 30,
+        //                 FocusOrder = 5
+        //             },
+        //             new Button
+        //             {
+        //                 Height = 4,
+        //                 Width = 10,
+        //                 FocusOrder = 2,
+        //                 Content = new Button
+        //                 {
+        //                     Width = 2,
+        //                     Height = 2,
+        //                     FocusOrder = 1,
+        //                 }.OnClick((button, _) =>
+        //                     {
+        //                         button.Content = new TextBlock
+        //                         {
+        //                             Text = "asd"
+        //                         };
+        //                     })
+        //             },
+        //             new Button
+        //             {
+        //                 Width = 30,
+        //                 Height = 2,
+        //                 X = 10,
+        //                 Y = 5,
+        //                 FocusOrder = 3,
+        //                 Content = new HsvColorSpaceVisualizer
+        //                 {
+        //                     Focusable = false,
+        //                     Height = 20
+        //                 }
+        //             }.OnClick((button, _) =>
+        //             {
+        //                 ((HsvColorSpaceVisualizer)button.Content!).SaturationOffset += 0.01;
+        //             })
+        //         ]
+        //     }
+        // };
+
+        var colors = new List<Color>
+        {
+            Color.Coral, Color.Brown, Color.DarkBlue,
+            Color.RebeccaPurple, Color.DarkGreen, Color.DodgerBlue,
+            Color.BlueViolet, Color.Crimson, Color.Fuchsia,
+        };
+
+        var grid = new Grid
+        {
+            RowDefinitions = RowDefinition.Of("2*, 2*, 8*"),
+            ColumnDefinitions = ColumnDefinition.Of("3*, 1*, 6*")
+        };
+
+        for (var i = 0; i < 3; i++)
+        {
+            for (var j = 0; j < 3; j++)
+            {
+                grid.SetContent(i, j, new TextBlock
+                {
+                    Text = $"[Row: {i} | Column: {j}]",
+                    BackgroundColor = colors[i * 3 + j]
+                });
+            }
+        }
+
+        var x = 0;
+        grid.SetContent(2, 0, new HsvColorSpaceVisualizer
+            {
+                FocusOrder = 2
+            })
+            .SetContent(1, 1, new Button 
+            {
+                FocusOrder = 1
+            }.OnClick((button, _) =>
+            {
+                x++;
+                button.Content ??= new TextBlock();
+                ((TextBlock)button.Content!).BackgroundColor = colors[x % colors.Count];
+                ((TextBlock)button.Content!).Text = x.ToString();
+            }))
+            .SetContent(2, 2, new TextBox());
+        
         var app = new Application
         {
-            Content = new Panel
-            {
-                Content =
-                [
-                    new HsvColorSpaceVisualizer
-                    {
-                        FocusOrder = 4
-                    },
-                    new TextBox
-                    {
-                        Height = 2,
-                        Width = 20,
-                        X = 15,
-                        Y = 30,
-                        FocusOrder = 5
-                    },
-                    new Button
-                    {
-                        Height = 4,
-                        Width = 10,
-                        FocusOrder = 2,
-                        Content = new Button
-                        {
-                            Width = 2,
-                            Height = 2,
-                            FocusOrder = 1,
-                        }.OnClick((button, _) =>
-                            {
-                                button.Content = new TextBlock
-                                {
-                                    Text = "asd"
-                                };
-                            })
-                    },
-                    new Button
-                    {
-                        Width = 30,
-                        Height = 2,
-                        X = 10,
-                        Y = 5,
-                        FocusOrder = 3,
-                        Content = new HsvColorSpaceVisualizer
-                        {
-                            Focusable = false,
-                            Height = 20
-                        }
-                    }.OnClick((button, _) =>
-                    {
-                        ((HsvColorSpaceVisualizer)button.Content!).SaturationOffset += 0.01;
-                    })
-                ]
-            }
+            Content = grid
         };
         
         app.AddGlobalKeyBind(new Key(ConsoleKey.C, ConsoleModifiers.Control), app.Kill);

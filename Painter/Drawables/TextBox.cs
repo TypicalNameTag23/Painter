@@ -1,5 +1,6 @@
 using System.Drawing;
 using Painter.Drawing;
+using Painter.Drawing.Canvas;
 using Painter.Events;
 using Painter.Utilities;
 
@@ -64,7 +65,7 @@ public class TextBox : Drawable
         }
     }
 
-    protected override void Draw(ICanvas canvas)
+    public override void Draw(ICanvas canvas)
     {
         var width = Width;
         var height = Height;
@@ -95,13 +96,13 @@ public class TextBox : Drawable
             for (var j = 0; j < line.Length; j++)
             {
                 var style = j + i * width == CursorPosition
-                    ? new Style
+                    ? new Brush
                     {
                         ForegroundColor = TextColor,
                         BackgroundColor = Focused ? FocusedColor : BackgroundColor,
                         Underline = Focused
                     }
-                    : new Style
+                    : new Brush
                     {
                         ForegroundColor = TextColor,
                         BackgroundColor = Focused ? FocusedColor : BackgroundColor,

@@ -7,7 +7,7 @@ public class Window : TopLevel
 {
     public override void Interact(KeyPressedEventArgs args)
     {
-        ExecuteWindowKeyBinds(args);
+        ExecuteKeyBinds(args);
         if (args.Handled)
         {
             return;

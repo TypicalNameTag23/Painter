@@ -1,4 +1,5 @@
 using Painter.Drawing;
+using Painter.Drawing.Canvas;
 
 namespace Painter.Drawables;
 
@@ -9,12 +10,18 @@ public abstract partial class Drawable : IComparable
 
     public bool Visible { get; set; } = true;
 
+    /// <summary>
+    /// Gets the parent <see cref="Drawable"/>
+    /// </summary>
     public Drawable? Parent
     {
         get;
         internal set;
     }
 
+    /// <summary>
+    /// Gets whether this <see cref="Drawable"/> needs to be redrawn
+    /// </summary>
     public bool NeedsRedraw
     {
         get;
@@ -38,18 +45,27 @@ public abstract partial class Drawable : IComparable
         }
     }
 
+    /// <summary>
+    /// Gets the X position of this <see cref="Drawable"/> on the screen
+    /// </summary>
     public int X
     {
         get; 
         set => SetAndRedrawIfChanged(ref field, value);
     } = 0;
 
+    /// <summary>
+    /// Gets the Y position of this <see cref="Drawable"/> on the screen
+    /// </summary>
     public int Y
     {
         get;
         set => SetAndRedrawIfChanged(ref field, value);
     } = 0;
 
+    /// <summary>
+    /// Gets the maximum width
+    /// </summary>
     public int? MaxWidth
     {
         get;
@@ -64,6 +80,9 @@ public abstract partial class Drawable : IComparable
         }
     }
 
+    /// <summary>
+    /// Gets the minimum width
+    /// </summary>
     public int MinWidth
     {
         get;
@@ -78,6 +97,9 @@ public abstract partial class Drawable : IComparable
         }
     } = 0;
 
+    /// <summary>
+    /// Gets the width
+    /// </summary>
     public int Width
     {
         get
@@ -174,9 +196,8 @@ public abstract partial class Drawable : IComparable
         }
     }
 
-    public virtual void DrawImpl(ICanvas canvas)
+    public virtual void Draw(ICanvas canvas)
     {
-        Draw(canvas);
         DrawChildren(canvas);
     }
 
@@ -199,8 +220,6 @@ public abstract partial class Drawable : IComparable
             
         return FocusOrder > other.FocusOrder ? 1 : 0;
     }
-
-    protected virtual void Draw(ICanvas canvas) { }
 
     /// <summary>
     /// 

@@ -1,18 +1,25 @@
 using System.Runtime.InteropServices;
 using System.Text;
 using Painter.Drawing;
+using Painter.Events;
 
 namespace Painter.Platform;
 
 internal abstract class Terminal
 {
-    private readonly StringBuilder _buffer = new(AnsiTerminalCodes.ResetCursorPosition);
-    private Style _currentStyle = new();
+    private Brush _currentBrush = new();
+    private bool _initialized;
     private int _cursorX;
     private int _cursorY;
+    
+    protected readonly StringBuilder Buffer = new(AnsiTerminalCodes.ResetCursorPosition);
+    protected int PreviousWidth = 0;
+    protected int PreviousHeight = 0;
 
-    public static int Width => Console.BufferWidth;
-    public static int Height => Console.BufferHeight;
+    public abstract int Width { get; }
+    public abstract int Height { get; }
+
+    public event TerminalSizeChangedEvent TerminalSizeChangedEvent;
 
     public static Terminal GetPlatformTerminal()
     {
@@ -23,16 +30,40 @@ internal abstract class Terminal
 
         return new GenericTerminal();
     }
-    
+
+    public void Initialize()
+    {
+        if (_initialized)
+        {
+            return;
+        }
+        
+        PollSizeChange();
+        _initialized = true;
+    }
+
     public void Write(string text)
     {
-        _buffer.Append(text);
-        _cursorX += text.Length;
+        var sections = text.Split(Environment.NewLine);
+        Buffer.Append(sections[0]);
+        _cursorX += sections[0].Length;
+
+        if (sections.Length == 1)
+        {
+            return;
+        }
+        
+        foreach (var textSection in sections)
+        {
+            SetCursorPosition(0, _cursorY + 1);
+            Buffer.Append(textSection);
+            _cursorX += sections[0].Length;
+        }
     }
     
     public void Write(char character)
     {
-        _buffer.Append(character);
+        Buffer.Append(character);
         _cursorX += 1;
     }
     
@@ -43,64 +74,65 @@ internal abstract class Terminal
             return;
         }
 
-        _buffer.Append(AnsiTerminalCodes.SetCursorPosition(x, y));
+        Buffer.Append(AnsiTerminalCodes.SetCursorPosition(x, y));
         _cursorX = x;
         _cursorY = y;
     }
 
-    public void SetStyle(Style style)
+    public void SetStyle(Brush brush)
     {
-        // lol trash
-        if (_currentStyle.ForegroundColor != style.ForegroundColor)
+        if (_currentBrush.ForegroundColor != brush.ForegroundColor)
         {
-            _buffer.Append(AnsiTerminalCodes.SetForegroundColor(style.ForegroundColor));
+            Buffer.Append(AnsiTerminalCodes.SetForegroundColor(brush.ForegroundColor));
         }
         
-        if (_currentStyle.BackgroundColor != style.BackgroundColor)
+        if (_currentBrush.BackgroundColor != brush.BackgroundColor)
         {
-            _buffer.Append(AnsiTerminalCodes.SetBackgroundColor(style.BackgroundColor));
+            Buffer.Append(AnsiTerminalCodes.SetBackgroundColor(brush.BackgroundColor));
         }
         
-        if (_currentStyle.Bold != style.Bold)
+        if (_currentBrush.Bold != brush.Bold)
         {
-            _buffer.Append(AnsiTerminalCodes.SetBoldMode(style.Bold));
+            Buffer.Append(AnsiTerminalCodes.SetBoldMode(brush.Bold));
         }
         
-        if (_currentStyle.Italic != style.Italic)
+        if (_currentBrush.Italic != brush.Italic)
         {
-            _buffer.Append(AnsiTerminalCodes.SetItalicsMode(style.Italic));
+            Buffer.Append(AnsiTerminalCodes.SetItalicsMode(brush.Italic));
         }
         
-        if (_currentStyle.Strikethrough != style.Strikethrough)
+        if (_currentBrush.Strikethrough != brush.Strikethrough)
         {
-            _buffer.Append(AnsiTerminalCodes.SetStrikethroughMode(style.Strikethrough));
+            Buffer.Append(AnsiTerminalCodes.SetStrikethroughMode(brush.Strikethrough));
         }
         
-        if (_currentStyle.Underline != style.Underline)
+        if (_currentBrush.Underline != brush.Underline)
         {
-            _buffer.Append(AnsiTerminalCodes.SetUnderlineMode(style.Underline));
+            Buffer.Append(AnsiTerminalCodes.SetUnderlineMode(brush.Underline));
         }
         
-        if (_currentStyle.Blinking != style.Blinking)
+        if (_currentBrush.Blinking != brush.Blinking)
         {
-            _buffer.Append(AnsiTerminalCodes.SetBlinkingMode(style.Blinking));
+            Buffer.Append(AnsiTerminalCodes.SetBlinkingMode(brush.Blinking));
         }
 
-        _currentStyle = style;
+        _currentBrush = brush;
     }
 
     public void ResetStyle()
     {
-        _buffer.Append(AnsiTerminalCodes.ResetStyles);
-        _buffer.Append(AnsiTerminalCodes.ResetBackgroundColor);
-        _buffer.Append(AnsiTerminalCodes.ResetForegroundColor);
-        _currentStyle = new Style();
+        Buffer.Append(AnsiTerminalCodes.ResetStyles);
+        Buffer.Append(AnsiTerminalCodes.ResetBackgroundColor);
+        Buffer.Append(AnsiTerminalCodes.ResetForegroundColor);
+        _currentBrush = new Brush();
     }
 
-    public void Flush()
+    public abstract void Flush();
+
+    public abstract void PollSizeChange();
+
+    protected void OnTerminalSizeChanged(object sender, TerminalChangedSizeEventArgs args)
     {
-        ResetStyle();
-        Console.Write(_buffer);
-        _buffer.Clear();
+        TerminalSizeChangedEvent?.Invoke(sender, args);
     }
 }
