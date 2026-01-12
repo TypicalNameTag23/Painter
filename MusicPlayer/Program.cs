@@ -50,35 +50,39 @@ class Program
             }
         };
 
-        application.AddGlobalKeyBind(new Key(ConsoleKey.C, ConsoleModifiers.Control), application.Kill);
-        application.AddGlobalKeyBind(new Key(ConsoleKey.Spacebar), TogglePlay);
-        application.AddGlobalKeyBind(new Key(ConsoleKey.UpArrow), _player.SkipBack);
-        application.AddGlobalKeyBind(new Key(ConsoleKey.DownArrow), _player.Skip);
-        application.AddGlobalKeyBind(new Key(ConsoleKey.UpArrow, ConsoleModifiers.Control), _player.PreviousTrack);
-        application.AddGlobalKeyBind(new Key(ConsoleKey.L), SwitchLoopType);
-        application.AddGlobalKeyBind(new Key(ConsoleKey.RightArrow), 
-            () => _player.Seek(SeekSmall));
-        application.AddGlobalKeyBind(new Key(ConsoleKey.RightArrow, ConsoleModifiers.Shift), 
-            () => _player.Seek(SeekMedium));
+        application.AddGlobalKeyBind(new Key(ConsoleKey.C, ConsoleModifiers.Control), (_, _) => application.Kill());
+        application.AddGlobalKeyBind(new Key(ConsoleKey.Spacebar), (_, _) => TogglePlay());
+        application.AddGlobalKeyBind(new Key(ConsoleKey.L), (_, _) => SwitchLoopType());
+        
+        application.AddGlobalKeyBind(new Key(ConsoleKey.UpArrow), (_, _) => _player.SkipBack());
+        application.AddGlobalKeyBind(new Key(ConsoleKey.DownArrow), (_, _) => _player.Skip());
+        application.AddGlobalKeyBind(new Key(ConsoleKey.UpArrow, ConsoleModifiers.Control), (_, _) => _player.PreviousTrack());
+        application.AddGlobalKeyBind(new Key(ConsoleKey.DownArrow, ConsoleModifiers.Control), (_, _) => _player.NextTrack());
+
+        application.AddGlobalKeyBind(new Key(ConsoleKey.RightArrow),
+            (_, _) => _player.Seek(SeekSmall));
+        application.AddGlobalKeyBind(new Key(ConsoleKey.RightArrow, ConsoleModifiers.Shift),
+            (_, _) => _player.Seek(SeekMedium));
         application.AddGlobalKeyBind(new Key(ConsoleKey.RightArrow, ConsoleModifiers.Control), 
-            () => _player.Seek(SeekLarge));
-        application.AddGlobalKeyBind(new Key(ConsoleKey.LeftArrow), 
-            () => _player.Seek(-SeekSmall));
+            (_, _) => _player.Seek(SeekLarge));
+        application.AddGlobalKeyBind(new Key(ConsoleKey.LeftArrow),
+            (_, _) => _player.Seek(-SeekSmall));
         application.AddGlobalKeyBind(new Key(ConsoleKey.LeftArrow, ConsoleModifiers.Shift), 
-            () => _player.Seek(-SeekMedium));
+            (_, _) => _player.Seek(-SeekMedium));
         application.AddGlobalKeyBind(new Key(ConsoleKey.LeftArrow, ConsoleModifiers.Control), 
-            () => _player.Seek(-SeekLarge));
-        application.AddGlobalKeyBind(new Key(ConsoleKey.D0), () => _player.SeekTo(TimeSpan.Zero));
-        application.AddGlobalKeyBind(new Key(ConsoleKey.D1), () => _player.SeekTo(TimeSpan.FromMinutes(1)));
-        application.AddGlobalKeyBind(new Key(ConsoleKey.D2), () => _player.SeekTo(TimeSpan.FromMinutes(2)));
-        application.AddGlobalKeyBind(new Key(ConsoleKey.D3), () => _player.SeekTo(TimeSpan.FromMinutes(3)));
-        application.AddGlobalKeyBind(new Key(ConsoleKey.D4), () => _player.SeekTo(TimeSpan.FromMinutes(4)));
-        application.AddGlobalKeyBind(new Key(ConsoleKey.D5), () => _player.SeekTo(TimeSpan.FromMinutes(5)));
-        application.AddGlobalKeyBind(new Key(ConsoleKey.D6), () => _player.SeekTo(TimeSpan.FromMinutes(6)));
-        application.AddGlobalKeyBind(new Key(ConsoleKey.D7), () => _player.SeekTo(TimeSpan.FromMinutes(7)));
-        application.AddGlobalKeyBind(new Key(ConsoleKey.D8), () => _player.SeekTo(TimeSpan.FromMinutes(8)));
-        application.AddGlobalKeyBind(new Key(ConsoleKey.D9), () => _player.SeekTo(TimeSpan.FromMinutes(9)));
-        application.AddGlobalKeyBind(new Key(ConsoleKey.Subtract), SeekToStart);
+            (_, _) => _player.Seek(-SeekLarge));
+        
+        application.AddGlobalKeyBind(new Key(ConsoleKey.D0), (_, _) => _player.SeekTo(TimeSpan.Zero));
+        application.AddGlobalKeyBind(new Key(ConsoleKey.D1), (_, _) => _player.SeekTo(TimeSpan.FromMinutes(1)));
+        application.AddGlobalKeyBind(new Key(ConsoleKey.D2), (_, _) => _player.SeekTo(TimeSpan.FromMinutes(2)));
+        application.AddGlobalKeyBind(new Key(ConsoleKey.D3), (_, _) => _player.SeekTo(TimeSpan.FromMinutes(3)));
+        application.AddGlobalKeyBind(new Key(ConsoleKey.D4), (_, _) => _player.SeekTo(TimeSpan.FromMinutes(4)));
+        application.AddGlobalKeyBind(new Key(ConsoleKey.D5), (_, _) => _player.SeekTo(TimeSpan.FromMinutes(5)));
+        application.AddGlobalKeyBind(new Key(ConsoleKey.D6), (_, _) => _player.SeekTo(TimeSpan.FromMinutes(6)));
+        application.AddGlobalKeyBind(new Key(ConsoleKey.D7), (_, _) => _player.SeekTo(TimeSpan.FromMinutes(7)));
+        application.AddGlobalKeyBind(new Key(ConsoleKey.D8), (_, _) => _player.SeekTo(TimeSpan.FromMinutes(8)));
+        application.AddGlobalKeyBind(new Key(ConsoleKey.D9), (_, _) => _player.SeekTo(TimeSpan.FromMinutes(9)));
+        application.AddGlobalKeyBind(new Key(ConsoleKey.Subtract), (_, _) => SeekToStart());
         application.Start();
     }
 

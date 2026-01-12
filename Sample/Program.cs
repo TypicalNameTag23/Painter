@@ -12,8 +12,8 @@ static class Program
     {
         var grid = new Grid
         {
-            RowDefinitions = RowDefinition.Of("*, *, *"),
-            ColumnDefinitions = ColumnDefinition.Of("*, *, *")
+            RowDefinitions = RowDefinition.Of("400*, 1, 200*"),
+            ColumnDefinitions = ColumnDefinition.Of("1*, 5000*, 6000*")
         };
 
         var viewModel = new MainWindowViewModel();

@@ -101,7 +101,7 @@ public class Grid : Drawable
         {
             var width = index == _columnDefinitions.Length - 1 
                 ? finalStarWidth 
-                : (int) (availableWidth * column.Length.Value * columnPercentage);
+                : (int) Math.Ceiling(availableWidth * column.Length.Value * columnPercentage);
             
             finalStarWidth -= width;
             for (var row = 0; row < _columnDefinitions.Length; row++)
@@ -118,7 +118,7 @@ public class Grid : Drawable
         {
             var height = index == _rowDefinitions.Length - 1
                 ? finalStarHeight
-                : (int)(availableHeight * row.Length.Value * rowPercentage);
+                : (int) Math.Ceiling(availableHeight * row.Length.Value * rowPercentage);
             
             finalStarHeight -= height;
             for (var column = 0; column < _columnDefinitions.Length; column++)

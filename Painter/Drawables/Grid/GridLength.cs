@@ -45,6 +45,7 @@ public record GridLength
     /// <returns>A <see cref="GridLength"/></returns>
     public static GridLength Star(double percentage)
     {
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(percentage, 0,$"Percentage should be greater than 0, found {percentage} instead.");
         return new GridLength(percentage, GridLengthType.Star);
     }
 
@@ -55,23 +56,29 @@ public record GridLength
     /// <returns>A <see cref="GridLength"/></returns>
     public static GridLength Absolute(int length)
     {
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(length, 0,$"Length should be greater than 0, found {length} instead.");
         return new GridLength(length, GridLengthType.Absolute);
     }
 
     public static GridLength Parse(string s)
     {
-        s = s.ToUpperInvariant();
-        if (!s.EndsWith('*'))
+        if (s.EndsWith('*'))
         {
-            // return s == "AUTO" ? 
-                // Auto : 
-                // Absolute(int.Parse(s));
-            return Absolute(int.Parse(s));
+            return Star(s.Length == 1 ? 
+                1 : 
+                double.Parse(s[..^1]));
         }
-            
-        var percentageString = s[..^1];
-        return Star(percentageString.Length == 0 ? 1 : double.Parse(percentageString));
+        
+        if (s.Equals("AUTO", StringComparison.InvariantCultureIgnoreCase))
+        {
+            throw new NotImplementedException();
+            // return s == "AUTO" ? 
+            // Auto : 
+            // Absolute(int.Parse(s));
+                // 
+        }
 
+        return Absolute(int.Parse(s));
     }
     
     public static IEnumerable<GridLength> ParseLengths(string s)

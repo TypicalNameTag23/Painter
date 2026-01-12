@@ -35,6 +35,7 @@ public abstract class AudioPlayerBase : IAudioPlayer
             // Seek timer might be buffering inputs when trying to navigate tracks and will cause issues
             // Reset the seek timer to disable this
             ResetSeekTimer();
+            TrackTime = TimeSpan.Zero;
             if (PlayerState != PlayerState.Stopped)
             {
                 ReadyTrack();

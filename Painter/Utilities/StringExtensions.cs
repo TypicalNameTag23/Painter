@@ -1,3 +1,5 @@
+using Painter.Drawing;
+
 namespace Painter.Utilities;
 
 public static class StringExtensions
