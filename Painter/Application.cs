@@ -80,12 +80,16 @@ public class Application
         {
             return;
         }
-        
+
         Console.Write(
+            // AnsiTerminalCodes.FuckAssLinuxThingStolenFromTerminalDotGui +
             AnsiTerminalCodes.SaveScreen + 
             AnsiTerminalCodes.SaveCursorPositon + 
             AnsiTerminalCodes.ClearScreen +
             AnsiTerminalCodes.HideCursor +
+            // AnsiTerminalCodes.CSI_EnableAnyEventMouse +
+            // AnsiTerminalCodes.CSI_EnableSgrExtModeMouse +
+            // AnsiTerminalCodes.CSI_EnableUrxvtExtModeMouse);
             AnsiTerminalCodes.ResetCursorPosition + 
             AnsiTerminalCodes.ResetStyles);
         

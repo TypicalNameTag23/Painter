@@ -5,7 +5,13 @@ namespace Painter.Platform;
 internal static class AnsiTerminalCodes
 {
     private const string ControlSequenceIntroducer = "\x1b[";
-
+    internal const string FuckAssLinuxThingStolenFromTerminalDotGui = $"{ControlSequenceIntroducer}?1049h";
+    
+    internal static readonly string CSI_EnableAnyEventMouse = ControlSequenceIntroducer + "?1003h";
+    internal static readonly string CSI_EnableSgrExtModeMouse = ControlSequenceIntroducer + "?1006h";
+    
+    internal static readonly string CSI_EnableUrxvtExtModeMouse = ControlSequenceIntroducer + "?1015h";
+    
     internal const string EnableBoldMode = $"{ControlSequenceIntroducer}1m";
     internal const string EnableItalicMode = $"{ControlSequenceIntroducer}3m";
     internal const string EnableUnderlineMode = $"{ControlSequenceIntroducer}4m";

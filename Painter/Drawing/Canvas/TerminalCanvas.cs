@@ -6,7 +6,7 @@ namespace Painter.Drawing.Canvas;
 /// <summary>
 /// A canvas that can print its content to a <see cref="Terminal"/>
 /// </summary>
-public class TerminalCanvas : Canvas
+internal class TerminalCanvas : Canvas
 {
     private readonly Dictionary<(int, int), (char, StrokeStyle)> _pixels = [];
     private readonly Terminal _terminal;
