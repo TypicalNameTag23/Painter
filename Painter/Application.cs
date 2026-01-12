@@ -53,9 +53,15 @@ public class Application
         set => _mainWindow.Content = value;
     }
     
-    public void AddGlobalKeyBind(Key key, Action run)
+    public object? DataContext
     {
-        _mainWindow.AddKeyBind(key, run);
+        get => _mainWindow.DataContext;
+        set => _mainWindow.DataContext = value;
+    }
+    
+    public void AddGlobalKeyBind(Key key, EventHandler<KeyPressedEventArgs> eventHandler)
+    {
+        _mainWindow.AddKeyBind(key, eventHandler);
     }
     
     public void RemoveGlobalBoundKey(Key key)

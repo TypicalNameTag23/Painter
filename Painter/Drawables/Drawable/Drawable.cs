@@ -227,15 +227,16 @@ public abstract partial class Drawable : IComparable
     /// <param name="field"></param>
     /// <param name="value"></param>
     /// <typeparam name="T"></typeparam>
-    protected void SetAndRedrawIfChanged<T>(ref T field, T value)
+    protected bool SetAndRedrawIfChanged<T>(ref T field, T value)
     {
         if (EqualityComparer<T>.Default.Equals(field, value))
         {
-            return;
+            return false;
         }
 
         field = value;
-        NeedsRedraw = true;
+        RequestRedraw();
+        return true;
     }
 
     /// <summary>

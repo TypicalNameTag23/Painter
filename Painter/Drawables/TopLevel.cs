@@ -6,17 +6,17 @@ namespace Painter.Drawables;
 
 public abstract class TopLevel : ContentControl
 {
-    private readonly Dictionary<Key, List<Action>> _windowKeyBinds = [];
+    private readonly Dictionary<Key, List<EventHandler<KeyPressedEventArgs>>> _windowKeyBinds = [];
 
-    public void AddKeyBind(Key key, Action action)
+    public void AddKeyBind(Key key, EventHandler<KeyPressedEventArgs> eventHandler)
     {
-        if (!_windowKeyBinds.TryGetValue(key, out var actions))
+        if (!_windowKeyBinds.TryGetValue(key, out var eventHandlers))
         {
-            actions = [];
-            _windowKeyBinds.Add(key, actions);
+            eventHandlers = [];
+            _windowKeyBinds.Add(key, eventHandlers);
         }
         
-        actions.Add(action);
+        eventHandlers.Add(eventHandler);
     }
     
     public void RemoveBoundKey(Key key)
@@ -32,14 +32,14 @@ public abstract class TopLevel : ContentControl
             key = new Key(key.KeyType, key.KeyModifiers ^ ConsoleModifiers.Shift);
         }
         
-        if (!_windowKeyBinds.TryGetValue(key, out var actions))
+        if (!_windowKeyBinds.TryGetValue(key, out var eventHandlers))
         {
             return;
         }
         
-        foreach (var action in actions)
+        foreach (var eventHandler in eventHandlers)
         {
-            action();
+            eventHandler.Invoke(this, args);
         }
 
         args.Handled = true;
