@@ -1,4 +1,3 @@
-using System.Drawing;
 using Painter.Drawing;
 using Painter.Drawing.Canvas;
 using Painter.Events;
@@ -38,7 +37,7 @@ public class TextBox : Drawable
     {
         get;
         set => SetAndRedrawIfChanged(ref field, value);
-    } = Color.DarkSlateGray;
+    } = Color.Black;
 
     public OverflowStyle OverflowStyle
     {
@@ -96,13 +95,13 @@ public class TextBox : Drawable
             for (var j = 0; j < line.Length; j++)
             {
                 var style = j + i * width == CursorPosition
-                    ? new Brush
+                    ? new StrokeStyle
                     {
                         ForegroundColor = TextColor,
                         BackgroundColor = Focused ? FocusedColor : BackgroundColor,
                         Underline = Focused
                     }
-                    : new Brush
+                    : new StrokeStyle
                     {
                         ForegroundColor = TextColor,
                         BackgroundColor = Focused ? FocusedColor : BackgroundColor,

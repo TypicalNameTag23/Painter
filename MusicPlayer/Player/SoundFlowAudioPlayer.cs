@@ -184,7 +184,9 @@ public sealed class SoundFlowAudioPlayer : AudioPlayerBase
         {
             Pause();
         }
-        
+
+        // _player?.Seek(TrackTime);
+        // return;
         SeekDelayTimer = new Timer(_ =>
         {
             // Don't allow seeking while playing, must pause player

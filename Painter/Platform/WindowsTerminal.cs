@@ -19,6 +19,7 @@ internal class WindowsTerminal : Terminal
     
     public WindowsTerminal()
     {
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
         var handle = GetStdHandle(STD_OUTPUT_HANDLE);
         GetConsoleMode(handle, out var mode);
         mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;

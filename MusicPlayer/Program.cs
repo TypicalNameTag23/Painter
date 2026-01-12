@@ -8,7 +8,7 @@ namespace MusicPlayer;
 
 class Program
 {
-    private const string AudioFolder = @"/home/typicalnametag23/Music/Celeste OST/Celeste Original Soundtrack";
+    private const string AudioFolder = @"C:\Users\\Downloads\Lena Raine\Celeste (Original Soundtrack)\FLAC (16bit-44.1kHz)";
     private static IAudioPlayer _player = new SoundFlowAudioPlayer();
     private static readonly TimeSpan SeekSmall = TimeSpan.FromSeconds(5);
     private static readonly TimeSpan SeekMedium = TimeSpan.FromSeconds(30);
@@ -16,7 +16,7 @@ class Program
     
     static async Task Main()
     {
-        var tracks = new System.Collections.Generic.List<AudioTrack>();
+        var tracks = new List<AudioTrack>();
         foreach (var filePath in Directory.GetFiles(AudioFolder))
         {
             var track = await AudioTrackFactory.CreateFromFileAsync(filePath);

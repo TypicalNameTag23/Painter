@@ -104,7 +104,7 @@ public class Grid : Drawable
                 : (int) Math.Ceiling(availableWidth * column.Length.Value * columnPercentage);
             
             finalStarWidth -= width;
-            for (var row = 0; row < _columnDefinitions.Length; row++)
+            for (var row = 0; row < _rowDefinitions.Length; row++)
             {
                 _content[row, index].Width = width;
             }

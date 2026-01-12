@@ -7,7 +7,7 @@ namespace Painter.Platform;
 
 internal abstract class Terminal
 {
-    private Brush _currentBrush = new();
+    private StrokeStyle _currentStrokeStyle = new();
     private bool _initialized;
     private int _cursorX;
     private int _cursorY;
@@ -79,44 +79,44 @@ internal abstract class Terminal
         _cursorY = y;
     }
 
-    public void SetStyle(Brush brush)
+    public void SetStyle(StrokeStyle strokeStyle)
     {
-        if (_currentBrush.ForegroundColor != brush.ForegroundColor)
+        if (_currentStrokeStyle.ForegroundColor != strokeStyle.ForegroundColor)
         {
-            Buffer.Append(AnsiTerminalCodes.SetForegroundColor(brush.ForegroundColor));
+            Buffer.Append(AnsiTerminalCodes.SetForegroundColor(strokeStyle.ForegroundColor));
         }
         
-        if (_currentBrush.BackgroundColor != brush.BackgroundColor)
+        if (_currentStrokeStyle.BackgroundColor != strokeStyle.BackgroundColor)
         {
-            Buffer.Append(AnsiTerminalCodes.SetBackgroundColor(brush.BackgroundColor));
+            Buffer.Append(AnsiTerminalCodes.SetBackgroundColor(strokeStyle.BackgroundColor));
         }
         
-        if (_currentBrush.Bold != brush.Bold)
+        if (_currentStrokeStyle.Bold != strokeStyle.Bold)
         {
-            Buffer.Append(AnsiTerminalCodes.SetBoldMode(brush.Bold));
+            Buffer.Append(AnsiTerminalCodes.SetBoldMode(strokeStyle.Bold));
         }
         
-        if (_currentBrush.Italic != brush.Italic)
+        if (_currentStrokeStyle.Italic != strokeStyle.Italic)
         {
-            Buffer.Append(AnsiTerminalCodes.SetItalicsMode(brush.Italic));
+            Buffer.Append(AnsiTerminalCodes.SetItalicsMode(strokeStyle.Italic));
         }
         
-        if (_currentBrush.Strikethrough != brush.Strikethrough)
+        if (_currentStrokeStyle.Strikethrough != strokeStyle.Strikethrough)
         {
-            Buffer.Append(AnsiTerminalCodes.SetStrikethroughMode(brush.Strikethrough));
+            Buffer.Append(AnsiTerminalCodes.SetStrikethroughMode(strokeStyle.Strikethrough));
         }
         
-        if (_currentBrush.Underline != brush.Underline)
+        if (_currentStrokeStyle.Underline != strokeStyle.Underline)
         {
-            Buffer.Append(AnsiTerminalCodes.SetUnderlineMode(brush.Underline));
+            Buffer.Append(AnsiTerminalCodes.SetUnderlineMode(strokeStyle.Underline));
         }
         
-        if (_currentBrush.Blinking != brush.Blinking)
+        if (_currentStrokeStyle.Blinking != strokeStyle.Blinking)
         {
-            Buffer.Append(AnsiTerminalCodes.SetBlinkingMode(brush.Blinking));
+            Buffer.Append(AnsiTerminalCodes.SetBlinkingMode(strokeStyle.Blinking));
         }
 
-        _currentBrush = brush;
+        _currentStrokeStyle = strokeStyle;
     }
 
     public void ResetStyle()
@@ -124,7 +124,7 @@ internal abstract class Terminal
         Buffer.Append(AnsiTerminalCodes.ResetStyles);
         Buffer.Append(AnsiTerminalCodes.ResetBackgroundColor);
         Buffer.Append(AnsiTerminalCodes.ResetForegroundColor);
-        _currentBrush = new Brush();
+        _currentStrokeStyle = new StrokeStyle();
     }
 
     public abstract void Flush();

@@ -19,15 +19,15 @@ public class PlayerProgressBar : Drawable
     {
         var width = Width;
 
-        canvas.Draw(X, Y, $"[{_player.TrackTime:mm':'ss}]", new Brush());
-        canvas.Draw(X + width - 7, Y, $"[{_player.TrackLength:mm':'ss}]", new Brush());
+        canvas.Draw(X, Y, $"[{_player.TrackTime:mm':'ss}]", new StrokeStyle());
+        canvas.Draw(X + width - 7, Y, $"[{_player.TrackLength:mm':'ss}]", new StrokeStyle());
 
         width -= 16;
         var trackProgress = (int) Math.Ceiling(width * (_player.TrackTime / _player.TrackLength));
         var hueStep = 359d / width;
         for (var x = 0; x < trackProgress; x++)
         {
-            canvas.Draw(X + x + 8, Y, " ", new Brush
+            canvas.Draw(X + x + 8, Y, " ", new StrokeStyle
             {
                 BackgroundColor = ColorHelper.FromHsv(hueStep * x, 1, 1)
             });
@@ -36,7 +36,7 @@ public class PlayerProgressBar : Drawable
         var brightnessStep = 0.2d / width;
         for (var x = trackProgress; x < width; x++)
         {
-            canvas.Draw(X + x + 8, Y, " ", new Brush
+            canvas.Draw(X + x + 8, Y, " ", new StrokeStyle
             {
                 BackgroundColor = ColorHelper.FromHsv(0, 0, 0.15 + brightnessStep * x)
             });

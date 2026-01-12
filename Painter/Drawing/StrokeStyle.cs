@@ -1,8 +1,6 @@
-using System.Drawing;
-
 namespace Painter.Drawing;
 
-public record Brush
+public record StrokeStyle
 {
     public Color? ForegroundColor { get; init; }
     public Color? BackgroundColor { get; init; }

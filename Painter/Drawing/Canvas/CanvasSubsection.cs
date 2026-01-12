@@ -15,14 +15,14 @@ public class CanvasSubsection : Canvas
         _fullCanvas = fullCanvas;
     }
 
-    public override void Draw(int x, int y, char character, Brush brush)
+    public override void Draw(int x, int y, char character, StrokeStyle strokeStyle)
     {
         if (x >= Width || x < 0 || y >= Height || y < 0)
         {
             return;
         }
         
-        _fullCanvas.Draw(x + _xOffset, y + _yOffset, character, brush);
+        _fullCanvas.Draw(x + _xOffset, y + _yOffset, character, strokeStyle);
     }
 
     public override ICanvas Subsection(int x, int y, int width, int height)

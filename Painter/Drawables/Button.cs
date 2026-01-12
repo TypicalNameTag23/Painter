@@ -1,4 +1,3 @@
-using System.Drawing;
 using Painter.Drawing;
 using Painter.Drawing.Canvas;
 using Painter.Events;
@@ -13,9 +12,9 @@ public class Button : ContentControl
 
     public Color BackgroundColor { get; set; } = Color.Black;
 
-    public Color FocusedColor { get; set; } = Color.Gray;
+    public Color FocusedColor { get; set; } = Color.Black;
 
-    public Color SelectedColor { get; set; } = Color.CadetBlue;
+    public Color SelectedColor { get; set; } = Color.White;
 
     public event EventHandler<Button, ButtonClickedEventArgs>? OnClickEvent;
 
@@ -42,7 +41,7 @@ public class Button : ContentControl
         {
             for (var x = 0; x < Width; x++)
             {
-                canvas.Draw(x + X, y + Y, new Brush
+                canvas.Draw(x + X, y + Y, new StrokeStyle
                 {
                     BackgroundColor = backgroundColor
                 });

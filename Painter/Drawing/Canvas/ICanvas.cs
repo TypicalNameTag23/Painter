@@ -18,18 +18,18 @@ public interface ICanvas
     /// <param name="x">The x coord to draw at</param>
     /// <param name="y">The y coord to draw at</param>
     /// <param name="character">The character to draw</param>
-    /// <param name="brush">The brush to use when drawing</param>
+    /// <param name="strokeStyle">The brush to use when drawing</param>
     /// <remarks>If either of the <see cref="x"/> or the <see cref="y"/> coords are larger than the <see cref="Width"/> and the <see cref="Height"/> nothing will be drawn</remarks>
-    public void Draw(int x, int y, char character, Brush brush);
+    public void Draw(int x, int y, char character, StrokeStyle strokeStyle);
     
     /// <summary>
     /// Draws the provided brush at the location 
     /// </summary>
     /// <param name="x">The x coord to draw at</param>
     /// <param name="y">The y coord to draw at</param>
-    /// <param name="brush">The brush to use when drawing</param>
+    /// <param name="strokeStyle">The brush to use when drawing</param>
     /// <remarks>If either of the <see cref="x"/> or the <see cref="y"/> coords are larger than the <see cref="Width"/> and the <see cref="Height"/> nothing will be drawn</remarks>
-    public void Draw(int x, int y, Brush brush);
+    public void Draw(int x, int y, StrokeStyle strokeStyle);
 
     /// <summary>
     /// Draws the string at the location 
@@ -37,7 +37,7 @@ public interface ICanvas
     /// <param name="x">The x coord to draw at</param>
     /// <param name="y">The y coord to draw at</param>
     /// <param name="content">The object to get the string value of</param>
-    /// <param name="brush">The brush to use when drawing</param>
+    /// <param name="strokeStyle">The brush to use when drawing</param>
     /// <remarks>
     /// <para>
     /// If either of the <see cref="x"/> or the <see cref="y"/> coords are larger than the <see cref="Width"/> and the <see cref="Height"/> nothing will be drawn
@@ -46,7 +46,7 @@ public interface ICanvas
     /// Does not draw <see cref="Environment.NewLine"/> characters
     /// </para>
     /// </remarks>
-    public void Draw(int x, int y, string content, Brush brush);
+    public void Draw(int x, int y, string content, StrokeStyle strokeStyle);
     
     /// <summary>
     /// Draws the return value of <see cref="object.ToString()"/> at the location 
@@ -54,7 +54,7 @@ public interface ICanvas
     /// <param name="x">The x coord to draw at</param>
     /// <param name="y">The y coord to draw at</param>
     /// <param name="obj">The object to get the string value of</param>
-    /// <param name="brush">The brush to use when drawing</param>
+    /// <param name="strokeStyle">The brush to use when drawing</param>
     /// <remarks>
     /// <para>
     /// If either of the <see cref="x"/> or the <see cref="y"/> coords are larger than the <see cref="Width"/> and the <see cref="Height"/> nothing will be drawn
@@ -63,7 +63,7 @@ public interface ICanvas
     /// Does not draw <see cref="Environment.NewLine"/> characters
     /// </para>
     /// </remarks>
-    public void Draw(int x, int y, object obj, Brush brush);
+    public void Draw(int x, int y, object obj, StrokeStyle strokeStyle);
     
     /// <summary>
     /// Gets an <see cref="ICanvas"/> that represents a subsection of this <see cref="ICanvas"/>

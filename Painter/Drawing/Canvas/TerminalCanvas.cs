@@ -8,7 +8,7 @@ namespace Painter.Drawing.Canvas;
 /// </summary>
 public class TerminalCanvas : Canvas
 {
-    private readonly Dictionary<(int, int), (char, Brush)> _pixels = [];
+    private readonly Dictionary<(int, int), (char, StrokeStyle)> _pixels = [];
     private readonly Terminal _terminal;
 
     /// <summary>
@@ -25,14 +25,14 @@ public class TerminalCanvas : Canvas
         _terminal.TerminalSizeChangedEvent += OnTerminalChangedSize;
     }
 
-    public override void Draw(int x, int y, char character, Brush brush)
+    public override void Draw(int x, int y, char character, StrokeStyle strokeStyle)
     {
         if (x >= Width || x < 0 || y >= Height || y < 0)
         {
             return;
         }
 
-        _pixels[(x, y)] = (character, brush);
+        _pixels[(x, y)] = (character, strokeStyle);
     }
 
     public override ICanvas Subsection(int x, int y, int width, int height)

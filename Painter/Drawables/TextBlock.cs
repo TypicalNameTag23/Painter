@@ -1,4 +1,3 @@
-using System.Drawing;
 using Painter.Drawing;
 using Painter.Drawing.Canvas;
 using Painter.Utilities;
@@ -71,7 +70,7 @@ public class TextBlock : Drawable
         
         for (var i = 0; i < lines.Length; i++)
         {
-            var style = new Brush
+            var style = new StrokeStyle
             {
                 ForegroundColor = TextColor,
                 BackgroundColor = BackgroundColor,

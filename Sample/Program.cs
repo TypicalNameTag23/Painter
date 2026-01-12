@@ -1,7 +1,7 @@
-﻿using System.Drawing;
-using Painter;
-using Painter.Data;
+﻿using Painter;
 using Painter.Drawables;
+using Painter.Drawing;
+using Painter.Drawing.Brushes;
 using Sample.ViewModels;
 
 namespace Sample;
@@ -12,15 +12,19 @@ static class Program
     {
         var grid = new Grid
         {
-            RowDefinitions = RowDefinition.Of("400*, 1, 200*"),
-            ColumnDefinitions = ColumnDefinition.Of("1*, 5000*, 6000*")
+            RowDefinitions = RowDefinition.Of("2*, 3*, 5*"),
+            ColumnDefinitions = ColumnDefinition.Of("12, 10*, *")
         };
 
         var viewModel = new MainWindowViewModel();
-        PopulateGrid(grid, viewModel);
+        // PopulateGrid(grid, viewModel);
         var app = new Application
         {
-            Content = grid,
+            Content = new Rectangle
+            {
+                Margin = Thickness.Of(4),
+                BackgroundColor = new SolidColorBrush(Color.Blue)
+            },
             DataContext = viewModel
         };
         
@@ -28,41 +32,36 @@ static class Program
         app.Start();
     }
 
-    private static void PopulateGrid(Grid grid, MainWindowViewModel viewModel)
-    {
-        var colors = new List<Color>
-        {
-            Color.Coral, Color.Brown, Color.DarkBlue,
-            Color.RebeccaPurple, Color.DarkGreen, Color.DodgerBlue,
-            Color.BlueViolet, Color.Crimson, Color.Fuchsia,
-        };
-        
-        for (var i = 0; i < 3; i++)
-        {
-            for (var j = 0; j < 3; j++)
-            {
-                grid.SetContent(i, j, new TextBlock
-                {
-                    Text = $"[Row: {i} | Column: {j}]",
-                    BackgroundColor = colors[i * 3 + j]
-                });
-            }
-        }
-        
-        grid.SetContent(1, 0, new HsvColorSpaceVisualizer
-            {
-                FocusOrder = 2
-            })
-            .SetContent(1, 1, new Button
-            {
-                FocusOrder = 1,
-                Content = new TextBlock
-                    {
-                        DataContext = viewModel
-                    }
-                    .Bind("BackgroundColor", nameof(viewModel.BackgroundColor), BindingType.TwoWay)
-                    .Bind("Text", nameof(viewModel.ButtonClickTimes), BindingType.TwoWay)
-            }.OnClick(viewModel.OnClick));
-    }
+    // private static void PopulateGrid(Grid grid, MainWindowViewModel viewModel)
+    // {
+    //     for (var row = 0; row < grid.RowDefinitions.Count; row++)
+    //     {
+    //         for (var column = 0; column < grid.ColumnDefinitions.Count; column++)
+    //         {
+    //             var index = row + column * grid.RowDefinitions.Count;
+    //             grid.SetContent(row, column, new HsvColorSpaceVisualizer
+    //             {
+    //                 HueOffset = index % 359,
+    //                 // SaturationOffset = index / 100d % 1,
+    //                 FocusOrder = index
+    //             });
+    //         }
+    //     }
+    //     
+    //     grid/*.SetContent(1, 0, new HsvColorSpaceVisualizer
+    //         {
+    //             FocusOrder = 2
+    //         })*/
+    //         .SetContent(1, 1, new Button
+    //         {
+    //             FocusOrder = 1,
+    //             Content = new TextBlock
+    //                 {
+    //                     DataContext = viewModel
+    //                 }
+    //                 .Bind("BackgroundColor", nameof(viewModel.BackgroundColor), BindingType.TwoWay)
+    //                 .Bind("Text", nameof(viewModel.ButtonClickTimes), BindingType.TwoWay)
+    //         }.OnClick(viewModel.OnClick));
+    // }
     
 }
