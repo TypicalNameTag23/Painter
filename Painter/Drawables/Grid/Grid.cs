@@ -57,7 +57,7 @@ public class Grid : Drawable
         }
     }
 
-    public Grid SetContent(int row, int column, Drawable content)
+    public Grid SetContent(Drawable content, int row = 0, int column = 0)
     {
         if (row >= _rowDefinitions.Length || row < 0 || column >= _columnDefinitions.Length || column < 0)
         {
@@ -94,7 +94,7 @@ public class Grid : Drawable
         }
         
         var availableWidth = MeasureAbsoluteColumns();
-        var finalStarWidth = Width;
+        var finalStarWidth = availableWidth;
         var starColumns = GetStarColumns();
         var columnPercentage = 1 / starColumns.Sum(column => column.Item2.Length.Value);
         foreach (var (index, column) in starColumns)
@@ -111,7 +111,7 @@ public class Grid : Drawable
         }
 
         var availableHeight = MeasureAbsoluteRows();
-        var finalStarHeight = Height;
+        var finalStarHeight = availableHeight;
         var starRows = GetStarRows();
         var rowPercentage = 1 / starRows.Sum(row => row.Item2.Length.Value);
         foreach (var (index, row) in starRows)
