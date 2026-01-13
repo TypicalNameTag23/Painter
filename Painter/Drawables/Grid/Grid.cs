@@ -162,7 +162,7 @@ public class Grid : Drawable
                 availableWidth -= width;
             }
             
-            for (var row = 0; row < _columnDefinitions.Length; row++)
+            for (var row = 0; row < _rowDefinitions.Length; row++)
             {
                 _content[row, columnIndex].Width = width;
             }
