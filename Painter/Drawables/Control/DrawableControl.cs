@@ -12,18 +12,22 @@ public abstract class DrawableControl : Drawable
 
     public Thickness Margin { get; set; }
     
+    public Thickness Padding { get; set; }
+    
     public override void Draw(ICanvas canvas)
     {
-        canvas = canvas.Subsection(X + Margin.Left, Y + Margin.Top, Width - Margin.Right - Margin.Right, Height - Margin.Bottom - Margin.Bottom);
-        for (var y = 0; y < canvas.Height; y++)
+        canvas = canvas.Subsection(X + Margin.Left, Y + Margin.Top, Width - Margin.Right - Margin.Right, Height - Margin.Bottom - Margin.Bottom); // margin
+        for (var y = 0; y < canvas.Height; y++) // draw background
         {
             for (var x = 0; x < canvas.Width; x++)
             {
                 canvas.Draw(x, y, new StrokeStyle
                 {
-                    BackgroundColor = BackgroundColor.GetColorAt(x, y)
+                    BackgroundColor = BackgroundColor.GetColorAt(x, y, canvas.Width, canvas.Height)
                 });
             }
         }
+        
+        DrawChildren(canvas);
     }
 }

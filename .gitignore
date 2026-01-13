@@ -91,3 +91,5 @@
 /MusicPlayer/obj/Debug/net10.0/MusicPlayer.assets.cache 
 /MusicPlayer/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs 
 /MusicPlayer/obj/Debug/net10.0/ref
+Painter.Tests/bin/
+bin/

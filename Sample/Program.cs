@@ -22,8 +22,8 @@ static class Program
         {
             Content = new Rectangle
             {
-                Margin = Thickness.Of(4),
-                BackgroundColor = new SolidColorBrush(Color.Blue)
+                Margin = Thickness.Of(1, 2),
+                BackgroundColor = new LinearGradientColorBrush((Color.Crimson, 6), (Color.MediumVioletRed, 2), (Color.Blue, 5), (Color.Black, 0))
             },
             DataContext = viewModel
         };

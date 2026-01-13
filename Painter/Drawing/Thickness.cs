@@ -7,7 +7,7 @@ public readonly struct Thickness(int top, int bottom, int left, int right)
     public int Left { get; } = left;
     public int Right { get; } = right;
 
-    public static Thickness Of(int top, int bottom, int left, int right)
+    public static Thickness Of(int top = 0, int bottom = 0, int left = 0, int right = 0)
     {
         return new Thickness(top, bottom, left, right);
     }

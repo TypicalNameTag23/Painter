@@ -8,6 +8,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{E3D6
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicPlayer", "MusicPlayer\MusicPlayer.csproj", "{6F15D0D5-D4B3-4CF6-AC07-CDDF7EF577CA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Painter.Tests", "Painter.Tests\Painter.Tests.csproj", "{8F51F96B-8193-4A05-9A74-68FF7CFDC898}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,10 @@ Global
 		{6F15D0D5-D4B3-4CF6-AC07-CDDF7EF577CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F15D0D5-D4B3-4CF6-AC07-CDDF7EF577CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F15D0D5-D4B3-4CF6-AC07-CDDF7EF577CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F51F96B-8193-4A05-9A74-68FF7CFDC898}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F51F96B-8193-4A05-9A74-68FF7CFDC898}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F51F96B-8193-4A05-9A74-68FF7CFDC898}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F51F96B-8193-4A05-9A74-68FF7CFDC898}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{1FCC632F-864E-4203-9080-B89E7EA3E2B4} = {E3D69FB0-CAF7-4434-A85E-CB3FCF1C2140}

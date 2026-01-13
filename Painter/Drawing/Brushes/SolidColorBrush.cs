@@ -1,13 +1,11 @@
-﻿using System.Drawing;
+﻿namespace Painter.Drawing.Brushes;
 
-namespace Painter.Drawing.Brushes;
-
-public readonly struct SolidColorBrush(Color? color) : IBrush
+public record SolidColorBrush(Color? Color) : IBrush
 {
-    public Color? GetColorAt(int x, int y)
+    public Color? GetColorAt(int x, int y, int width, int height)
     {
-        return color;
+        return Color;
     }
 
-    public static readonly SolidColorBrush TransparentColorBrush = new(Color.Transparent);
+    public static readonly SolidColorBrush TransparentColorBrush = new(Drawing.Color.Transparent);
 }
