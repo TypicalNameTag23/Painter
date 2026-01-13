@@ -6,7 +6,7 @@ using Painter.Drawing.Brushes;
 namespace Painter.Drawing;
 
 /// <summary>
-/// 
+/// A color
 /// </summary>
 public readonly record struct Color(byte R, byte G, byte B) 
 {
@@ -90,7 +90,7 @@ public readonly record struct Color(byte R, byte G, byte B)
     #region HTML Named Colors 
     // Taken from https://htmlcolorcodes.com/color-names/
     
-    #region Reds
+    #region Red
     
     public static readonly Color IndianRed = new(205, 92, 92); // erm, html kinda anti woke smh
     public static readonly Color LightCoral = new(240, 128, 128);
@@ -103,7 +103,7 @@ public readonly record struct Color(byte R, byte G, byte B)
     
     #endregion
 
-    #region Pinks
+    #region Pink
     
     public static readonly Color Pink = new(255, 192, 203);
     public static readonly Color LightPink = new(255, 192, 203);
@@ -112,6 +112,88 @@ public readonly record struct Color(byte R, byte G, byte B)
     public static readonly Color MediumVioletRed = new(199, 21, 133);
     public static readonly Color PaleVioletRed = new(219, 112, 147);
     
+    #endregion
+
+    #region Orange
+    
+    public static readonly Color Coral = new(255, 127, 80);
+    public static readonly Color Tomato = new(255, 99, 71);
+    public static readonly Color OrangeRed = new(255, 69, 0);
+    public static readonly Color DarkOrange = new(255, 140, 0);
+    public static readonly Color Orange = new(255, 165, 0);
+
+    #endregion
+
+    #region Yellow
+    
+    public static readonly Color Gold = new(255, 215, 0);
+    public static readonly Color Yellow = new(255, 255, 0);
+    public static readonly Color LightYellow = new(255, 255, 224);
+    public static readonly Color LemonChiffon = new(255, 250, 205);
+    public static readonly Color LightGoldenrodYellow = new(250, 250, 210);
+    public static readonly Color PapayaWhip = new(255, 239, 213);
+    public static readonly Color Moccasin = new(255, 228, 181);
+    public static readonly Color PeachPuff = new(255, 218, 185);
+    public static readonly Color PaleGoldenrod = new(238, 232, 170);
+    public static readonly Color Khaki = new(240, 230, 140);
+    public static readonly Color DarkKhaki = new(189, 183, 107);
+
+    #endregion
+
+    #region Purple
+    
+    public static readonly Color Lavender = new(	230, 230, 250);
+    public static readonly Color Thistle = new(	216, 191, 216);
+    public static readonly Color Plum = new(221, 160, 221);
+    public static readonly Color Violet = new(	238, 130, 238);
+    public static readonly Color Orchid = new(218, 112, 214);
+    public static readonly Color Fuchsia = new(255, 0, 255);
+    public static readonly Color Magenta = new(255, 0, 255);
+    public static readonly Color MediumOrchid = new(186, 85, 211);
+    public static readonly Color MediumPurple = new(	147, 112, 219);
+    public static readonly Color RebeccaPurple = new(102, 51, 153);
+    public static readonly Color BlueViolet = new(138, 43, 226);
+    public static readonly Color DarkViolet = new(148, 0, 211);
+    public static readonly Color DarkOrchid = new(153, 50, 204);
+    public static readonly Color DarkMagenta = new(139, 0, 139);
+    public static readonly Color Purple = new(128, 0, 128);
+    public static readonly Color Indigo = new(75, 0, 130);
+    public static readonly Color SlateBlue = new(106, 90, 205);
+    public static readonly Color DarkSlateBlue = new(72, 61, 139);
+    public static readonly Color MediumSlateBlue = new(	123, 104, 238);
+
+    #endregion
+
+    #region Green
+    
+    public static readonly Color GreenYellow = new(173, 255, 47);
+    public static readonly Color Chartreuse = new(127, 255, 0);
+    public static readonly Color LawnGreen = new(124, 252, 0);
+    public static readonly Color Lime = new(0, 255, 0);
+    public static readonly Color LimeGreen = new(50, 205, 50);
+    public static readonly Color PaleGreen = new(152, 251, 152);
+    public static readonly Color LightGreen = new(144, 238, 144);
+    public static readonly Color MediumSpringGreen = new(0, 250, 154);
+    public static readonly Color SpringGreen = new(0, 255, 127);
+    public static readonly Color MediumSeaGreen = new(60, 179, 113);
+    public static readonly Color SeaGreen = new(46, 139, 87);
+    public static readonly Color ForestGreen = new(34, 139, 34);
+    
+    /// <summary>
+    /// HTML Green color
+    /// </summary>
+    public static readonly Color LeafGreen = new(0, 128, 0);
+    public static readonly Color DarkGreen = new(0, 100, 0);
+    public static readonly Color YellowGreen = new(154, 205, 50);
+    public static readonly Color OliveDrab = new(	107, 142, 35);
+    public static readonly Color Olive = new(128, 128, 0);
+    public static readonly Color DarkOliveGreen = new(85, 107, 47);
+    public static readonly Color MediumAquamarine = new(102, 205, 170);
+    public static readonly Color DarkSeaGreen = new(143, 188, 139);
+    public static readonly Color LightSeaGreen = new(32, 178, 170);
+    public static readonly Color DarkCyan = new(0, 139, 139);
+    public static readonly Color Teal = new(0, 128, 128);
+
     #endregion
     
     #endregion

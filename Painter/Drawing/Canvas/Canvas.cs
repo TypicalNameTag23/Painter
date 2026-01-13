@@ -8,8 +8,6 @@ public abstract class Canvas : ICanvas
 
     public abstract void Draw(int x, int y, char character, StrokeStyle strokeStyle);
 
-    public abstract ICanvas Subsection(int x, int y, int width, int height);
-
     public void Draw(int x, int y, StrokeStyle strokeStyle)
     {
         Draw(x, y, ' ', strokeStyle);
@@ -31,5 +29,15 @@ public abstract class Canvas : ICanvas
         {
             Draw(x, y, text, strokeStyle);
         }
+    }
+
+    public virtual ICanvas Subsection(int x, int y, int width, int height)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(width, 0);
+        ArgumentOutOfRangeException.ThrowIfLessThan(height, 0);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(width, Width);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(height, Height);
+        
+        return new SubsectionCanvas(x, y, width, height, this);
     }
 }

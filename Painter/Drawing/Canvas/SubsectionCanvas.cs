@@ -25,22 +25,13 @@ public class SubsectionCanvas : Canvas
         _fullCanvas.Draw(x + _xOffset, y + _yOffset, character, strokeStyle);
     }
 
-    // internal void DrawIgnoreSubsection(int x, int y, char character, StrokeStyle strokeStyle)
-    // {
-    //     _fullCanvas.Draw(x + _xOffset, y + _yOffset, character, strokeStyle);
-    // }
-    //
-    // internal void DrawIgnoreSubsection(int x, int y, string s, StrokeStyle strokeStyle)
-    // {
-    //      s = s.Replace("\n", "");
-    //      foreach (var c in s)
-    //      {
-    //         _fullCanvas.Draw(x, y, c, strokeStyle);
-    //      }
-    // }
-
     public override ICanvas Subsection(int x, int y, int width, int height)
     {
+        ArgumentOutOfRangeException.ThrowIfLessThan(width, 0);
+        ArgumentOutOfRangeException.ThrowIfLessThan(height, 0);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(width, Width);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(height, Height);
+        
         return new SubsectionCanvas(
             x + _xOffset, 
             y + _yOffset, 

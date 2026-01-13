@@ -43,16 +43,6 @@ internal class TerminalCanvas : Canvas
                 : strokeStyle);
     }
 
-    public override ICanvas Subsection(int x, int y, int width, int height)
-    {
-        ArgumentOutOfRangeException.ThrowIfLessThan(width, 0);
-        ArgumentOutOfRangeException.ThrowIfLessThan(height, 0);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(width, Width);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(height, Height);
-        
-        return new SubsectionCanvas(x, y, width, height, this);
-    }
-
     /// <summary>
     /// Displays this <see cref="TerminalCanvas"/> to the provided <see cref="Terminal"/>
     /// </summary>
