@@ -1,0 +1,1 @@
+Perhaps add a way to detect which controls need to be redrawn to prevent unnecessary redraws?

@@ -20,12 +20,43 @@ static class Program
         // PopulateGrid(grid, viewModel);
         var app = new Application
         {
-            Content = new Rectangle
-            {
-                Margin = Thickness.Of(1, 2),
-                BackgroundColor = new LinearGradientColorBrush((Color.Crimson, 6), (Color.MediumVioletRed, 2), (Color.Blue, 5), (Color.Black, 0))
-            },
-            DataContext = viewModel
+            Content = 
+                new Grid
+                    {
+                        RowDefinitions = RowDefinition.Of("1, *"),
+                    }
+                    .SetContent(new FpsTacker(), row: 0)
+                    .SetContent(
+                        new Grid
+                            {
+                                ColumnDefinitions = ColumnDefinition.Of("10*, 20, *")
+                            }
+                            .SetContent(
+                                new Rectangle 
+                                { 
+                                    Margin = Thickness.Of(top: 1, left: 2, right: 2, bottom: 2), 
+                                    BackgroundColor = new LinearGradientColorBrush(
+                                        (Color.Crimson, 6),
+                                        (Color.MediumVioletRed, 2), 
+                                        (Color.Blue, 5),
+                                        (Color.DeepPink, 7),
+                                        (Color.White, 4),
+                                        (Color.DarkSalmon, 0)) 
+                                }, column: 0)
+                            .SetContent(new HsvColorSpaceVisualizer(), column: 1)
+                            .SetContent(
+                                new Rectangle 
+                                { 
+                                    Margin = Thickness.Of(top: 1, left: 2, right: 2, bottom: 2), 
+                                    BackgroundColor = new LinearGradientColorBrush(
+                                        (Color.Crimson, 6),
+                                        (Color.MediumVioletRed, 2), 
+                                        (Color.Blue, 5),
+                                        (Color.DeepPink, 7),
+                                        (Color.White, 4),
+                                        (Color.DarkSalmon, 0)) 
+                                }, column: 2)
+                        , row: 1)
         };
         
         app.AddGlobalKeyBind(new Key(ConsoleKey.C, ConsoleModifiers.Control), (_, _) => app.Kill());

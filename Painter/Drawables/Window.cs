@@ -3,7 +3,7 @@ using Painter.Events;
 
 namespace Painter.Drawables;
 
-public class Window : TopLevel
+public class Window(Application application) : TopLevel(application)
 {
     public override void Interact(KeyPressedEventArgs args)
     {

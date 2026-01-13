@@ -8,7 +8,8 @@ namespace Painter.Drawing.Canvas;
 /// </summary>
 internal class TerminalCanvas : Canvas
 {
-    private readonly Dictionary<(int, int), (char, StrokeStyle)> _pixels = [];
+    private Dictionary<Point, Pixel> _previousFrame = [];
+    private Dictionary<Point, Pixel> _pixels = [];
     private readonly Terminal _terminal;
 
     /// <summary>
@@ -32,7 +33,14 @@ internal class TerminalCanvas : Canvas
             return;
         }
 
-        _pixels[(x, y)] = (character, strokeStyle);
+        var point = new Point(x, y);
+        _pixels[point] = new Pixel(
+            character == ' ' 
+                ? null 
+                : character, 
+            strokeStyle == StrokeStyle.Unstyled 
+                ? null 
+                : strokeStyle);
     }
 
     public override ICanvas Subsection(int x, int y, int width, int height)
@@ -42,7 +50,7 @@ internal class TerminalCanvas : Canvas
         ArgumentOutOfRangeException.ThrowIfGreaterThan(width, Width);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(height, Height);
         
-        return new CanvasSubsection(x, y, width, height, this);
+        return new SubsectionCanvas(x, y, width, height, this);
     }
 
     /// <summary>
@@ -50,20 +58,44 @@ internal class TerminalCanvas : Canvas
     /// </summary>
     internal void Display()
     {
-        foreach (var ((x, y), (character, style)) in _pixels)
+        // Should there be a dedicated Pixel and Point class instead of using a tuple?
+        foreach (var (point, pixel) in _pixels)
         {
-            _terminal.SetCursorPosition(x, y);
-            _terminal.SetStyle(style);
-            _terminal.Write(character);
-        }
+            // If we there was a pixel there in the old frame remove it
+            if (_previousFrame.Remove(point, out var oldPixel))
+            {
+                // If the old pixel matches the current one we are drawing, continue instead of redrawing it
+                if (oldPixel.Character == pixel.Character && oldPixel.StrokeStyle == pixel.StrokeStyle)
+                {
+                    continue;
+                }
+            }
 
-        _pixels.Clear();
+            // Redraw the pixel if it has changed
+            _terminal.SetCursorPosition(point);
+            _terminal.SetStyle(pixel.StrokeStyle ?? StrokeStyle.Unstyled);
+            _terminal.Write(pixel.Character ?? ' ');
+        }
+        
+        // All remaining pixels that haven't been removed were not drawn to in the new frame
+        foreach (var (point, _) in _previousFrame)
+        {
+            _terminal.SetCursorPosition(point);
+            // This means that they should be blank
+            _terminal.SetStyle(StrokeStyle.Unstyled);
+            _terminal.Write(' ');
+        }
+        
+        _previousFrame = _pixels;
+        // todo: Is there a better way to do this other than creating a new Dictionary each frame?
+        _pixels = [];
         _terminal.Flush();
     }
 
     private void OnTerminalChangedSize(object? sender, TerminalChangedSizeEventArgs args)
     {
         _pixels.Clear();
+        _previousFrame.Clear();
         Width = args.Width;
         Height = args.Height;
     }

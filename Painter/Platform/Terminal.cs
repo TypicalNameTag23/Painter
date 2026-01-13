@@ -78,6 +78,18 @@ internal abstract class Terminal
         _cursorX = x;
         _cursorY = y;
     }
+    
+    public void SetCursorPosition(Point point)
+    {
+        if (_cursorX == point.X && _cursorY == point.Y)
+        {
+            return;
+        }
+
+        Buffer.Append(AnsiTerminalCodes.SetCursorPosition(point.X, point.Y));
+        _cursorX = point.X;
+        _cursorY = point.Y;
+    }
 
     public void SetStyle(StrokeStyle strokeStyle)
     {

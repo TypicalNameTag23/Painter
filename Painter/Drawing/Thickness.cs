@@ -21,4 +21,9 @@ public readonly struct Thickness(int top, int bottom, int left, int right)
     {
         return new Thickness(all, all, all, all);
     }
+
+    public override string ToString()
+    {
+        return $"Margin({Top},{Bottom},{Left},{Right})";
+    }
 }

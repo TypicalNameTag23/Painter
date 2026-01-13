@@ -10,11 +10,15 @@ public class Application
     private readonly Terminal _terminal;
     private readonly Window _mainWindow;
     private readonly TerminalCanvas _canvas;
+    private Timer _keyProcessingTimer;
+    
+    public static event BeforeApplicationDrawFrameEvent? BeforeApplicationDrawFrameEvent;
+    public static event AfterApplicationDrawFrameEvent? AfterApplicationDrawFrameEvent;
 
     public Application()
     {
         _terminal = Terminal.GetPlatformTerminal();
-        _mainWindow = new Window
+        _mainWindow = new Window(this)
         {
             Width = _terminal.Width,
             Height = _terminal.Height
@@ -95,20 +99,25 @@ public class Application
         
         Console.TreatControlCAsInput = true;
         ApplicationState = ApplicationState.Running;
+        _keyProcessingTimer = new Timer(_ =>
+        {
+            while (Console.KeyAvailable)
+            {
+                var key = Console.ReadKey(true);
+                _mainWindow.Interact(new KeyPressedEventArgs(new Key(key.Key, key.Modifiers), key.KeyChar));
+            }
+        }, null, 5, 5);
+        
         while (ApplicationState == ApplicationState.Running)
         {
             _terminal.PollSizeChange();
             if (_mainWindow.NeedsRedraw)
             {
+                BeforeApplicationDrawFrameEvent?.Invoke();
                 _mainWindow.Draw(_canvas);
                 _canvas.Display();
                 _mainWindow.NeedsRedraw = false;
-            }
-            
-            while (Console.KeyAvailable)
-            {
-                var key = Console.ReadKey(true);
-                _mainWindow.Interact(new KeyPressedEventArgs(new Key(key.Key, key.Modifiers), key.KeyChar));
+                AfterApplicationDrawFrameEvent?.Invoke();
             }
         }
     }
@@ -116,5 +125,6 @@ public class Application
     public void Kill()
     {
         ApplicationState = ApplicationState.Killed;
+        _keyProcessingTimer.Dispose();
     }
 }

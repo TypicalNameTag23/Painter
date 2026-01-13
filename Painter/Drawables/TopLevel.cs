@@ -4,8 +4,10 @@ using Painter.Events;
 
 namespace Painter.Drawables;
 
-public abstract class TopLevel : ContentControl
+public abstract class TopLevel(Application applicationContext) : ContentControl
 {
+    public Application ApplicationContext { get; } = applicationContext;
+    
     private readonly Dictionary<Key, List<EventHandler<KeyPressedEventArgs>>> _windowKeyBinds = [];
 
     public void AddKeyBind(Key key, EventHandler<KeyPressedEventArgs> eventHandler)

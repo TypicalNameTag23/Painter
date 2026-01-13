@@ -6,9 +6,9 @@ namespace Painter.Drawables.Control;
 
 public abstract class DrawableControl : Drawable
 {
-    public IBrush BackgroundColor { get; set; }
+    public IBrush? BackgroundColor { get; set; }
     
-    public IBrush ForegroundColor { get; set; }
+    public IBrush? ForegroundColor { get; set; }
 
     public Thickness Margin { get; set; }
     
@@ -16,18 +16,26 @@ public abstract class DrawableControl : Drawable
     
     public override void Draw(ICanvas canvas)
     {
-        canvas = canvas.Subsection(X + Margin.Left, Y + Margin.Top, Width - Margin.Right - Margin.Right, Height - Margin.Bottom - Margin.Bottom); // margin
-        for (var y = 0; y < canvas.Height; y++) // draw background
+        var subsection = canvas.Subsection(
+            X + Margin.Left, 
+            Y + Margin.Top, 
+            Width - (Margin.Right + Margin.Left), 
+            Height - (Margin.Bottom + Margin.Top)); // Remove space defined by margin
+        
+        if (BackgroundColor is not null)
         {
-            for (var x = 0; x < canvas.Width; x++)
+            for (var y = 0; y < subsection.Height; y++) // draw background
             {
-                canvas.Draw(x, y, new StrokeStyle
+                for (var x = 0; x < subsection.Width; x++)
                 {
-                    BackgroundColor = BackgroundColor.GetColorAt(x, y, canvas.Width, canvas.Height)
-                });
+                    subsection.Draw(x, y, new StrokeStyle
+                    {
+                        BackgroundColor = BackgroundColor.GetColorAt(x, y, subsection.Width, subsection.Height)
+                    });
+                }
             }
         }
         
-        DrawChildren(canvas);
+        DrawChildren(subsection);
     }
 }

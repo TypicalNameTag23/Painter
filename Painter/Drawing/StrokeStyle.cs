@@ -9,4 +9,6 @@ public record StrokeStyle
     public bool Underline { get; init; }
     public bool Strikethrough { get; init; }
     public bool Blinking { get; init; }
+
+    public static readonly StrokeStyle Unstyled = new();
 }
