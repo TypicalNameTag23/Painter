@@ -1,1 +1,41 @@
 Perhaps add a way to detect which controls need to be redrawn to prevent unnecessary redraws?
+Think of ways to make the linear gradient code better
+Improve rendering performance (especially on windows)
+
+DO THIS ==> **ADD WAY TO CALCULATE SIZE OF DRAWABLES** <== DO THIS
+
+Try to improve the Grid layout code
+Allow linear gradient transformations (angled gradient)
+Change grid row and column count without voiding all of the current content
+
+Version 1.0 Roadmap
+-- Rendering Stuff --
+Implement way to measure drawables
+ - Remove or loosen restrictions on the SubsectionCanvas
+   - Loosening restrictions on drawing in the SubsectionCanvas would allow for rendering things that are not included in the width calculation of the Drawable
+ - Add Auto sizing to Grid
+
+Track dirty widgets and only redraw those
+ - Implement quad tree for fast lookup of intersecting widgets
+   - https://hypersphere.blog/blog/quad-trees/
+   - https://hypersphere.blog/blog/quad-trees-find-in-area/
+   - https://hypersphere.blog/blog/quad-trees-nearest-neighbour/
+   - https://stackoverflow.com/questions/41946007/efficient-and-well-explained-implementation-of-a-quadtree-for-2d-collision-det
+
+Directly interact with underlying terminal implementation
+ - Try to use native libraries to interact with console
+   - Read input from terminal (including mouse)
+   - Write directly to terminal
+   - https://vt100.net/emu/dec_ansi_parser
+   - https://en.wikipedia.org/wiki/ANSI_escape_code#24-bit
+   - https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
+   - https://stackoverflow.com/questions/78327670/how-to-use-ansi-sequences-to-get-the-hovering-position-of-the-mouse-in-a-python
+ - Try to get terminal capabilities
+   - Round colors down if terminal doesn't support full RGB colorspace
+
+-- Standard Drawable Library --
+Clean up LinearGradientColorBrush
+ - https://bsouthga.dev/posts/color-gradients-with-python
+ - Add diagonal gradients
+   - https://stackoverflow.com/questions/22607043/color-gradient-algorithm
+   - https://dev.to/ndesmic/linear-color-gradients-from-scratch-1a0e

@@ -87,6 +87,7 @@ public class Application
 
         Console.Write(
             // AnsiTerminalCodes.FuckAssLinuxThingStolenFromTerminalDotGui +
+            AnsiTerminalCodes.DisableLineWrapping +
             AnsiTerminalCodes.SaveScreen + 
             AnsiTerminalCodes.SaveCursorPositon + 
             AnsiTerminalCodes.ClearScreen +
@@ -126,5 +127,6 @@ public class Application
     {
         ApplicationState = ApplicationState.Killed;
         _keyProcessingTimer.Dispose();
+        Console.WriteLine(AnsiTerminalCodes.EnableLineWrapping);
     }
 }

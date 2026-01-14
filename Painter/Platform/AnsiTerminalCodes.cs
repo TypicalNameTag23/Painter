@@ -38,6 +38,8 @@ internal static class AnsiTerminalCodes
     internal const string RestoreCursorPositon = $"{ControlSequenceIntroducer}[u";
 
     internal const string SaveScreen = $"{ControlSequenceIntroducer}?47h";
+    internal const string DisableLineWrapping = $"{ControlSequenceIntroducer}?7l";
+    internal const string EnableLineWrapping = $"{ControlSequenceIntroducer}?7h";
     internal const string RestoreScreen = $"{ControlSequenceIntroducer}?47l";
     internal const string ClearScreen = $"{ControlSequenceIntroducer}3J{ResetCursorPosition}{ControlSequenceIntroducer}J";//$"{ResetCursorPosition}{ControlSequenceIntroducer}J"; // windows \:
 
