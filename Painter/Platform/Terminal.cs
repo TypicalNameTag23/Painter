@@ -134,8 +134,6 @@ internal abstract class Terminal
     public void ResetStyle()
     {
         Buffer.Append(AnsiTerminalCodes.ResetStyles);
-        Buffer.Append(AnsiTerminalCodes.ResetBackgroundColor);
-        Buffer.Append(AnsiTerminalCodes.ResetForegroundColor);
         _currentStrokeStyle = new StrokeStyle();
     }
 

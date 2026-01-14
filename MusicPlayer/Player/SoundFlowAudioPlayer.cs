@@ -185,9 +185,7 @@ public sealed class SoundFlowAudioPlayer : AudioPlayerBase
         {
             Pause();
         }
-
-        // _player?.Seek(TrackTime);
-        // return;
+        
         SeekDelayTimer = new Timer(_ =>
         {
             // Don't allow seeking while playing, must pause player
@@ -245,41 +243,6 @@ public sealed class SoundFlowAudioPlayer : AudioPlayerBase
             }
 
             TrackTime = TimeSpan.Zero;
-        }
-    }
-    
-    protected override void OnTrackEnd()
-    {
-        switch (LoopType)
-        {
-            case LoopType.LoopQueue:
-            {
-                if (CurrentTrackIndex == TrackList.Count - 1)
-                {
-                    CurrentTrackIndex = 0;
-                    break;
-                }
-
-                CurrentTrackIndex++;
-                break;
-            }
-            case LoopType.LoopTrack:
-            {
-                Replay();
-                break;
-            }
-            case LoopType.Disabled:
-            {
-                if (CurrentTrackIndex == TrackList.Count - 1)
-                {
-                    Stop();
-                    CurrentTrackIndex = 0;
-                    return;
-                }
-
-                CurrentTrackIndex++;
-                break;
-            }
         }
     }
 }

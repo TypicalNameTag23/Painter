@@ -29,7 +29,7 @@ internal static class AnsiTerminalCodes
     
     internal const string ResetForegroundColor = $"{ControlSequenceIntroducer}39m";
     internal const string ResetBackgroundColor = $"{ControlSequenceIntroducer}49m";
-    internal const string ResetStyles = $"{ControlSequenceIntroducer}0";
+    internal const string ResetStyles = $"{ControlSequenceIntroducer}0m";
 
     internal const string HideCursor = $"{ControlSequenceIntroducer}?25l";
     internal const string ShowCursor = $"{ControlSequenceIntroducer}?25h";
