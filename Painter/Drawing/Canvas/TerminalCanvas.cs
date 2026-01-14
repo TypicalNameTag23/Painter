@@ -48,10 +48,9 @@ internal class TerminalCanvas : Canvas
     /// </summary>
     internal void Display()
     {
-        // Should there be a dedicated Pixel and Point class instead of using a tuple?
         foreach (var (point, pixel) in _pixels)
         {
-            // If we there was a pixel there in the old frame remove it
+            // If there was a pixel there in the old frame remove it
             if (_previousFrame.Remove(point, out var oldPixel))
             {
                 // If the old pixel matches the current one we are drawing, continue instead of redrawing it
@@ -77,7 +76,7 @@ internal class TerminalCanvas : Canvas
         }
         
         _previousFrame = _pixels;
-        // todo: Is there a better way to do this other than creating a new Dictionary each frame?
+        // todo: Is there a better way to do this other than creating a new Dictionary every frame?
         _pixels = [];
         _terminal.Flush();
     }

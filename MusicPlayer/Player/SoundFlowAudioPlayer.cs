@@ -16,6 +16,7 @@ namespace MusicPlayer.Player;
 
 public sealed class SoundFlowAudioPlayer : AudioPlayerBase
 {
+    private readonly Lock _trackChangeLock = new();
     private readonly AudioEngine _engine;
     private readonly AudioFormat _format;
     private readonly AudioPlaybackDevice _device;
@@ -218,29 +219,67 @@ public sealed class SoundFlowAudioPlayer : AudioPlayerBase
         {
             return;
         }
-                
-        _audioStream?.Dispose();
-        _audioStream = CurrentTrack.TrackSource switch
-        {
-            TrackSource.File => new StreamDataProvider(_engine, _format, File.OpenRead(CurrentTrack.Path)),
-            TrackSource.Network => new NetworkDataProvider(_engine, _format, CurrentTrack.Path)
-        };
 
-        if (_player is not null)
+        lock (_trackChangeLock)
         {
-            _device.MasterMixer.RemoveComponent(_player);
-            _player.Dispose();
-        }
-                
-        _player = new SoundPlayer(_engine, _format, _audioStream);
-        _player.PlaybackEnded += (_, _) => OnTrackEnd();
-        _device.MasterMixer.AddComponent(_player);
-        if (startTime is not null)
-        {
-            _player.Seek(startTime.Value);
-            TrackTime = startTime.Value;
-        }
+            if (_player is not null)
+            {
+                _device.MasterMixer.RemoveComponent(_player);
+                _player.Dispose();
+            }
 
-        TrackTime = TimeSpan.Zero;
+            _audioStream?.Dispose();
+            _audioStream = CurrentTrack.TrackSource switch
+            {
+                TrackSource.File => new StreamDataProvider(_engine, _format, File.OpenRead(CurrentTrack.Path)),
+                TrackSource.Network => new NetworkDataProvider(_engine, _format, CurrentTrack.Path)
+            };
+
+            _player = new SoundPlayer(_engine, _format, _audioStream);
+            _player.PlaybackEnded += (_, _) => OnTrackEnd();
+            _device.MasterMixer.AddComponent(_player);
+            if (startTime is not null)
+            {
+                _player.Seek(startTime.Value);
+                TrackTime = startTime.Value;
+            }
+
+            TrackTime = TimeSpan.Zero;
+        }
+    }
+    
+    protected override void OnTrackEnd()
+    {
+        switch (LoopType)
+        {
+            case LoopType.LoopQueue:
+            {
+                if (CurrentTrackIndex == TrackList.Count - 1)
+                {
+                    CurrentTrackIndex = 0;
+                    break;
+                }
+
+                CurrentTrackIndex++;
+                break;
+            }
+            case LoopType.LoopTrack:
+            {
+                Replay();
+                break;
+            }
+            case LoopType.Disabled:
+            {
+                if (CurrentTrackIndex == TrackList.Count - 1)
+                {
+                    Stop();
+                    CurrentTrackIndex = 0;
+                    return;
+                }
+
+                CurrentTrackIndex++;
+                break;
+            }
+        }
     }
 }

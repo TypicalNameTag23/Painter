@@ -27,10 +27,10 @@ public class SubsectionCanvas : Canvas
 
     public override ICanvas Subsection(int x, int y, int width, int height)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(width, 0);
-        ArgumentOutOfRangeException.ThrowIfLessThan(height, 0);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(width, Width);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(height, Height);
+        // ArgumentOutOfRangeException.ThrowIfLessThan(width, 0);
+        // ArgumentOutOfRangeException.ThrowIfLessThan(height, 0);
+        // ArgumentOutOfRangeException.ThrowIfGreaterThan(width, Width);
+        // ArgumentOutOfRangeException.ThrowIfGreaterThan(height, Height);
         
         return new SubsectionCanvas(
             x + _xOffset, 

@@ -1,6 +1,6 @@
-using System.Drawing;
 using MusicPlayer.Player;
 using Painter.Drawables;
+using Painter.Drawing;
 
 namespace MusicPlayer.Drawables;
 
@@ -14,7 +14,7 @@ public class PlaybackInformation : Drawable
         var textBlock = new TextBlock
         {
             Text = DisplayText(),
-            TextColor = Color.Aquamarine,
+            TextColor = Color.DarkSeaGreen,
             Height = 1
         };
         

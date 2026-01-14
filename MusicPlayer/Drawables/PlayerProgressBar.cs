@@ -29,7 +29,7 @@ public class PlayerProgressBar : Drawable
         {
             canvas.Draw(X + x + 8, Y, " ", new StrokeStyle
             {
-                BackgroundColor = ColorHelper.FromHsv(hueStep * x, 1, 1)
+                BackgroundColor = Color.FromHsv(hueStep * x, 1, 1)
             });
         }
 
@@ -38,7 +38,7 @@ public class PlayerProgressBar : Drawable
         {
             canvas.Draw(X + x + 8, Y, " ", new StrokeStyle
             {
-                BackgroundColor = ColorHelper.FromHsv(0, 0, 0.15 + brightnessStep * x)
+                BackgroundColor = Color.FromHsv(0, 0, 0.15 + brightnessStep * x)
             });
         }
     }

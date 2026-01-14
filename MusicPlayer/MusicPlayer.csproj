@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Painter\Painter.csproj" />
+      <ProjectReference Include="..\Sample\Sample.csproj" />
     </ItemGroup>
 
     <ItemGroup>

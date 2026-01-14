@@ -43,8 +43,6 @@ public abstract class TopLevel(Application applicationContext) : ContentControl
         {
             eventHandler.Invoke(this, args);
         }
-
-        args.Handled = true;
     }
     
     public IReadOnlyList<Key> GetBoundKeys()

@@ -1,14 +1,14 @@
-﻿using System.Drawing;
-using MusicPlayer.Player;
+﻿using MusicPlayer.Player;
 using Painter.Drawables;
+using Painter.Drawing;
 
 namespace MusicPlayer.Drawables;
 
 // todo: kinda jank broken rn, will come back and make changes to improve this later
 public class PlayerTracksViewer : Drawable
 {
-    private static readonly Color SecondaryRowColor = Color.FromArgb(39, 39, 39);
-    private static readonly Color SelectedRowColor = Color.FromArgb(186, 0, 91);
+    private static readonly Color SecondaryRowColor = new(39, 39, 39);
+    private static readonly Color SelectedRowColor = new(186, 0, 91);
     private readonly List<TextBlock> _rows = [];
     private readonly IAudioPlayer _player;
 
@@ -30,7 +30,7 @@ public class PlayerTracksViewer : Drawable
                     Height = 1,
                     Y = i,
                     OverflowStyle = OverflowStyle.Ellipses,
-                    TextColor = Color.Wheat
+                    // TextColor = Color.Wheat
                 };
                 
                 _rows.Add(textBlock);

@@ -1,6 +1,6 @@
-﻿using System.Drawing;
-using MusicPlayer.Player;
+﻿using MusicPlayer.Player;
 using Painter.Drawables;
+using Painter.Drawing;
 
 namespace MusicPlayer.Drawables;
 
@@ -16,7 +16,7 @@ public class PlayerTrackInfo : Drawable
             Height = 1,
             OverflowStyle = OverflowStyle.Ellipses,
             Text = GetDisplayTitle(),
-            TextColor = Color.Aquamarine
+            TextColor = Color.DarkSeaGreen
         };
         
         Attach(textBlock);

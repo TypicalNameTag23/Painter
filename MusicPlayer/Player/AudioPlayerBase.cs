@@ -267,7 +267,7 @@ public abstract class AudioPlayerBase : IAudioPlayer
         PlayerStateChangedEvent?.Invoke();
     }
 
-    protected void OnTrackEnd()
+    protected virtual void OnTrackEnd()
     {
         switch (LoopType)
         {
