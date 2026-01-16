@@ -4,19 +4,23 @@ namespace Painter.Utilities;
 
 public static class DrawableExtensions
 {
-    /// <summary>
-    /// Gets the <see cref="TopLevel"/> associated with a <see cref="Drawable"/>
-    /// </summary>
-    /// <param name="drawable">The <see cref="Drawable"/></param>
-    /// <returns>The <see cref="TopLevel"/></returns>
-    public static TopLevel? GetTopLevel(this Drawable drawable)
+    public static int EffectiveMaxWidth(this Drawable drawable)
     {
-        var ancestor = drawable.Parent;
-        while (ancestor is not null && ancestor is not TopLevel)
-        {
-            ancestor = ancestor.Parent;
-        }
+        return drawable.Width ?? drawable.MaxWidth;
+    }
+    
+    public static int EffectiveMinWidth(this Drawable drawable)
+    {
+        return drawable.Width ?? drawable.MinWidth;
+    }
+    
+    public static int EffectiveMaxHeight(this Drawable drawable)
+    {
+        return drawable.Height ?? drawable.MaxHeight;
+    }
 
-        return (TopLevel?) ancestor;
+    public static int EffectiveMinHeight(this Drawable drawable)
+    {
+        return drawable.Height ?? drawable.MinHeight;
     }
 }

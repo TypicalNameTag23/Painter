@@ -5,6 +5,7 @@ using Painter;
 using Painter.Drawables;
 using Painter.Drawing;
 using Painter.Drawing.Brushes;
+using Painter.Platform;
 using Sample;
 
 namespace MusicPlayer;

@@ -11,7 +11,7 @@ public class PlayerProgressBar : Drawable
     public PlayerProgressBar(IAudioPlayer player)
     {
         _player = player;
-        _player.PlaybackTimeChangedEvent += RequestRedraw;
+        _player.PlaybackTimeChangedEvent += InvalidateDraw;
     }
     
     public override void Draw(ICanvas canvas)

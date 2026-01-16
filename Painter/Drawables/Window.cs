@@ -1,4 +1,3 @@
-using Painter.Drawables.DrawableImpl;
 using Painter.Events;
 
 namespace Painter.Drawables;

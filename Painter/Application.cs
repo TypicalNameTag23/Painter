@@ -1,41 +1,21 @@
 using Painter.Drawables;
-using Painter.Drawing.Canvas;
 using Painter.Events;
 using Painter.Platform;
+using Painter.Rendering;
 
 namespace Painter;
 
 public class Application
 {
-    private readonly Terminal _terminal;
-    private readonly Window _mainWindow;
-    private readonly TerminalCanvas _canvas;
     private Timer _keyProcessingTimer;
-    
+    private Renderer _renderer;
+    private Window _mainWindow;
+    private Terminal _terminal;
+
     public static event BeforeApplicationDrawFrameEvent? BeforeApplicationDrawFrameEvent;
     public static event AfterApplicationDrawFrameEvent? AfterApplicationDrawFrameEvent;
 
-    public Application()
-    {
-        _terminal = Terminal.GetPlatformTerminal();
-        _mainWindow = new Window(this)
-        {
-            Width = _terminal.Width,
-            Height = _terminal.Height
-        };
-        
-        _canvas = new TerminalCanvas(_terminal, Width, Height);
-        _terminal.TerminalSizeChangedEvent += (_, args) =>
-        {
-            Console.Write(AnsiTerminalCodes.ClearScreen);
-            _mainWindow.Width = args.Width;
-            _mainWindow.Height = args.Height;
-            _mainWindow.NeedsRedraw = true;
-        };
-    }
-
-    public int Width => _mainWindow.Width;
-    public int Height => _mainWindow.Height;
+    public Window MainWindow { get; set; }
 
     public ApplicationState ApplicationState
     {
@@ -50,18 +30,6 @@ public class Application
             field = value;
         }
     } = ApplicationState.Inactive;
-
-    public Drawable? Content
-    {
-        get => _mainWindow.Content;
-        set => _mainWindow.Content = value;
-    }
-    
-    public object? DataContext
-    {
-        get => _mainWindow.DataContext;
-        set => _mainWindow.DataContext = value;
-    }
     
     public void AddGlobalKeyBind(Key key, EventHandler<KeyPressedEventArgs> eventHandler)
     {
@@ -85,40 +53,20 @@ public class Application
             return;
         }
 
-        Console.Write(
-            // AnsiTerminalCodes.FuckAssLinuxThingStolenFromTerminalDotGui +
-            AnsiTerminalCodes.DisableLineWrapping +
-            AnsiTerminalCodes.SaveScreen + 
-            AnsiTerminalCodes.SaveCursorPositon + 
-            AnsiTerminalCodes.ClearScreen +
-            AnsiTerminalCodes.HideCursor +
-            // AnsiTerminalCodes.CSI_EnableAnyEventMouse +
-            // AnsiTerminalCodes.CSI_EnableSgrExtModeMouse +
-            // AnsiTerminalCodes.CSI_EnableUrxvtExtModeMouse);
-            AnsiTerminalCodes.ResetCursorPosition + 
-            AnsiTerminalCodes.ResetStyles);
+        _terminal = Terminal.GetPlatformTerminal();
+        _renderer = new Renderer(_terminal, _mainWindow);
         
-        Console.TreatControlCAsInput = true;
+        _terminal.Initialize();
         ApplicationState = ApplicationState.Running;
-        _keyProcessingTimer = new Timer(_ =>
+        while (ApplicationState == ApplicationState.Running)
         {
+            _terminal.PollSizeChange();   
+            _renderer.ExecuteRenderPass();
+            
             while (Console.KeyAvailable)
             {
                 var key = Console.ReadKey(true);
                 _mainWindow.Interact(new KeyPressedEventArgs(new Key(key.Key, key.Modifiers), key.KeyChar));
-            }
-        }, null, 5, 5);
-        
-        while (ApplicationState == ApplicationState.Running)
-        {
-            _terminal.PollSizeChange();
-            if (_mainWindow.NeedsRedraw)
-            {
-                BeforeApplicationDrawFrameEvent?.Invoke();
-                _mainWindow.Draw(_canvas);
-                _canvas.Display();
-                _mainWindow.NeedsRedraw = false;
-                AfterApplicationDrawFrameEvent?.Invoke();
             }
         }
     }

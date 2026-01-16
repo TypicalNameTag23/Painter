@@ -6,6 +6,8 @@ public readonly struct Thickness(int top, int bottom, int left, int right)
     public int Bottom { get; } = bottom;
     public int Left { get; } = left;
     public int Right { get; } = right;
+    public int VerticalSum => Top + Bottom;
+    public int HorizontalSum => Left + Right;
 
     public static Thickness Of(int top = 0, int bottom = 0, int left = 0, int right = 0)
     {

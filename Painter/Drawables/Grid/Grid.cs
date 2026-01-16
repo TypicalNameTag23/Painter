@@ -36,7 +36,7 @@ public class Grid : Drawable
             _rowDefinitions = value.ToArray();
             UpdateContentArray();
             Measure();
-            RequestRedraw();
+            InvalidateDraw();
         }
     }
     
@@ -53,7 +53,7 @@ public class Grid : Drawable
             _columnDefinitions = value.ToArray();
             UpdateContentArray();
             Measure();
-            RequestRedraw();
+            InvalidateDraw();
         }
     }
 

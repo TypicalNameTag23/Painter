@@ -122,6 +122,6 @@ public class HsvColorSpaceVisualizer : Drawable
         
         args.Handled = true;
         SaturationOffset += 0.1;
-        RequestRedraw();
+        InvalidateDraw();
     }
 }

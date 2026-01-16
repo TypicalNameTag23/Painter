@@ -39,3 +39,16 @@ Clean up LinearGradientColorBrush
  - Add diagonal gradients
    - https://stackoverflow.com/questions/22607043/color-gradient-algorithm
    - https://dev.to/ndesmic/linear-color-gradients-from-scratch-1a0e
+   
+   
+   
+Implement way to measure drawables
+ - Drawable.cs
+   - Should get an Size that marks how much space it has to work with
+   - Should remove the margin from the space
+   - Apply size constraints defined by the min and max values for height and width along with the height and width values themselves if they are set
+     - Delegate to the class to calculate how much space it specifically needs
+   - Clamp the Drawable down to any set heigh or width limits
+   - Re-add the margin to the space 
+ - Any time one of the size properties changes (eg: width, height, minwidth, minheight) Drawable.cs should call an event that lets the renderer know that it has changed
+ - Have an event for 

@@ -1,3 +1,5 @@
+using Painter.Platform;
+
 namespace Painter.Events;
 
 public class KeyPressedEventArgs(Key key, char character) : EventArgs

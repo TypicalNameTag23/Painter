@@ -1,21 +1,22 @@
 using System.Runtime.InteropServices;
-using Painter.Drawables.DrawableImpl;
 using Painter.Events;
+using Painter.Rendering;
 
 namespace Painter.Drawables;
 
 public abstract class TopLevel(Application applicationContext) : ContentControl
 {
-    public Application ApplicationContext { get; } = applicationContext;
+    internal ILayoutManager LayoutManager { get; }
+    internal IRenderer Renderer => (Renderer) LayoutManager;
     
-    private readonly Dictionary<Key, List<EventHandler<KeyPressedEventArgs>>> _windowKeyBinds = [];
+    private readonly Dictionary<Key, List<EventHandler<KeyPressedEventArgs>>> _globalKeyBinds = [];
 
     public void AddKeyBind(Key key, EventHandler<KeyPressedEventArgs> eventHandler)
     {
-        if (!_windowKeyBinds.TryGetValue(key, out var eventHandlers))
+        if (!_globalKeyBinds.TryGetValue(key, out var eventHandlers))
         {
             eventHandlers = [];
-            _windowKeyBinds.Add(key, eventHandlers);
+            _globalKeyBinds.Add(key, eventHandlers);
         }
         
         eventHandlers.Add(eventHandler);
@@ -23,7 +24,7 @@ public abstract class TopLevel(Application applicationContext) : ContentControl
     
     public void RemoveBoundKey(Key key)
     {
-        _windowKeyBinds.Remove(key);
+        _globalKeyBinds.Remove(key);
     }
     
     public void ExecuteKeyBinds(KeyPressedEventArgs args)
@@ -34,7 +35,7 @@ public abstract class TopLevel(Application applicationContext) : ContentControl
             key = new Key(key.KeyType, key.KeyModifiers ^ ConsoleModifiers.Shift);
         }
         
-        if (!_windowKeyBinds.TryGetValue(key, out var eventHandlers))
+        if (!_globalKeyBinds.TryGetValue(key, out var eventHandlers))
         {
             return;
         }
@@ -47,6 +48,6 @@ public abstract class TopLevel(Application applicationContext) : ContentControl
     
     public IReadOnlyList<Key> GetBoundKeys()
     {
-        return _windowKeyBinds.Keys.ToList();
+        return _globalKeyBinds.Keys.ToList();
     }
 }

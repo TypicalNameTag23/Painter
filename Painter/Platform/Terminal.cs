@@ -31,13 +31,27 @@ internal abstract class Terminal
         return new GenericTerminal();
     }
 
-    public void Initialize()
+    public virtual void Initialize()
     {
         if (_initialized)
         {
             return;
         }
         
+        Console.Write(
+            // AnsiTerminalCodes.FuckAssLinuxThingStolenFromTerminalDotGui +
+            AnsiTerminalCodes.DisableLineWrapping +
+            AnsiTerminalCodes.SaveScreen + 
+            AnsiTerminalCodes.SaveCursorPositon + 
+            AnsiTerminalCodes.ClearScreen +
+            AnsiTerminalCodes.HideCursor +
+            // AnsiTerminalCodes.CSI_EnableAnyEventMouse +
+            // AnsiTerminalCodes.CSI_EnableSgrExtModeMouse +
+            // AnsiTerminalCodes.CSI_EnableUrxvtExtModeMouse);
+            AnsiTerminalCodes.ResetCursorPosition + 
+            AnsiTerminalCodes.ResetStyles);
+        
+        Console.TreatControlCAsInput = true;
         PollSizeChange();
         _initialized = true;
     }

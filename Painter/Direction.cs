@@ -1,4 +1,4 @@
-namespace Painter.Drawables.DrawableImpl;
+namespace Painter;
 
 public enum Direction
 {

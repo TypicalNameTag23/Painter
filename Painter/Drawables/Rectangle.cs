@@ -1,5 +1,3 @@
-﻿using Painter.Drawables.Control;
+﻿namespace Painter.Drawables;
 
-namespace Painter.Drawables;
-
-public class Rectangle : DrawableControl;
+public class Rectangle : Drawable;

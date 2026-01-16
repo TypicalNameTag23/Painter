@@ -16,12 +16,8 @@ internal class TerminalCanvas : Canvas
     /// Creates a new <see cref="TerminalCanvas"/>
     /// </summary>
     /// <param name="terminal">The <see cref="Terminal"/> to print to</param>
-    /// <param name="width">The width of this canvas</param>
-    /// <param name="height">The height of this canvas</param>
-    internal TerminalCanvas(Terminal terminal, int width, int height)
+    internal TerminalCanvas(Terminal terminal)
     {
-        Width = width;
-        Height = height;
         _terminal = terminal;
         _terminal.TerminalSizeChangedEvent += OnTerminalChangedSize;
     }

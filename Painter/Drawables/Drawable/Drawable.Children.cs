@@ -13,29 +13,28 @@ public abstract partial class Drawable
     protected IReadOnlyList<Drawable> Children => _children.AsReadOnly();
 
     /// <summary>
-    /// Attaches a child <see cref="index"/> to this <see cref="Painter.Drawables.Drawable"/>
+    /// Attaches a child <see cref="index"/> to this drawable
     /// </summary>
     /// <param name="index">The index to attach this drawable at</param>
     /// <param name="drawable">The drawable to attach</param>
     /// <remarks>
-    /// The <see cref="Drawables.Drawable"/> will not be attached if it is already attached to another <see cref="Drawables.Drawable"/>
-    /// <br/>
-    /// Lower indexes get rendered first
+    /// The rendering of children starts at the lowest index, meaning that the child at index 0 will likely get drawn over if there is more than one child
     /// </remarks>
     protected void AttachAt(int index, Drawable drawable)
     {
-        if (index > _children.Count)
-        {
-            index = _children.Count;
-        }
-        
+        ArgumentNullException.ThrowIfNull(drawable);
+        ArgumentOutOfRangeException.ThrowIfLessThan(0, Children.Count);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(index, Children.Count);
         if (drawable.Parent is not null)
         {
-            return;
+            throw new ArgumentException("Drawable is already attached to a parent");
         }
+        
         drawable.Parent = this;
+        drawable.Root = Root;
         _children.Insert(index, drawable);
-        NeedsRedraw = true;
+        InvalidateDraw();
+        // NeedsRedraw = true;
     }
     
     /// <summary>
@@ -68,8 +67,9 @@ public abstract partial class Drawable
         }
         
         drawable.Parent = null;
+        drawable.Root = null;
         _children.Remove(drawable);
-        NeedsRedraw = true;
+        InvalidateDraw();
     }
     
     /// <summary>
@@ -114,7 +114,7 @@ public abstract partial class Drawable
 
     protected void DrawChildren(ICanvas canvas)
     {
-        var canvasSubsection = canvas.Subsection(X, Y, Width, Height);
+        var canvasSubsection = canvas.Subsection(X, Y, DesiredSize.Width, DesiredSize.Height);
         foreach (var drawable in _children)
         {
             drawable.Draw(canvasSubsection);
