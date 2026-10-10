@@ -15,19 +15,19 @@ public class Application
     public static event BeforeApplicationDrawFrameEvent? BeforeApplicationDrawFrameEvent;
     public static event AfterApplicationDrawFrameEvent? AfterApplicationDrawFrameEvent;
 
-    public Application()
+    public Application(Terminal? terminal = null)
     {
-        _terminal = Terminal.GetPlatformTerminal();
+        _terminal = terminal ?? Terminal.GetPlatformTerminal();
         _mainWindow = new Window(this)
         {
             Width = _terminal.Width,
             Height = _terminal.Height
         };
-        
+
         _canvas = new TerminalCanvas(_terminal, Width, Height);
         _terminal.TerminalSizeChangedEvent += (_, args) =>
         {
-            Console.Write(AnsiTerminalCodes.ClearScreen);
+            _terminal.Write(AnsiTerminalCodes.ClearScreen);
             _mainWindow.Width = args.Width;
             _mainWindow.Height = args.Height;
             _mainWindow.NeedsRedraw = true;
@@ -84,8 +84,8 @@ public class Application
         {
             return;
         }
-
-        Console.Write(
+        
+        _terminal.Write(
             // AnsiTerminalCodes.FuckAssLinuxThingStolenFromTerminalDotGui +
             AnsiTerminalCodes.DisableLineWrapping +
             AnsiTerminalCodes.SaveScreen + 
@@ -98,14 +98,15 @@ public class Application
             AnsiTerminalCodes.ResetCursorPosition + 
             AnsiTerminalCodes.ResetStyles);
         
-        Console.TreatControlCAsInput = true;
+        //Console.TreatControlCAsInput = true;
         ApplicationState = ApplicationState.Running;
         _keyProcessingTimer = new Timer(_ =>
         {
-            while (Console.KeyAvailable)
+            var key = _terminal.ReadKey();
+            while (key != null)
             {
-                var key = Console.ReadKey(true);
-                _mainWindow.Interact(new KeyPressedEventArgs(new Key(key.Key, key.Modifiers), key.KeyChar));
+                _mainWindow.Interact(new KeyPressedEventArgs(key));
+                key = _terminal.ReadKey();
             }
         }, null, 5, 5);
         
@@ -127,6 +128,6 @@ public class Application
     {
         ApplicationState = ApplicationState.Killed;
         _keyProcessingTimer.Dispose();
-        Console.WriteLine(AnsiTerminalCodes.EnableLineWrapping);
+        _terminal.Write(AnsiTerminalCodes.EnableLineWrapping);
     }
 }

@@ -59,7 +59,7 @@ static class Program
                         , row: 1)
         };
         
-        app.AddGlobalKeyBind(new Key(ConsoleKey.C, ConsoleModifiers.Control), (_, _) => app.Kill());
+        app.AddGlobalKeyBind(new Key(ConsoleKey.C, 'c', ConsoleModifiers.Control), (_, _) => app.Kill());
         app.Start();
     }
 

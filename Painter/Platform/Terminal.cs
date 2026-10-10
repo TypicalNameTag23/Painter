@@ -5,7 +5,7 @@ using Painter.Events;
 
 namespace Painter.Platform;
 
-internal abstract class Terminal
+public abstract class Terminal
 {
     private StrokeStyle _currentStrokeStyle = new();
     private bool _initialized;
@@ -42,7 +42,11 @@ internal abstract class Terminal
         _initialized = true;
     }
 
-    public void Write(string text)
+    public abstract void Write(string text);
+
+    public abstract Key? ReadKey();
+
+    public void WriteBuffered(string text)
     {
         var sections = text.Split(Environment.NewLine);
         Buffer.Append(sections[0]);
@@ -61,7 +65,7 @@ internal abstract class Terminal
         }
     }
     
-    public void Write(char character)
+    public void WriteBuffered(char character)
     {
         Buffer.Append(character);
         _cursorX += 1;

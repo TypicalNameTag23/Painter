@@ -63,7 +63,7 @@ internal class TerminalCanvas : Canvas
             // Redraw the pixel if it has changed
             _terminal.SetCursorPosition(point);
             _terminal.SetStyle(pixel.StrokeStyle ?? StrokeStyle.Unstyled);
-            _terminal.Write(pixel.Character ?? ' ');
+            _terminal.WriteBuffered(pixel.Character ?? ' ');
         }
         
         // All remaining pixels that haven't been removed were not drawn to in the new frame
@@ -72,7 +72,7 @@ internal class TerminalCanvas : Canvas
             _terminal.SetCursorPosition(point);
             // This means that they should be blank
             _terminal.SetStyle(StrokeStyle.Unstyled);
-            _terminal.Write(' ');
+            _terminal.WriteBuffered(' ');
         }
         
         _previousFrame = _pixels;
