@@ -35,6 +35,28 @@ internal class WindowsTerminal : Terminal
         Console.Write(Buffer);
         Buffer.Clear();
     }
+    
+    public override Key? ReadKey()
+    {
+        if (!Console.KeyAvailable)
+        {
+            return null;
+        }
+
+        var key = Console.ReadKey(true);
+        var modifiers = key.Modifiers;
+        if (Console.CapsLock)
+        {
+            modifiers ^= ConsoleModifiers.Shift;
+        }
+        
+        return new Key(key.Key, key.KeyChar, modifiers);
+    }
+    
+    public override void Write(string text)
+    {
+        Console.Write(text);
+    }
 
     public override void PollSizeChange()
     {

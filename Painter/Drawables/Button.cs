@@ -16,9 +16,9 @@ public class Button : ContentControl
 
     public Color SelectedColor { get; set; } = Color.White;
 
-    public event EventHandler<Button, ButtonClickedEventArgs>? OnClickEvent;
+    public event EventHandler<ButtonClickedEventArgs>? OnClickEvent;
 
-    public Button OnClick(EventHandler<Button, ButtonClickedEventArgs> onClick)
+    public Button OnClick(EventHandler<ButtonClickedEventArgs> onClick)
     {
         OnClickEvent += onClick;
         return this;
@@ -31,7 +31,7 @@ public class Button : ContentControl
             return;
         }
         
-        OnClickEvent?.Invoke(this, new ButtonClickedEventArgs());
+        OnClickEvent?.Invoke(this, new ButtonClickedEventArgs(this));
     }
 
     public override void Draw(ICanvas canvas)

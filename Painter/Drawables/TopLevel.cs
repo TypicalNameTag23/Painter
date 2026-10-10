@@ -29,11 +29,6 @@ public abstract class TopLevel(Application applicationContext) : ContentControl
     public void ExecuteKeyBinds(KeyPressedEventArgs args)
     {
         var key = args.Key;
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && Console.CapsLock)
-        {
-            key = new Key(key.KeyType, key.KeyModifiers ^ ConsoleModifiers.Shift);
-        }
-        
         if (!_windowKeyBinds.TryGetValue(key, out var eventHandlers))
         {
             return;

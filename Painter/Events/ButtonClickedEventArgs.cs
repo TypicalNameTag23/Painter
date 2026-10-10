@@ -1,3 +1,5 @@
+using Painter.Drawables;
+
 namespace Painter.Events;
 
-public class ButtonClickedEventArgs;
+public class ButtonClickedEventArgs(Button sender);

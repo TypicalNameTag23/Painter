@@ -1,3 +1,3 @@
 namespace Painter.Events;
 
-internal record TerminalChangedSizeEventArgs(int Width, int Height);
+public record TerminalChangedSizeEventArgs(int Width, int Height);
