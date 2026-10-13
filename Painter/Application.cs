@@ -10,7 +10,6 @@ public class Application
     private readonly Terminal _terminal;
     private readonly Window _mainWindow;
     private readonly TerminalCanvas _canvas;
-    private Timer _keyProcessingTimer;
     
     public static event BeforeApplicationDrawFrameEvent? BeforeApplicationDrawFrameEvent;
     public static event AfterApplicationDrawFrameEvent? AfterApplicationDrawFrameEvent;
@@ -133,7 +132,6 @@ public class Application
     public void Kill()
     {
         ApplicationState = ApplicationState.Killed;
-        _keyProcessingTimer.Dispose();
         _terminal.Write(AnsiTerminalCodes.EnableLineWrapping);
     }
 }
