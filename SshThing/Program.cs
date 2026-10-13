@@ -132,10 +132,16 @@ class Program
                         Console.WriteLine("Create lobby button clicked!");
                         ctHodler.Content = new GameView();
                         
+                        app.RemoveGlobalBoundKey(new Key(ConsoleKey.C,  ConsoleModifiers.Control));
                         app.AddGlobalKeyBind(new Key(ConsoleKey.C,  ConsoleModifiers.Control), (_, _) =>
                         {
                             ctHodler.Content = content;
                             app.RemoveGlobalBoundKey(new Key(ConsoleKey.C,  ConsoleModifiers.Control));
+                            app.AddGlobalKeyBind(new Key(ConsoleKey.C, ConsoleModifiers.Control), (_, _) =>
+                            {
+                                app.Kill();
+                                session.Disconnect();
+                            });
                         });
                     };
                     content.OnJoinLobbyClick = () =>
@@ -151,10 +157,16 @@ class Program
                         // to change the displayed content nor is there a way to add a page specific key bind
                         // and there is also no concept of a back stack, so its either create a new welcome window
                         // or this hack
+                        app.RemoveGlobalBoundKey(new Key(ConsoleKey.C,  ConsoleModifiers.Control));
                         app.AddGlobalKeyBind(new Key(ConsoleKey.C,  ConsoleModifiers.Control), (_, _) =>
                         {
                             ctHodler.Content = content;
                             app.RemoveGlobalBoundKey(new Key(ConsoleKey.C,  ConsoleModifiers.Control));
+                            app.AddGlobalKeyBind(new Key(ConsoleKey.C, ConsoleModifiers.Control), (_, _) =>
+                            {
+                                app.Kill();
+                                session.Disconnect();
+                            });
                         });
                     };
                     content.OnLeaderboardClick = () =>
@@ -162,10 +174,16 @@ class Program
                         Console.WriteLine("Leaderboard button clicked!");
                         ctHodler.Content = new LeaderboardView();
                         
+                        app.RemoveGlobalBoundKey(new Key(ConsoleKey.C,  ConsoleModifiers.Control));
                         app.AddGlobalKeyBind(new Key(ConsoleKey.C,  ConsoleModifiers.Control), (_, _) =>
                         {
                             ctHodler.Content = content;
                             app.RemoveGlobalBoundKey(new Key(ConsoleKey.C,  ConsoleModifiers.Control));
+                            app.AddGlobalKeyBind(new Key(ConsoleKey.C, ConsoleModifiers.Control), (_, _) =>
+                            {
+                                app.Kill();
+                                session.Disconnect();
+                            });
                         });
                     };
 
