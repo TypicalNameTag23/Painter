@@ -8,6 +8,8 @@ namespace Sample;
 public class HsvColorSpaceVisualizer : Drawable
 {
     private readonly Timer _timer;
+    private double _unfocusedValue = 1;
+    private double _currentValue = 1;
 
     public HsvColorSpaceVisualizer()
     {
@@ -46,29 +48,36 @@ public class HsvColorSpaceVisualizer : Drawable
             {
                 offset = 0;
             }
-
+            
             SetAndRedrawIfChanged(ref field, offset);
         }
     }
 
     public double Value
     {
-        get;
+        get => _currentValue;
         set
         {
-            var offset = value;
-            if (offset > 1)
+            var clamped = value;
+            if (clamped > 1)
             {
-                offset = 1;
+                clamped = 1;
             }
-            else if (offset < 0)
+            else if (clamped < 0)
             {
-                offset = 0;
+                clamped = 0;
+            }
+            
+            if (_currentValue == clamped)
+            {
+                return;
             }
 
-            SetAndRedrawIfChanged(ref field, offset);
+            _currentValue = clamped;
+            _unfocusedValue = clamped;
+            RequestRedraw();
         }
-    } = 1;
+    }
 
     public override bool Focusable { get; set; } = true;
 
@@ -77,8 +86,14 @@ public class HsvColorSpaceVisualizer : Drawable
         get;
         set
         {
-            SetAndRedrawIfChanged(ref field, value);
-            Value = Focused ? 0.7 : 1;
+            if (field == value)
+            {
+                return;
+            }
+            
+            field = value;
+            _currentValue = Focused ? 0.7 : _unfocusedValue;
+            RequestRedraw();
         }
     }
 

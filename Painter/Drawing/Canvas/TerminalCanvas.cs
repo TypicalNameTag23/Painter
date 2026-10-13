@@ -34,11 +34,25 @@ internal class TerminalCanvas : Canvas
         }
 
         var point = new Point(x, y);
+        if (strokeStyle.BackgroundColor == Color.Transparent && _pixels.TryGetValue(point, out var pixel))
+        {
+            strokeStyle = new StrokeStyle
+            {
+                BackgroundColor = pixel.StrokeStyle?.BackgroundColor,
+                ForegroundColor = strokeStyle.ForegroundColor,
+                Blinking = strokeStyle.Blinking,
+                Bold = strokeStyle.Bold,
+                Italic = strokeStyle.Italic,
+                Strikethrough = strokeStyle.Strikethrough,
+                Underline = strokeStyle.Underline
+            };
+        }
+        
         _pixels[point] = new Pixel(
             character == ' ' 
                 ? null 
                 : character, 
-            strokeStyle == StrokeStyle.Unstyled 
+            strokeStyle == StrokeStyle.Unstyled
                 ? null 
                 : strokeStyle);
     }

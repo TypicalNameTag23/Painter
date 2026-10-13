@@ -11,7 +11,7 @@ namespace MusicPlayer;
 
 class Program
 {
-    private const string AudioFolder = @"/home/typicalnametag23/Music/Metalish__";
+    private const string AudioFolder = @"/home/typicalnametag23/Music/Celeste OST/Celeste Original Soundtrack";
     private static IAudioPlayer _player = new SoundFlowAudioPlayer();
     private static readonly TimeSpan SeekSmall = TimeSpan.FromSeconds(5);
     private static readonly TimeSpan SeekMedium = TimeSpan.FromSeconds(30);
@@ -39,42 +39,58 @@ class Program
                     RowDefinitions = RowDefinition.Of("1, *")
                 }
                 .SetContent(new FpsTacker())
-                .SetContent(
-                    new Grid
-                    {
-                        RowDefinitions = RowDefinition.Of("*, 2*"),
-                        ColumnDefinitions = ColumnDefinition.Of("*, 5*")
-                    }
-                    .SetContent(new HsvColorSpaceVisualizer(), 0, 0)
-                    .SetContent(new Rectangle 
-                    { 
-                        BackgroundColor = new LinearGradientColorBrush(
-                            (Color.Crimson, 6),
-                            (Color.MediumVioletRed, 2), 
-                            (Color.Blue, 5),
-                            (Color.DeepPink, 7),
-                            (Color.White, 4),
-                            (Color.DarkSalmon, 0)) 
-                    }, 0, 1)
-                    .SetContent(
-                        new StackPanel
+                .SetContent(new StackPanel
+                {
+                    Content = [
+                        new PlayerTrackInfo(_player)
                         {
-                            Content = [
-                                new PlayerTrackInfo(_player)
-                                {
-                                    Height = 1
-                                },
-                                new PlayerProgressBar(_player)
-                                {
-                                    Height = 1
-                                },
-                                new PlaybackInformation(_player)
-                                {
-                                    Height = 1
-                                },
-                                new PlayerTracksViewer(_player)
-                            ]
-                        }, 1, 1), row: 1)
+                            Height = 1
+                        },
+                        new PlayerProgressBar(_player)
+                        {
+                            Height = 1
+                        },
+                        new PlaybackInformation(_player)
+                        {
+                            Height = 1
+                        },
+                        new PlayerTracksViewer(_player)
+                    ]
+                    // new Grid
+                    // {
+                        // RowDefinitions = RowDefinition.Of("*, 2*"),
+                        // ColumnDefinitions = ColumnDefinition.Of("*, 5*")
+                    // }
+                    // .SetContent(new HsvColorSpaceVisualizer(), 0, 0)
+                    // .SetContent(new Rectangle 
+                    // { 
+                        // BackgroundColor = new LinearGradientColorBrush(
+                            // (Color.Crimson, 6),
+                            // (Color.MediumVioletRed, 2), 
+                            // (Color.Blue, 5),
+                            // (Color.DeepPink, 7),
+                            // (Color.White, 4),
+                            // (Color.DarkSalmon, 0)) 
+                    // }, 0, 1)
+                    // .SetContent(
+                        // new StackPanel
+                        // {
+                            // Content = [
+                                // new PlayerTrackInfo(_player)
+                                // {
+                                    // Height = 1
+                                // },
+                                // new PlayerProgressBar(_player)
+                                // {
+                                    // Height = 1
+                                // },
+                                // new PlaybackInformation(_player)
+                                // {
+                                    // Height = 1
+                                // },
+                                // new PlayerTracksViewer(_player)
+                            // ]
+                        }/*, 1, 1)*/, row: 1)
         };
 
         application.AddGlobalKeyBind(new Key(ConsoleKey.C, ConsoleModifiers.Control), (_, _) => application.Kill());

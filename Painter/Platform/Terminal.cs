@@ -8,18 +8,15 @@ namespace Painter.Platform;
 public abstract class Terminal
 {
     private StrokeStyle _currentStrokeStyle = new();
-    private bool _initialized;
     private int _cursorX;
     private int _cursorY;
     
     protected readonly StringBuilder Buffer = new(AnsiTerminalCodes.ResetCursorPosition);
-    protected int PreviousWidth = 0;
-    protected int PreviousHeight = 0;
 
-    public abstract int Width { get; }
-    public abstract int Height { get; }
+    public int Width { get; protected set; }
+    public int Height { get; protected set; }
 
-    public event TerminalSizeChangedEvent TerminalSizeChangedEvent;
+    public event TerminalSizeChangedEvent? TerminalSizeChangedEvent;
 
     public static Terminal GetPlatformTerminal()
     {
@@ -31,56 +28,14 @@ public abstract class Terminal
         return new GenericTerminal();
     }
 
-    public void Initialize()
-    {
-        if (_initialized)
-        {
-            return;
-        }
-        
-        PollSizeChange();
-        _initialized = true;
-    }
-
     public abstract void Write(string text);
 
-    public abstract Key? ReadKey();
-
-    public void WriteBuffered(string text)
-    {
-        var sections = text.Split(Environment.NewLine);
-        Buffer.Append(sections[0]);
-        _cursorX += sections[0].Length;
-
-        if (sections.Length == 1)
-        {
-            return;
-        }
-        
-        foreach (var textSection in sections)
-        {
-            SetCursorPosition(0, _cursorY + 1);
-            Buffer.Append(textSection);
-            _cursorX += sections[0].Length;
-        }
-    }
+    public abstract KeyInfo? ReadKey();
     
     public void WriteBuffered(char character)
     {
         Buffer.Append(character);
         _cursorX += 1;
-    }
-    
-    public void SetCursorPosition(int x, int y)
-    {
-        if (_cursorX == x && _cursorY == y)
-        {
-            return;
-        }
-
-        Buffer.Append(AnsiTerminalCodes.SetCursorPosition(x, y));
-        _cursorX = x;
-        _cursorY = y;
     }
     
     public void SetCursorPosition(Point point)
@@ -135,7 +90,7 @@ public abstract class Terminal
         _currentStrokeStyle = strokeStyle;
     }
 
-    public void ResetStyle()
+    public void BufferStyleReset()
     {
         Buffer.Append(AnsiTerminalCodes.ResetStyles);
         _currentStrokeStyle = new StrokeStyle();

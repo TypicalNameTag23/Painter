@@ -5,14 +5,12 @@ namespace Painter.Platform;
 
 internal class GenericTerminal : Terminal
 {
-    public override int Width => Console.BufferWidth;
-    public override int Height => Console.BufferHeight;
     public override void Write(string text)
     {
         Console.Write(text);
     }
 
-    public override Key? ReadKey()
+    public override KeyInfo? ReadKey()
     {
         if (!Console.KeyAvailable)
         {
@@ -25,28 +23,28 @@ internal class GenericTerminal : Terminal
         {
             modifiers ^= ConsoleModifiers.Shift;
         }
-        
-        return new Key(key.Key, key.KeyChar, modifiers);
+
+        return new KeyInfo(new Key(key.Key, modifiers), key.KeyChar);
     }
 
     public override void Flush()
     {
-        ResetStyle();
+        BufferStyleReset();
         Console.Write(Buffer);
         Buffer.Clear();
     }
 
     public override void PollSizeChange()
     {
-        var width = Width;
-        var height = Height;
-        if (Width == PreviousWidth && Height == PreviousHeight)
+        var width = Console.BufferWidth;
+        var height = Console.BufferHeight;
+        if (Width == width && Height == height)
         {
             return;
         }
 
-        PreviousWidth = width;
-        PreviousHeight = height;
+        Width = width;
+        Height = height;
         OnTerminalSizeChanged(this, new TerminalChangedSizeEventArgs(width, height));
     }
 }

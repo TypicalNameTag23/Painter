@@ -12,9 +12,9 @@ public class Button : ContentControl
 
     public Color BackgroundColor { get; set; } = Color.Black;
 
-    public Color FocusedColor { get; set; } = Color.Black;
+    public Color FocusedColor { get; set; } = Color.White;
 
-    public Color SelectedColor { get; set; } = Color.White;
+    public Color UnfocusedColor { get; set; } = Color.Black;
 
     public event EventHandler<ButtonClickedEventArgs>? OnClickEvent;
 
@@ -23,7 +23,12 @@ public class Button : ContentControl
         OnClickEvent += onClick;
         return this;
     }
-    
+
+    public override void OnFocusChanged(bool focused)
+    {
+        BackgroundColor = focused ? FocusedColor : UnfocusedColor;
+    }
+
     public override void Interact(KeyPressedEventArgs args)
     {
         if (args.Key.KeyType != ConsoleKey.Spacebar)

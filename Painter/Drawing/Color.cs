@@ -70,7 +70,7 @@ public readonly record struct Color(byte R, byte G, byte B)
             _ =>            new Color(chromaPrime, mPrime,      xPrime)
         };
     }
-    
+
     /// <summary>
     /// Special transparent color
     /// </summary>
