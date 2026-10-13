@@ -132,10 +132,10 @@ class Program
                         Console.WriteLine("Create lobby button clicked!");
                         ctHodler.Content = new GameView();
                         
-                        app.AddGlobalKeyBind(new Key(ConsoleKey.B), (_, _) =>
+                        app.AddGlobalKeyBind(new Key(ConsoleKey.C,  ConsoleModifiers.Control), (_, _) =>
                         {
                             ctHodler.Content = content;
-                            app.RemoveGlobalBoundKey(new Key(ConsoleKey.B));
+                            app.RemoveGlobalBoundKey(new Key(ConsoleKey.C,  ConsoleModifiers.Control));
                         });
                     };
                     content.OnJoinLobbyClick = () =>
@@ -151,10 +151,10 @@ class Program
                         // to change the displayed content nor is there a way to add a page specific key bind
                         // and there is also no concept of a back stack, so its either create a new welcome window
                         // or this hack
-                        app.AddGlobalKeyBind(new Key(ConsoleKey.B), (_, _) =>
+                        app.AddGlobalKeyBind(new Key(ConsoleKey.C,  ConsoleModifiers.Control), (_, _) =>
                         {
                             ctHodler.Content = content;
-                            app.RemoveGlobalBoundKey(new Key(ConsoleKey.B));
+                            app.RemoveGlobalBoundKey(new Key(ConsoleKey.C,  ConsoleModifiers.Control));
                         });
                     };
                     content.OnLeaderboardClick = () =>
@@ -162,10 +162,10 @@ class Program
                         Console.WriteLine("Leaderboard button clicked!");
                         ctHodler.Content = new LeaderboardView();
                         
-                        app.AddGlobalKeyBind(new Key(ConsoleKey.B), (_, _) =>
+                        app.AddGlobalKeyBind(new Key(ConsoleKey.C,  ConsoleModifiers.Control), (_, _) =>
                         {
                             ctHodler.Content = content;
-                            app.RemoveGlobalBoundKey(new Key(ConsoleKey.B));
+                            app.RemoveGlobalBoundKey(new Key(ConsoleKey.C,  ConsoleModifiers.Control));
                         });
                     };
 
