@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <OutputType>Exe</OutputType>
+        <LangVersion>14</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Painter\Painter.csproj" />
+      <ProjectReference Include="..\Sample\Sample.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="FxSsh" Version="1.4.0" />
+    </ItemGroup>
+
+</Project>
