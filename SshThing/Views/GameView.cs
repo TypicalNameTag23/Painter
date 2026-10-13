@@ -31,7 +31,7 @@ public class GameView : Drawable
                 .SetContent(
                     new TextBlock
                     {
-                        Text = "  [TAB]: Cycle Focus  |  [SPACE]: Interact  |  [B]: Exit Lobby  |  [CTRL+C]: Quit  ",
+                        Text = "  [TAB]: Cycle Focus  |  [SPACE]: Interact  |  [CTRL+C]: Exit Lobby  ",
                         OverflowStyle = OverflowStyle.Cutoff,
                         BackgroundColor = Color.Black
                     }, row: 1)

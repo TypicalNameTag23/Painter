@@ -60,7 +60,7 @@ public class JoinLobbyView : Drawable
                 .SetContent(
                     new TextBlock
                     {
-                        Text = "  [TAB]: Cycle Focus  |  [SPACE]: Interact  |  [B]: Previous Page  |  [CTRL+C]: Quit  ",
+                        Text = "  [TAB]: Cycle Focus  |  [SPACE]: Interact  |  [CTRL+C]: Previous Page  ",
                         OverflowStyle = OverflowStyle.Cutoff,
                         BackgroundColor = Color.Black
                     }, row: 1)
