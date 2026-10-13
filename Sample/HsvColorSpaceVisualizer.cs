@@ -104,9 +104,9 @@ public class HsvColorSpaceVisualizer : Drawable
         
         var hueStep = 359d / width;
         var saturationStep = 1d / height;
-        for (var y = 0; y < height; y++)
+        for (var y = 0; y < canvas.Height; y++)
         {
-            for (var x = 0; x < width; x++)
+            for (var x = 0; x < canvas.Width; x++)
             {
                 var hue = hueStep * x + HueOffset;
                 if (hue > 359)
