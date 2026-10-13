@@ -39,7 +39,7 @@ public static class StringExtensions
 
             case Alignment.Center:
             {
-                var leftPadding = width / 2 + text.Length / 2;
+                var leftPadding = (int) Math.Round(width / 2.0 + text.Length / 2.0);
                 text = text.PadLeft(leftPadding, ' ');
                 text = text.PadRight(width, ' ');
                 break;
