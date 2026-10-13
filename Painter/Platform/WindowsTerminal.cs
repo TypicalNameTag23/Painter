@@ -25,18 +25,15 @@ internal class WindowsTerminal : Terminal
         mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
         SetConsoleMode(handle, mode);
     }
-
-    public override int Width => Console.BufferWidth;
-    public override int Height => Console.BufferHeight;
     
     public override void Flush()
     {
-        ResetStyle();
+        BufferStyleReset();
         Console.Write(Buffer);
         Buffer.Clear();
     }
     
-    public override Key? ReadKey()
+    public override KeyInfo? ReadKey()
     {
         if (!Console.KeyAvailable)
         {
@@ -49,8 +46,8 @@ internal class WindowsTerminal : Terminal
         {
             modifiers ^= ConsoleModifiers.Shift;
         }
-        
-        return new Key(key.Key, key.KeyChar, modifiers);
+
+        return new KeyInfo(new Key(key.Key, modifiers), key.KeyChar);
     }
     
     public override void Write(string text)
@@ -60,15 +57,15 @@ internal class WindowsTerminal : Terminal
 
     public override void PollSizeChange()
     {
-        var width = Width;
-        var height = Height;
-        if (Width == PreviousWidth && Height == PreviousHeight)
+        var width = Console.BufferWidth;
+        var height = Console.BufferHeight;
+        if (Width == width && Height == height)
         {
             return;
         }
 
-        PreviousWidth = width;
-        PreviousHeight = height;
+        Width = width;
+        Height = height;
         OnTerminalSizeChanged(this, new TerminalChangedSizeEventArgs(width, height));
     }
 }

@@ -12,10 +12,20 @@ public abstract partial class Drawable
     public virtual bool Focused
     {
         get;
-        set => SetAndRedrawIfChanged(ref field, value);
+        set
+        {
+            if (Focused != value)
+            {
+                OnFocusChanged(value);
+            }
+            
+            SetAndRedrawIfChanged(ref field, value);
+        }
     }
 
     public virtual void Interact(KeyPressedEventArgs args) { }
+    
+    public virtual void OnFocusChanged(bool focused) { }
 
     internal Drawable? GetFocusedChild()
     {

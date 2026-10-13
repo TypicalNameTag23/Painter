@@ -4,7 +4,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <RootNamespace>Painter</RootNamespace>
-        <LangVersion>preview</LangVersion>
+        <LangVersion>14</LangVersion>
         <TargetFrameworks>net10.0;net9.0</TargetFrameworks>
     </PropertyGroup>
 

@@ -159,13 +159,13 @@ public class TextBox : Drawable
             }
         }
 
-        if (args.Key.Character == '\0' || args.Key.KeyModifiers.HasFlag(ConsoleModifiers.Control))
+        if (args.Character == '\0' || args.Key.KeyModifiers.HasFlag(ConsoleModifiers.Control))
         {
             args.Handled = false;
             return;
         }
 
-        Text += args.Key.Character;
+        Text += args.Character;
         CursorPosition++;
     }
 }

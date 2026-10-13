@@ -4,7 +4,7 @@ using Painter.Drawing.Canvas;
 
 namespace Painter.Drawables.Control;
 
-public abstract class DrawableControl : Drawable
+public abstract class DrawableControl : ContentControl
 {
     public IBrush? BackgroundColor { get; set; }
     

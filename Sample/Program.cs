@@ -37,10 +37,13 @@ static class Program
                                     Margin = Thickness.Of(top: 1, left: 2, right: 2, bottom: 2), 
                                     BackgroundColor = new LinearGradientColorBrush(
                                         (Color.Crimson, 6),
-                                        (Color.MediumVioletRed, 2), 
+                                        (Color.MediumVioletRed, 0.1), 
+                                        (Color.Black, 0.1), 
                                         (Color.Blue, 5),
                                         (Color.DeepPink, 7),
                                         (Color.White, 4),
+                                        (Color.IndianRed, 14),
+                                        (Color.Khaki, 4),
                                         (Color.DarkSalmon, 0)) 
                                 }, column: 0)
                             .SetContent(new HsvColorSpaceVisualizer(), column: 1)
@@ -59,7 +62,7 @@ static class Program
                         , row: 1)
         };
         
-        app.AddGlobalKeyBind(new Key(ConsoleKey.C, 'c', ConsoleModifiers.Control), (_, _) => app.Kill());
+        app.AddGlobalKeyBind(new Key(ConsoleKey.C, ConsoleModifiers.Control), (_, _) => app.Kill());
         app.Start();
     }
 

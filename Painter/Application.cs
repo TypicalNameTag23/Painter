@@ -11,6 +11,7 @@ public class Application
     private readonly Window _mainWindow;
     private readonly TerminalCanvas _canvas;
     private Timer _keyProcessingTimer;
+    private Lock _mainWindowLock = new();
     
     public static event BeforeApplicationDrawFrameEvent? BeforeApplicationDrawFrameEvent;
     public static event AfterApplicationDrawFrameEvent? AfterApplicationDrawFrameEvent;
@@ -54,7 +55,13 @@ public class Application
     public Drawable? Content
     {
         get => _mainWindow.Content;
-        set => _mainWindow.Content = value;
+        set
+        {
+            lock (_mainWindowLock)
+            {
+                _mainWindow.Content = value;
+            }
+        }
     }
     
     public object? DataContext
@@ -94,31 +101,37 @@ public class Application
             AnsiTerminalCodes.HideCursor +
             // AnsiTerminalCodes.CSI_EnableAnyEventMouse +
             // AnsiTerminalCodes.CSI_EnableSgrExtModeMouse +
-            // AnsiTerminalCodes.CSI_EnableUrxvtExtModeMouse);
+            // AnsiTerminalCodes.CSI_EnableUrxvtExtModeMouse +
             AnsiTerminalCodes.ResetCursorPosition + 
             AnsiTerminalCodes.ResetStyles);
         
         //Console.TreatControlCAsInput = true;
         ApplicationState = ApplicationState.Running;
-        _keyProcessingTimer = new Timer(_ =>
+        // _keyProcessingTimer = new Timer(_ =>
+        // {
+        //     
+        // }, null, 5, 5);
+        
+        while (ApplicationState == ApplicationState.Running)
         {
             var key = _terminal.ReadKey();
             while (key != null)
             {
-                _mainWindow.Interact(new KeyPressedEventArgs(key));
+                _mainWindow.Interact(new KeyPressedEventArgs(key.Key, key.Character));
                 key = _terminal.ReadKey();
             }
-        }, null, 5, 5);
-        
-        while (ApplicationState == ApplicationState.Running)
-        {
+            
             _terminal.PollSizeChange();
             if (_mainWindow.NeedsRedraw)
             {
                 BeforeApplicationDrawFrameEvent?.Invoke();
-                _mainWindow.Draw(_canvas);
+                lock (_mainWindowLock)
+                {
+                    _mainWindow.Draw(_canvas);
+                    _mainWindow.NeedsRedraw = false;
+                }
+                
                 _canvas.Display();
-                _mainWindow.NeedsRedraw = false;
                 AfterApplicationDrawFrameEvent?.Invoke();
             }
         }

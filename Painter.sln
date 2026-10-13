@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicPlayer", "MusicPlayer\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Painter.Tests", "Painter.Tests\Painter.Tests.csproj", "{8F51F96B-8193-4A05-9A74-68FF7CFDC898}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SshThing", "SshThing\SshThing.csproj", "{FAEA4081-A1C2-4A6A-9B3A-735B5A19355F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,9 +34,14 @@ Global
 		{8F51F96B-8193-4A05-9A74-68FF7CFDC898}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F51F96B-8193-4A05-9A74-68FF7CFDC898}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F51F96B-8193-4A05-9A74-68FF7CFDC898}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FAEA4081-A1C2-4A6A-9B3A-735B5A19355F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAEA4081-A1C2-4A6A-9B3A-735B5A19355F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAEA4081-A1C2-4A6A-9B3A-735B5A19355F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAEA4081-A1C2-4A6A-9B3A-735B5A19355F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{1FCC632F-864E-4203-9080-B89E7EA3E2B4} = {E3D69FB0-CAF7-4434-A85E-CB3FCF1C2140}
 		{6F15D0D5-D4B3-4CF6-AC07-CDDF7EF577CA} = {E3D69FB0-CAF7-4434-A85E-CB3FCF1C2140}
+		{FAEA4081-A1C2-4A6A-9B3A-735B5A19355F} = {E3D69FB0-CAF7-4434-A85E-CB3FCF1C2140}
 	EndGlobalSection
 EndGlobal
