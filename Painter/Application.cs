@@ -115,6 +115,11 @@ public class Application
                 _mainWindow.Interact(new KeyPressedEventArgs(key.Key, key.Character));
                 key = _terminal.ReadKey();
             }
+
+            if (ApplicationState != ApplicationState.Running)
+            {
+                return;
+            }
             
             _terminal.PollSizeChange();
             if (_mainWindow.NeedsRedraw)
