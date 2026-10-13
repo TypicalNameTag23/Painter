@@ -11,7 +11,6 @@ public class Application
     private readonly Window _mainWindow;
     private readonly TerminalCanvas _canvas;
     private Timer _keyProcessingTimer;
-    private Lock _mainWindowLock = new();
     
     public static event BeforeApplicationDrawFrameEvent? BeforeApplicationDrawFrameEvent;
     public static event AfterApplicationDrawFrameEvent? AfterApplicationDrawFrameEvent;
@@ -57,10 +56,7 @@ public class Application
         get => _mainWindow.Content;
         set
         {
-            lock (_mainWindowLock)
-            {
-                _mainWindow.Content = value;
-            }
+            _mainWindow.Content = value;
         }
     }
     
@@ -125,11 +121,8 @@ public class Application
             if (_mainWindow.NeedsRedraw)
             {
                 BeforeApplicationDrawFrameEvent?.Invoke();
-                lock (_mainWindowLock)
-                {
-                    _mainWindow.Draw(_canvas);
-                    _mainWindow.NeedsRedraw = false;
-                }
+                _mainWindow.Draw(_canvas);
+                _mainWindow.NeedsRedraw = false;
                 
                 _canvas.Display();
                 AfterApplicationDrawFrameEvent?.Invoke();
