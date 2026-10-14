@@ -69,9 +69,10 @@ public class WelcomeView : Drawable
                                 new HsvColorSpaceVisualizer
                                 {
                                     SaturationOffset = 0.5,
-                                    Height = 6,
-                                    Value = 0.8,
-                                    Focusable = false
+                                    Height = 400,
+                                    Width = 500,
+                                    Value = 0.5,
+                                    Focusable = true
                                 },
                                 new TextBlock
                                 {
