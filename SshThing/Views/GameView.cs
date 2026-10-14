@@ -17,10 +17,10 @@ public class GameView : Drawable
                     new Panel
                         {
                             Content = [
-                                new HsvColorSpaceVisualizer()
-                                {
-                                    Focusable = false
-                                },
+                                // new HsvColorSpaceVisualizer()
+                                // {
+                                //     Focusable = false
+                                // },
                                 new Grid
                                 {
                                     RowDefinitions = RowDefinition.Of("*, 11, *"),
@@ -31,7 +31,7 @@ public class GameView : Drawable
                 .SetContent(
                     new TextBlock
                     {
-                        Text = "  [TAB]: Cycle Focus  |  [SPACE]: Interact  |  [CTRL+C]: Exit Lobby  ",
+                        Text = "    [TAB]: Cycle Focus  |  [SPACE]: Interact  |  [CTRL+C]: Exit Lobby    ",
                         OverflowStyle = OverflowStyle.Cutoff,
                         BackgroundColor = Color.Black
                     }, row: 1)

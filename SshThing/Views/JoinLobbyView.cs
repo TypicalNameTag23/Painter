@@ -37,8 +37,9 @@ public class JoinLobbyView : Drawable
                             new HsvColorSpaceVisualizer
                             {
                                 SaturationOffset = 0.5,
-                                Height = 6,
-                                Value = 0.8,
+                                Height = 15,
+                                Width = 350,
+                                Value = 0.7,
                                 Focusable = false
                             },
                             new TextBlock
@@ -60,7 +61,7 @@ public class JoinLobbyView : Drawable
                 .SetContent(
                     new TextBlock
                     {
-                        Text = "  [TAB]: Cycle Focus  |  [SPACE]: Interact  |  [CTRL+C]: Previous Page  ",
+                        Text = "    [TAB]: Cycle Focus  |  [SPACE]: Interact  |  [CTRL+C]: Previous Page    ",
                         OverflowStyle = OverflowStyle.Cutoff,
                         BackgroundColor = Color.Black
                     }, row: 1)

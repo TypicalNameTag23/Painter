@@ -13,7 +13,7 @@ namespace SshThing;
 public class SshTerminal : Terminal
 {
     private readonly SessionChannel _channel;
-    private readonly List<KeyInfo> _keyBuffer = [];
+    private readonly Queue<KeyInfo> _keyBuffer = [];
     private int _width;
     private int _height;
 
@@ -29,10 +29,13 @@ public class SshTerminal : Terminal
         _channel.DataReceived += (_, dataArgs) =>
         {
             var key = inputParser.Parse(dataArgs.ToArray());
-            if (key != null)
+            if (key == null)
             {
-                _keyBuffer.Add(key);
+                return;
             }
+            
+            Console.WriteLine($"Added key {key.Key.KeyType} to buffer. {key}");
+            _keyBuffer.Enqueue(key);
         };
         
         _width = (int) ptyArgs.WidthChars;
@@ -50,9 +53,9 @@ public class SshTerminal : Terminal
         {
             return null;
         }
-
-        var key = _keyBuffer[0];
-        _keyBuffer.RemoveAt(0);
+        
+        var key = _keyBuffer.Dequeue();
+        Console.WriteLine($"Popped key {key.Key.KeyType} from buffer. {key}");
 
         return key;
     }
