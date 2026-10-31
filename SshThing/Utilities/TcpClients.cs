@@ -1,6 +1,8 @@
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using SshThing.Packets;
+using SshThing.Game;
+using SshThing.Game.Packets;
+using TicTacToeServer.Packets;
 
 namespace SshThing.Utilities;
 
@@ -24,5 +26,21 @@ public static class TcpClients
     public static void Send(this TcpClient tcpClient, IPacket packet)
     {
         tcpClient.Send(packet.Encode());
+    }
+
+    public static bool TrySend(this TcpClient tcpClient, IPacket packet)
+    {
+        try
+        {
+            tcpClient.Send(packet.Encode());
+            return true;
+        }
+        catch (IOException e)
+        {
+            Console.WriteLine("Failed to send packet:");
+            Console.WriteLine(e);
+        }
+
+        return false;
     }
 }

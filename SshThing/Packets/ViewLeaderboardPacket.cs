@@ -1,6 +1,11 @@
-namespace SshThing.Packets;
+using System.Buffers;
+using TicTacToeServer.Packets;
+
+namespace SshThing.Game.Packets;
 
 public class ViewLeaderboardPacket : IPacket
 {
-    public string PacketType => "ViewLeaderboard";
+    public PacketType PacketType => PacketType.ViewLeaderboard;
+
+    public int Load(ReadOnlySequence<byte> buffer) => 0;
 }
