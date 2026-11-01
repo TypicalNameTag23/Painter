@@ -8,11 +8,10 @@ using SshThing.Views;
 using TicTacToeServer.Packets;
 using TicTacToeServer.Packets.Lobby;
 
-namespace SshThing;
+namespace SshThing.Game;
 
 public class Client : IDisposable
 {
-    private readonly PtyArgs _args;
     private static readonly Key CtrlCKey = new(ConsoleKey.C, ConsoleModifiers.Control);
     private const string BackendServerAddress = "127.0.0.1";
     private const int BackendServerPort = 4343;
@@ -23,6 +22,7 @@ public class Client : IDisposable
     private WelcomeView _welcomeView;
     private Application _app;
 
+    private readonly PtyArgs _args;
     private ServerConnectionHandler _serverConnectionHandler;
     private Session _session;
 
