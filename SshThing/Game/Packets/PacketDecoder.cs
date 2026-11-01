@@ -10,18 +10,18 @@ namespace SshThing.Game;
 
 public static class PacketDecoder
 {
-    private static readonly Dictionary<PacketType, Func<IPacket>> PacketRegistry = new()
+    private static readonly Dictionary<PacketType, Func<AbstractPacket>> PacketRegistry = new()
     {
-        [PacketType.LobbyCreate] = () => new LobbyCreatePacket(),
+        // [PacketType.LobbyCreate] = () => new LobbyCreatePacket(),
         // [PacketType.LobbyDisconnect] = () => new LobbyCreatePacket() todo
-        [PacketType.LobbyJoin] = () => new LobbyJoinPacket(),
-        // [PacketType.LobbyInfo] = () => new LobbyInfoPacket() client side
+        // [PacketType.LobbyJoin] = () => new LobbyJoinPacket(),
+        [PacketType.LobbyInfo] = () => new LobbyInfoPacket()
         // [PacketType.LobbyJoinRejected] = () => new LobbyJoinRejectionPacket() client side
-        [PacketType.CloseConnection] = () => new CloseConnectionPacket(),
-        [PacketType.ViewLeaderboard] = () => new ViewLeaderboardPacket(),
+        // [PacketType.CloseConnection] = () => new CloseConnectionPacket(),
+        // [PacketType.ViewLeaderboard] = () => new ViewLeaderboardPacket(),
     };
 
-    public static bool TryReadPacket(ref ReadOnlySequence<byte> buffer, out IPacket? packet)
+    public static bool TryReadPacket(ref ReadOnlySequence<byte> buffer, out AbstractPacket? packet)
     {
         packet = null;
         if (buffer.Length < 2)
@@ -31,7 +31,7 @@ public static class PacketDecoder
         
         try
         {
-            var slice = buffer.Slice(0, IPacket.PacketTypeSizeBytes).FirstSpan;
+            var slice = buffer.Slice(0, AbstractPacket.PacketTypeSizeBytes).FirstSpan;
             if (BitConverter.IsLittleEndian)
             {
                 slice = slice.Reversed();
@@ -52,7 +52,7 @@ public static class PacketDecoder
                 return false;
             }
 
-            buffer = buffer.Slice(bytesRead + IPacket.PacketTypeSizeBytes);
+            buffer = buffer.Slice(bytesRead + AbstractPacket.PacketTypeSizeBytes);
             
             return true;
         }

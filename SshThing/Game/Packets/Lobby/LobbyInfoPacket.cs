@@ -5,12 +5,12 @@ using TicTacToeServer.Utilities;
 
 namespace TicTacToeServer.Packets.Lobby;
 
-public class LobbyInfoPacket : IPacket
+public class LobbyInfoPacket : AbstractPacket
 {
     private const int LobbyIdSizeBytes = sizeof(int);
     
-    public PacketType PacketType => PacketType.LobbyJoin;
-    public string Message => $"{PacketType}{LobbyId}";
+    public override PacketType PacketType => PacketType.LobbyInfo;
+    public override string Message => $"{PacketType}{LobbyId}";
     public int LobbyId { get; private set; }
     
     public LobbyInfoPacket() { }
@@ -20,7 +20,7 @@ public class LobbyInfoPacket : IPacket
         LobbyId = lobbyId;
     }
     
-    public byte[] Encode()
+    public override byte[] Encode()
     {
         var packetTypeBytes = BitConverter.GetBytes((short) PacketType);
         if (BitConverter.IsLittleEndian)
@@ -37,16 +37,16 @@ public class LobbyInfoPacket : IPacket
         var encoded = new byte[6];
         Buffer.BlockCopy(
             packetTypeBytes, 0, 
-            encoded, 0, IPacket.PacketTypeSizeBytes);
+            encoded, 0, AbstractPacket.PacketTypeSizeBytes);
         Buffer.BlockCopy(
             lobbyIdBytes, 0, 
-            encoded, IPacket.PacketTypeSizeBytes, LobbyIdSizeBytes);
+            encoded, AbstractPacket.PacketTypeSizeBytes, LobbyIdSizeBytes);
 
         return encoded;
     }
 
     // todo little endian validate data length
-    public int Load(ReadOnlySequence<byte> buffer)
+    public override int Load(ReadOnlySequence<byte> buffer)
     {
         if (buffer.Length < LobbyIdSizeBytes)
         {
@@ -54,7 +54,7 @@ public class LobbyInfoPacket : IPacket
         }
 
         var slice = buffer
-            .Slice(IPacket.PacketTypeSizeBytes, LobbyIdSizeBytes)
+            .Slice(AbstractPacket.PacketTypeSizeBytes, LobbyIdSizeBytes)
             .FirstSpan;
         
         if (BitConverter.IsLittleEndian)
@@ -67,4 +67,6 @@ public class LobbyInfoPacket : IPacket
         
         return LobbyIdSizeBytes;
     }
+
+    public override string ToString() => $"{{ PacketType: {PacketType}, LobbyId: {LobbyId} }}";
 }

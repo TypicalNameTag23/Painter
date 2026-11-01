@@ -9,7 +9,7 @@ using SshThing.Views;
 
 namespace SshThing;
 
-public class Server
+public class SshServer
 {
 
     // already public on FxSSH repo, no sensitive info transmitted so far
@@ -61,12 +61,12 @@ public class Server
             TA==
             -----END PRIVATE KEY-----";
     
-    private readonly SshServer _sshServer;
+    private readonly FxSsh.SshServer _sshServer;
     private readonly List<Client> _clients = [];
 
-    public Server()
+    public SshServer()
     {
-        _sshServer = new SshServer(new StartingInfo(IPAddress.Any, 22, "SSH-2.0-tic-tac-toe"));
+        _sshServer = new FxSsh.SshServer(new StartingInfo(IPAddress.Any, 22, "SSH-2.0-tic-tac-toe"));
         _sshServer.AddHostKey("rea-sha2-256", Rsa2048BitPem);
         _sshServer.AddHostKey("rsa-sha2-512", Rsa2048BitPem);
         _sshServer.AddHostKey("ecdsa-sha2-nistp256", Ecdsap256Pem);
@@ -86,7 +86,7 @@ public class Server
     {
         _clients.ForEach(it =>
         {
-            it.Disconnect();
+            it.DisconnectAsync().Wait();
         });
     }
     
@@ -134,6 +134,8 @@ public class Server
     private void PtyReceived(PtyArgs e, Session session)
     {
         var client = new Client(e, session);
+        _ = client.StartAsync();
+        
         _clients.Add(client);
     }
 }
