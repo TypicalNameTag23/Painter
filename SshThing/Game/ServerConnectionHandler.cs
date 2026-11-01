@@ -39,9 +39,7 @@ public class ServerConnectionHandler(string address, int port)
                Console.WriteLine("Failed to connect to the backend server, is it up?");
                Console.WriteLine(e);
 
-               _server!.Dispose();
-               _server = null;
-
+               await CloseConnectionAsync();
                return false;
           }
           // catch (Exception e)
@@ -57,23 +55,24 @@ public class ServerConnectionHandler(string address, int port)
 
      public async Task DisconnectAsync()
      {
-          if (_server == null)
+          if (!Connected)
           {
                return;
           }
-          
-          await _cancellationTokenSource!.CancelAsync();
-          await TrySendAsync(new CloseConnectionPacket());
-          
-          _server.Close();
-          _server.Dispose();
-          _server = null;
-          
-          OnConnectionClosed?.Invoke(this, EventArgs.Empty);
+
+          if (await TrySendAsync(new CloseConnectionPacket()))
+          {
+               await CloseConnectionAsync();
+          }
      }
 
      public async Task<bool> TrySendAsync(AbstractPacket packet)
      {
+          if (!Connected)
+          {
+               return false;
+          }
+          
           try
           {
                await _server!.SendAsync(packet);
@@ -83,7 +82,7 @@ public class ServerConnectionHandler(string address, int port)
                Console.WriteLine("Failed to send packet");
                Console.WriteLine(e);
                
-               await DisconnectAsync();
+               await CloseConnectionAsync();
                return false;
           }
           
@@ -92,6 +91,11 @@ public class ServerConnectionHandler(string address, int port)
 
      public async Task<AbstractPacket?> GetResponseAsync(ulong id, CancellationToken cancellationToken = default)
      {
+          if (!Connected)
+          {
+               return null;
+          }
+          
           var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _cancellationTokenSource!.Token);
           var token = linkedTokenSource.Token;
           var start = DateTime.Now;
@@ -110,7 +114,22 @@ public class ServerConnectionHandler(string address, int port)
           
           return null;
      }
-     
+
+     private async Task CloseConnectionAsync()
+     {
+          if (!Connected)
+          {
+               return;
+          }
+          
+          await _cancellationTokenSource!.CancelAsync();
+          _server!.Close();
+          _server.Dispose();
+          _server = null;
+          
+          OnConnectionClosed?.Invoke(this, EventArgs.Empty);
+     }
+
      private int ProcessIncomingData(ReadOnlySequence<byte> buffer)
      {
           if (!PacketDecoder.TryReadPacket(ref buffer, out var packet))
@@ -118,11 +137,11 @@ public class ServerConnectionHandler(string address, int port)
                return 0;
           }
           
-          _ = HandlePacketAsync(packet!);
+          HandlePacket(packet!);
           return packet!.PacketSizeBytes;
      }
 
-     private async Task HandlePacketAsync(AbstractPacket packet)
+     private void HandlePacket(AbstractPacket packet)
      {
           Console.WriteLine($"Received packet: {packet}");
           switch (packet.PacketType)
