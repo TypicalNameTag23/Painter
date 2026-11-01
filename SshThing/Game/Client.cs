@@ -110,7 +110,7 @@ public class Client : IDisposable
         }
 
         var response = _serverConnectionHandler.GetResponseAsync(packet.Id).Result;
-        if (response == null)
+        if (response is not { PacketType: PacketType.LobbyInfo })
         {
             return;
         }
