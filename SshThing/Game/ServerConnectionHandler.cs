@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO.Pipelines;
 using System.Net.Sockets;
 using SshThing.Game;
@@ -13,7 +14,7 @@ public class ServerConnectionHandler(string address, int port)
      private static readonly TimeSpan TimeOut = TimeSpan.FromSeconds(5);
 
      private CancellationTokenSource _cancellationTokenSource;
-     private List<AbstractPacket> _pendingPackets = [];
+     private Dictionary<ulong, AbstractPacket> _pendingPackets = [];
      private Pipe _pipe = new();
      private TcpClient? _server;
 
@@ -51,12 +52,14 @@ public class ServerConnectionHandler(string address, int port)
      public async Task DisconnectAsync()
      {
           await _cancellationTokenSource.CancelAsync();
-          await _server!.SendAsync(new CloseConnectionPacket());
+          if (_server != null)
+          {
+               await TrySendAsync(new CloseConnectionPacket());
+               _server?.Close();
+               _server?.Dispose();
+          }
           
-          _server?.Close();
-          _server?.Dispose();
           _server = null;
-          
           OnConnectionClosed?.Invoke(this, EventArgs.Empty);
      }
 
@@ -68,29 +71,22 @@ public class ServerConnectionHandler(string address, int port)
           }
           catch (Exception e)
           {
+               await DisconnectAsync();
                return false;
           }
           
           return true;
      }
 
-     public async Task<AbstractPacket?> GetResponseAsync(PacketType packetType, CancellationToken cancellationToken = default)
+     public async Task<AbstractPacket?> GetResponseAsync(ulong id, CancellationToken cancellationToken = default)
      {
           var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _cancellationTokenSource.Token);
           var token = linkedTokenSource.Token;
           var start = DateTime.Now;
           while (!token.IsCancellationRequested)
           {
-               for (var i = 0; i < _pendingPackets.Count; i++)
+               if (_pendingPackets.Remove(id, out var packet))
                {
-                    if (_pendingPackets[i].PacketType != packetType)
-                    {
-                         continue;
-                    }
-                    
-                    var packet = _pendingPackets[i];
-                    _pendingPackets.RemoveAt(i);
-                    
                     return packet;
                }
 
@@ -105,11 +101,11 @@ public class ServerConnectionHandler(string address, int port)
 
      private async Task ProcessPacketsAsync()
      {
-          var writing = FillPipeAsync();
-          var reading = ReadPipeAsync();
-
           try
           {
+               var writing = FillPipeAsync();
+               var reading = ReadPipeAsync();
+               
                await Task.WhenAll(writing, reading);
           }
           catch (OperationCanceledException) { }
@@ -195,12 +191,7 @@ public class ServerConnectionHandler(string address, int port)
                case PacketType.Denied:
                case PacketType.Accepted:
                {
-                    if (packet == null)
-                    {
-                         Console.WriteLine("WWTTFFFFFF");
-                    }
-                    
-                    _pendingPackets.Add(packet);
+                    _pendingPackets.Add(packet.Id, packet);
                     break;
                }
                case PacketType.CloseConnection:
