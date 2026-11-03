@@ -5,9 +5,10 @@ using FxSsh.Services;
 using Painter;
 using Painter.Drawables;
 using Sample;
-using SshThing.Packets;
+using SshThing.Game.Packets;
 using SshThing.Utilities;
 using SshThing.Views;
+using TicTacToeServer.Packets.Lobby;
 
 namespace SshThing;
 
@@ -66,19 +67,11 @@ public class Client : IDisposable
         _applicationThread.Start();
     }
 
-    private void OnReconnectClick()
-    {
-        if (ConnectToBackendServer())
-        {
-            _contentDisplay.Content = _welcomeView;
-        }
-    }
-
     public void Disconnect()
     {
         if (ConnectedToServer())
         {
-            _server!.Send(new DisconnectPacket());
+            _server!.Send(new CloseConnectionPacket());
         }
 
         _app.Kill();
@@ -104,70 +97,79 @@ public class Client : IDisposable
         return true;
     }
 
+    private void OnReconnectClick()
+    {
+        if (ConnectToBackendServer())
+        {
+            _contentDisplay.Content = _welcomeView;
+        }
+    }
+
     private void OnCreateLobbyClick()
     {
-        if (!ValidateServerConnection())
+        if (!ConnectedToServer() || !_server!.TrySend(new LobbyCreatePacket()))
         {
+            OnDisconnectedFromServer();
             return;
         }
-
-        _server!.Send(new CreateLobbyPacket());
+        
         _contentDisplay.Content = new GameView();
         UpdateCtrlCKeyBind();
-        
         Console.WriteLine("Create lobby button clicked!");
     }
 
     private void OnJoinLobbyClick()
     {
-        Console.WriteLine("Join lobby button clicked!");
-        _contentDisplay.Content = new JoinLobbyView(code =>
-        {
-            if (!ValidateServerConnection())
-            {
-                return;
-            }
-
-            _server!.Send(new JoinLobbyPacket(code));
-            _contentDisplay.Content = new GameView();
-            
-            Console.WriteLine("Join button clicked!");
-        });
-
+        _contentDisplay.Content = new JoinLobbyView(OnJoinButtonClick);
         UpdateCtrlCKeyBind();
+        Console.WriteLine("Join lobby button clicked!");
+    }
+    
+    private void OnJoinButtonClick(string code)
+    {
+        if (!ConnectedToServer() || !_server!.TrySend(new LobbyJoinPacket(int.Parse(code)))) // todo force int only
+        {
+            OnDisconnectedFromServer();
+            return;
+        }
+
+        _contentDisplay.Content = new GameView();
+        Console.WriteLine("Join button clicked!");
     }
 
     private void ContentOnLeaderboardClick()
     {
-        if (!ValidateServerConnection())
+        if (!ConnectedToServer() || !_server!.TrySend(new ViewLeaderboardPacket()))
         {
+            OnDisconnectedFromServer();
             return;
         }
-
-        _server!.Send(new ViewLeaderboardPacket());
+        
         _contentDisplay.Content = new LeaderboardView();
         UpdateCtrlCKeyBind();
-        
         Console.WriteLine("Leaderboard button clicked!");
-    }
-
-    private bool ValidateServerConnection()
-    {
-        var connected = ConnectedToServer();
-        if (!connected)
-        {
-            _contentDisplay.Content = _disconnectedView;
-            _server?.Close();
-            _server?.Dispose();
-            _server = null;
-        }
-
-        return connected;
     }
 
     private bool ConnectedToServer()
     {
-        return _server != null && _server.GetState() == TcpState.Established;
+        return _server != null;
+    }
+
+    private void OnDisconnectedFromServer()
+    {
+        if (_server == null)
+        {
+            return;
+        }
+        
+        _contentDisplay.Content = _disconnectedView;
+        
+        _app.RemoveGlobalBoundKey(CtrlCKey);
+        _app.AddGlobalKeyBind(CtrlCKey, (_, _) => { Disconnect(); });
+        
+        _server?.Close();
+        _server?.Dispose();
+        _server = null;
     }
 
     // a bunch of stupid hacks since there is no way of interacting with the main application
