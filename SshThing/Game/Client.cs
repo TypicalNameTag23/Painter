@@ -3,27 +3,20 @@ using FxSsh.Services;
 using Painter;
 using Painter.Drawables;
 using Sample;
-using SshThing.Game.Packets;
 using SshThing.Views;
-using TicTacToeServer.Packets;
-using TicTacToeServer.Packets.Lobby;
 
 namespace SshThing.Game;
 
 public class Client : IDisposable
 {
     private static readonly Key CtrlCKey = new(ConsoleKey.C, ConsoleModifiers.Control);
-    private const string BackendServerAddress = "127.0.0.1";
-    private const int BackendServerPort = 4343;
 
     private CancellationTokenSource _cancellationTokenSource;
-    private DisconnectedView _disconnectedView;
     private ContentControl _contentDisplay;
     private WelcomeView _welcomeView;
     private Application _app;
 
     private readonly PtyArgs _args;
-    private ServerConnectionHandler _serverConnectionHandler;
     private Session _session;
 
     public Client(PtyArgs args, Session session)
@@ -42,11 +35,6 @@ public class Client : IDisposable
             OnLeaderboardClick = OnLeaderboardClick
         };
         
-        _disconnectedView = new DisconnectedView
-        {
-            OnReconnectButtonClick = OnReconnectClick
-        };
-        
         _contentDisplay = new ContentControl
         {
             Content = _welcomeView
@@ -63,18 +51,6 @@ public class Client : IDisposable
         };
         _app.AddGlobalKeyBind(CtrlCKey, (_, _) => { DisconnectAsync().Wait(); });
         #endregion
-
-        #region Setup server connection
-        _serverConnectionHandler = new ServerConnectionHandler(BackendServerAddress, BackendServerPort);
-        _serverConnectionHandler.OnConnectionClosed += (_, _) => OnDisconnectedFromServer();
-
-        _cancellationTokenSource = new CancellationTokenSource();
-        var connected = await _serverConnectionHandler.TryConnectAsync(_cancellationTokenSource);
-        if (!connected)
-        {
-            _contentDisplay.Content = _disconnectedView;
-        }
-        #endregion
         
         var applicationThread = new Thread(_app.Start);
         applicationThread.Start();
@@ -82,41 +58,12 @@ public class Client : IDisposable
 
     public async Task DisconnectAsync()
     {
-        await _serverConnectionHandler.DisconnectAsync();
         _app.Kill();
         _session.Disconnect();
     }
 
-    private void OnReconnectClick()
-    {
-        if (_serverConnectionHandler.Connected)
-        {
-            return;
-        }
-        
-        _cancellationTokenSource = new CancellationTokenSource();
-        if (_serverConnectionHandler.TryConnectAsync(_cancellationTokenSource).Result)
-        {
-            _contentDisplay.Content = _welcomeView;
-        }
-    }
-
     private void OnCreateLobbyClick()
     {
-        var packet = new LobbyCreatePacket(AbstractPacket.NextPacketId());
-        if (!_serverConnectionHandler.TrySendAsync(packet).Result)
-        {
-            return;
-        }
-
-        var response = _serverConnectionHandler.GetResponseAsync(packet.Id).Result;
-        if (response is not { PacketType: PacketType.LobbyInfo })
-        {
-            return;
-        }
-        
-        Console.WriteLine(response);
-        
         _contentDisplay.Content = new GameView();
         UpdateCtrlCKeyBind();
         Console.WriteLine("Create lobby button clicked!");
@@ -131,38 +78,15 @@ public class Client : IDisposable
     
     private void OnJoinButtonClick(string code)
     {
-        if (!_serverConnectionHandler.TrySendAsync(
-                new LobbyJoinPacket(
-                    int.Parse(code),
-                    AbstractPacket.NextPacketId())).Result) // todo force int only
-        {
-            OnDisconnectedFromServer();
-            return;
-        }
-
         _contentDisplay.Content = new GameView();
         Console.WriteLine("Join button clicked!");
     }
 
     private void OnLeaderboardClick()
     {
-        if (!_serverConnectionHandler.TrySendAsync(new ViewLeaderboardPacket(AbstractPacket.NextPacketId())).Result)
-        {
-            OnDisconnectedFromServer();
-            return;
-        }
-        
         _contentDisplay.Content = new LeaderboardView();
         UpdateCtrlCKeyBind();
         Console.WriteLine("Leaderboard button clicked!");
-    }
-
-    private void OnDisconnectedFromServer()
-    {
-        _contentDisplay.Content = _disconnectedView;
-        
-        _app.RemoveGlobalBoundKey(CtrlCKey);
-        _app.AddGlobalKeyBind(CtrlCKey, (_, _) => { DisconnectAsync().Wait(); });
     }
 
     // a bunch of stupid hacks since there is no way of interacting with the main application
