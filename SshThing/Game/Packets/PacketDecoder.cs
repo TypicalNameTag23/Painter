@@ -15,9 +15,9 @@ public static class PacketDecoder
         // [PacketType.LobbyCreate] = () => new LobbyCreatePacket(),
         // [PacketType.LobbyDisconnect] = () => new LobbyCreatePacket() todo
         // [PacketType.LobbyJoin] = () => new LobbyJoinPacket(),
-        [PacketType.LobbyInfo] = () => new LobbyInfoPacket()
+        [PacketType.LobbyInfo] = () => new LobbyInfoPacket(), //client side
         // [PacketType.LobbyJoinRejected] = () => new LobbyJoinRejectionPacket() client side
-        // [PacketType.CloseConnection] = () => new CloseConnectionPacket(),
+        [PacketType.CloseConnection] = () => new CloseConnectionPacket(),
         // [PacketType.ViewLeaderboard] = () => new ViewLeaderboardPacket(),
     };
 
@@ -46,13 +46,13 @@ public static class PacketDecoder
             }
 
             packet = packetFactory();
-            var bytesRead = packet.Load(buffer);
-            if (bytesRead == -1)
+            if (buffer.Length < packet.PacketSizeBytes)
             {
                 return false;
             }
-
-            buffer = buffer.Slice(bytesRead + AbstractPacket.PacketTypeSizeBytes);
+            
+            packet.Load(buffer);
+            buffer = buffer.Slice(packet.PacketSizeBytes);
             
             return true;
         }

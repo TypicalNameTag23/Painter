@@ -39,7 +39,7 @@ public class Client : IDisposable
         {
             OnCreateLobbyClick = OnCreateLobbyClick,
             OnJoinLobbyClick = OnJoinLobbyClick,
-            OnLeaderboardClick = ContentOnLeaderboardClick
+            OnLeaderboardClick = OnLeaderboardClick
         };
         
         _disconnectedView = new DisconnectedView
@@ -103,13 +103,18 @@ public class Client : IDisposable
 
     private void OnCreateLobbyClick()
     {
-        if (!_serverConnectionHandler.TrySendAsync(new LobbyCreatePacket()).Result)
+        var packet = new LobbyCreatePacket(AbstractPacket.NextPacketId());
+        if (!_serverConnectionHandler.TrySendAsync(packet).Result)
         {
-            OnDisconnectedFromServer();
             return;
         }
 
-        var response = _serverConnectionHandler.GetResponseAsync(PacketType.LobbyInfo).Result;
+        var response = _serverConnectionHandler.GetResponseAsync(packet.Id).Result;
+        if (response == null)
+        {
+            return;
+        }
+        
         Console.WriteLine(response);
         
         _contentDisplay.Content = new GameView();
@@ -126,7 +131,10 @@ public class Client : IDisposable
     
     private void OnJoinButtonClick(string code)
     {
-        if (!_serverConnectionHandler.TrySendAsync(new LobbyJoinPacket(int.Parse(code))).Result) // todo force int only
+        if (!_serverConnectionHandler.TrySendAsync(
+                new LobbyJoinPacket(
+                    int.Parse(code),
+                    AbstractPacket.NextPacketId())).Result) // todo force int only
         {
             OnDisconnectedFromServer();
             return;
@@ -136,9 +144,9 @@ public class Client : IDisposable
         Console.WriteLine("Join button clicked!");
     }
 
-    private void ContentOnLeaderboardClick()
+    private void OnLeaderboardClick()
     {
-        if (!_serverConnectionHandler.TrySendAsync(new ViewLeaderboardPacket()).Result)
+        if (!_serverConnectionHandler.TrySendAsync(new ViewLeaderboardPacket(AbstractPacket.NextPacketId())).Result)
         {
             OnDisconnectedFromServer();
             return;

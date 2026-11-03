@@ -34,7 +34,7 @@ public class SshTerminal : Terminal
                 return;
             }
             
-            Console.WriteLine($"Added key {key.Key.KeyType} to buffer. {key}");
+            // Console.WriteLine($"Added key {key.Key.KeyType} to buffer. {key}");
             _keyBuffer.Enqueue(key);
         };
         
@@ -55,7 +55,7 @@ public class SshTerminal : Terminal
         }
         
         var key = _keyBuffer.Dequeue();
-        Console.WriteLine($"Popped key {key.Key.KeyType} from buffer. {key}");
+        // Console.WriteLine($"Popped key {key.Key.KeyType} from buffer. {key}");
 
         return key;
     }

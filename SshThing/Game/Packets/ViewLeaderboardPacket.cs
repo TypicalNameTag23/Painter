@@ -3,7 +3,7 @@ using TicTacToeServer.Packets;
 
 namespace SshThing.Game.Packets;
 
-public class ViewLeaderboardPacket : AbstractPacket
+public class ViewLeaderboardPacket(ulong id) : AbstractPacket(id)
 {
     public override PacketType PacketType => PacketType.ViewLeaderboard;
 }
