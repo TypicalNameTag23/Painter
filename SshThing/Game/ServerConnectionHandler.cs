@@ -1,21 +1,18 @@
-using System.Globalization;
-using System.IO.Pipelines;
+using System.Buffers;
 using System.Net.Sockets;
-using SshThing.Game;
 using SshThing.Game.Packets;
 using SshThing.Utilities;
-using SshThing.Views;
 using TicTacToeServer.Packets;
 
-namespace SshThing;
+namespace SshThing.Game;
 
 public class ServerConnectionHandler(string address, int port)
 {
      private static readonly TimeSpan TimeOut = TimeSpan.FromSeconds(5);
 
-     private CancellationTokenSource _cancellationTokenSource;
      private Dictionary<ulong, AbstractPacket> _pendingPackets = [];
-     private Pipe _pipe = new();
+     private CancellationTokenSource? _cancellationTokenSource;
+     private NetworkStreamProcessor? _networkStreamProcessor;
      private TcpClient? _server;
 
      public EventHandler<EventArgs>? OnConnectionClosed;
@@ -28,12 +25,14 @@ public class ServerConnectionHandler(string address, int port)
           {
                return true;
           }
-          
+
           try
           {
                _server = new TcpClient();
                await _server.ConnectAsync(address, port);
-               _ = ProcessPacketsAsync();
+
+               _networkStreamProcessor = new NetworkStreamProcessor(_server.GetStream(), ProcessIncomingData);
+               _ = _networkStreamProcessor.StartAsync(cancellationTokenSource.Token);
           }
           catch (SocketException e)
           {
@@ -42,24 +41,34 @@ public class ServerConnectionHandler(string address, int port)
 
                _server!.Dispose();
                _server = null;
-       
+
                return false;
           }
+          // catch (Exception e)
+          // {
+          //      Console.WriteLine("An exception occured while processing incoming data, disconnecting from server.");
+          //      Console.WriteLine(e);
+          //      
+          //      await DisconnectAsync();
+          // }
           
           return true;
      }
 
      public async Task DisconnectAsync()
      {
-          await _cancellationTokenSource.CancelAsync();
-          if (_server != null)
+          if (_server == null)
           {
-               await TrySendAsync(new CloseConnectionPacket());
-               _server?.Close();
-               _server?.Dispose();
+               return;
           }
           
+          await _cancellationTokenSource!.CancelAsync();
+          await TrySendAsync(new CloseConnectionPacket());
+          
+          _server.Close();
+          _server.Dispose();
           _server = null;
+          
           OnConnectionClosed?.Invoke(this, EventArgs.Empty);
      }
 
@@ -71,6 +80,9 @@ public class ServerConnectionHandler(string address, int port)
           }
           catch (Exception e)
           {
+               Console.WriteLine("Failed to send packet");
+               Console.WriteLine(e);
+               
                await DisconnectAsync();
                return false;
           }
@@ -80,7 +92,7 @@ public class ServerConnectionHandler(string address, int port)
 
      public async Task<AbstractPacket?> GetResponseAsync(ulong id, CancellationToken cancellationToken = default)
      {
-          var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _cancellationTokenSource.Token);
+          var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _cancellationTokenSource!.Token);
           var token = linkedTokenSource.Token;
           var start = DateTime.Now;
           while (!token.IsCancellationRequested)
@@ -98,79 +110,16 @@ public class ServerConnectionHandler(string address, int port)
           
           return null;
      }
-
-     private async Task ProcessPacketsAsync()
+     
+     private int ProcessIncomingData(ReadOnlySequence<byte> buffer)
      {
-          try
+          if (!PacketDecoder.TryReadPacket(ref buffer, out var packet))
           {
-               var writing = FillPipeAsync();
-               var reading = ReadPipeAsync();
-               
-               await Task.WhenAll(writing, reading);
-          }
-          catch (OperationCanceledException) { }
-          catch (Exception e)
-          {
-               await DisconnectAsync();
-          }
-     }
-
-     private async Task FillPipeAsync()
-     {
-          const int minimumBufferSize = 512;
-          
-          var stream = _server!.GetStream();
-          var writer = _pipe.Writer;
-          while (!_cancellationTokenSource.IsCancellationRequested)
-          {
-               var memory = writer.GetMemory(minimumBufferSize);
-               try
-               {
-                    var bytesRead = await stream.ReadAsync(memory, _cancellationTokenSource.Token);
-                    if (bytesRead == 0)
-                    {
-                         break;
-                    }
-                    
-                    writer.Advance(bytesRead);
-               }
-               catch (Exception e)
-               {
-                    Console.WriteLine(e);
-                    break;
-               }
-
-               var result = await writer.FlushAsync(_cancellationTokenSource.Token);
-               if (result.IsCompleted)
-               {
-                    break;
-               }
+               return 0;
           }
           
-          await writer.CompleteAsync();
-     }
-
-     private async Task ReadPipeAsync()
-     {
-          var reader = _pipe.Reader;
-          while (!_cancellationTokenSource.IsCancellationRequested)
-          {
-               var result = await reader.ReadAsync(_cancellationTokenSource.Token);
-               var buffer = result.Buffer;
-               if (!PacketDecoder.TryReadPacket(ref buffer, out var packet))
-               {
-                    return;
-               }
-
-               reader.AdvanceTo(buffer.GetPosition(buffer.Length));
-               await HandlePacketAsync(packet!);
-               if (result.IsCompleted)
-               {
-                    break;
-               }
-          }
-
-          await reader.CompleteAsync();
+          _ = HandlePacketAsync(packet!);
+          return packet!.PacketSizeBytes;
      }
 
      private async Task HandlePacketAsync(AbstractPacket packet)
@@ -178,14 +127,6 @@ public class ServerConnectionHandler(string address, int port)
           Console.WriteLine($"Received packet: {packet}");
           switch (packet.PacketType)
           {
-               // case PacketType.LobbyCreate:
-                    // break;
-               // case PacketType.LobbyDisconnect:
-                    // break;
-               // case PacketType.LobbyJoin:
-                    // break;
-               // case PacketType.ViewLeaderboard:
-                    // break;
                case PacketType.LobbyInfo:
                case PacketType.Denied:
                case PacketType.Accepted:
@@ -200,7 +141,7 @@ public class ServerConnectionHandler(string address, int port)
                }
                default:
                {
-                    Console.WriteLine($"Received client side packet from server, dropping.");
+                    Console.WriteLine("Received client side packet from server, dropping.");
                     break;
                }
           }

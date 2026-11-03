@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Painter;
 using Painter.Drawables;
 using Sample;
+using SshThing.Game;
 using SshThing.Views;
 
 namespace SshThing;
