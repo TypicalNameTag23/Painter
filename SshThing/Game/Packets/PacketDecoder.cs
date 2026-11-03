@@ -26,14 +26,17 @@ public static class PacketDecoder
     public static bool TryReadPacket(ref ReadOnlySequence<byte> buffer, out AbstractPacket? packet)
     {
         packet = null;
-        if (buffer.Length < 2)
+        if (buffer.Length < AbstractPacket.PacketTypeSizeBytes)
         {
             return false;
         }
         
         try
         {
-            var slice = buffer.Slice(0, AbstractPacket.PacketTypeSizeBytes).FirstSpan;
+            var slice = buffer
+                .Slice(0, AbstractPacket.PacketTypeSizeBytes)
+                .FirstSpan;
+            
             if (BitConverter.IsLittleEndian)
             {
                 slice = slice.Reversed();
@@ -71,7 +74,6 @@ public static class PacketDecoder
         catch (Exception e)
         {
             Console.WriteLine(e);
-            Console.WriteLine("Received ");
             return false;
         }
     }

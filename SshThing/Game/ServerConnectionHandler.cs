@@ -157,13 +157,12 @@ public class ServerConnectionHandler(string address, int port)
           {
                var result = await reader.ReadAsync(_cancellationTokenSource.Token);
                var buffer = result.Buffer;
-               reader.AdvanceTo(buffer.GetPosition(buffer.Length));
-               
                if (!PacketDecoder.TryReadPacket(ref buffer, out var packet))
                {
                     return;
                }
-               
+
+               reader.AdvanceTo(buffer.GetPosition(buffer.Length));
                await HandlePacketAsync(packet!);
                if (result.IsCompleted)
                {
