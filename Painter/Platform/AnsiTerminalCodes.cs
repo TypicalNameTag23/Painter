@@ -1,11 +1,17 @@
-using System.Drawing;
+using Painter.Drawing;
 
 namespace Painter.Platform;
 
 internal static class AnsiTerminalCodes
 {
     private const string ControlSequenceIntroducer = "\x1b[";
-
+    internal const string FuckAssLinuxThingStolenFromTerminalDotGui = $"{ControlSequenceIntroducer}?1049h";
+    
+    internal static readonly string CSI_EnableAnyEventMouse = ControlSequenceIntroducer + "?1003h";
+    internal static readonly string CSI_EnableSgrExtModeMouse = ControlSequenceIntroducer + "?1006h";
+    
+    internal static readonly string CSI_EnableUrxvtExtModeMouse = ControlSequenceIntroducer + "?1015h";
+    
     internal const string EnableBoldMode = $"{ControlSequenceIntroducer}1m";
     internal const string EnableItalicMode = $"{ControlSequenceIntroducer}3m";
     internal const string EnableUnderlineMode = $"{ControlSequenceIntroducer}4m";
@@ -23,7 +29,7 @@ internal static class AnsiTerminalCodes
     
     internal const string ResetForegroundColor = $"{ControlSequenceIntroducer}39m";
     internal const string ResetBackgroundColor = $"{ControlSequenceIntroducer}49m";
-    internal const string ResetStyles = $"{ControlSequenceIntroducer}0";
+    internal const string ResetStyles = $"{ControlSequenceIntroducer}0m";
 
     internal const string HideCursor = $"{ControlSequenceIntroducer}?25l";
     internal const string ShowCursor = $"{ControlSequenceIntroducer}?25h";
@@ -32,12 +38,19 @@ internal static class AnsiTerminalCodes
     internal const string RestoreCursorPositon = $"{ControlSequenceIntroducer}[u";
 
     internal const string SaveScreen = $"{ControlSequenceIntroducer}?47h";
+    internal const string DisableLineWrapping = $"{ControlSequenceIntroducer}?7l";
+    internal const string EnableLineWrapping = $"{ControlSequenceIntroducer}?7h";
     internal const string RestoreScreen = $"{ControlSequenceIntroducer}?47l";
-    internal const string ClearScreen = $"{ControlSequenceIntroducer}H{ControlSequenceIntroducer}0J";//$"{ResetCursorPosition}{ControlSequenceIntroducer}J"; // windows \:
+    internal const string ClearScreen = $"{ControlSequenceIntroducer}3J{ResetCursorPosition}{ControlSequenceIntroducer}J";//$"{ResetCursorPosition}{ControlSequenceIntroducer}J"; // windows \:
 
     internal static string SetBoldMode(bool enabled)
     {
         return enabled ? EnableBoldMode : DisableBoldMode;
+    }
+    
+    internal static string SetBlinkingMode(bool enabled)
+    {
+        return enabled ? EnableBlinkingMode : DisableBlinkingMode;
     }
     
     internal static string SetItalicsMode(bool enabled)

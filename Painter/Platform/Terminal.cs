@@ -1,18 +1,22 @@
 using System.Runtime.InteropServices;
 using System.Text;
 using Painter.Drawing;
+using Painter.Events;
 
 namespace Painter.Platform;
 
 public abstract class Terminal
 {
-    private readonly StringBuilder _buffer = new();
-    private Style _currentStyle = new();
+    private StrokeStyle _currentStrokeStyle = new();
     private int _cursorX;
     private int _cursorY;
+    
+    protected readonly StringBuilder Buffer = new(AnsiTerminalCodes.ResetCursorPosition);
 
-    public static int Width => Console.BufferWidth;
-    public static int Height => Console.BufferHeight;
+    public int Width { get; protected set; }
+    public int Height { get; protected set; }
+
+    public event TerminalSizeChangedEvent? TerminalSizeChangedEvent;
 
     public static Terminal GetPlatformTerminal()
     {
@@ -23,73 +27,81 @@ public abstract class Terminal
 
         return new GenericTerminal();
     }
+
+    public abstract void Write(string text);
+
+    public abstract KeyInfo? ReadKey();
     
-    public void Write(string text)
+    public void WriteBuffered(char character)
     {
-        _buffer.Append(text);
-        _cursorX += text.Length;
+        Buffer.Append(character);
+        _cursorX += 1;
     }
     
-    public void SetCursorPosition(int x, int y)
+    public void SetCursorPosition(Point point)
     {
-        if (_cursorX == x && _cursorY == y)
+        if (_cursorX == point.X && _cursorY == point.Y)
         {
             return;
         }
 
-        _buffer.Append(AnsiTerminalCodes.SetCursorPosition(x, y));
-        _cursorX = x;
-        _cursorY = y;
+        Buffer.Append(AnsiTerminalCodes.SetCursorPosition(point.X, point.Y));
+        _cursorX = point.X;
+        _cursorY = point.Y;
     }
 
-    public void SetStyle(Style style)
+    public void SetStyle(StrokeStyle strokeStyle)
     {
-        // lol trash
-        if (_currentStyle.ForegroundColor != style.ForegroundColor)
+        if (_currentStrokeStyle.ForegroundColor != strokeStyle.ForegroundColor)
         {
-            _buffer.Append(AnsiTerminalCodes.SetForegroundColor(style.ForegroundColor));
+            Buffer.Append(AnsiTerminalCodes.SetForegroundColor(strokeStyle.ForegroundColor));
         }
         
-        if (_currentStyle.BackgroundColor != style.BackgroundColor)
+        if (_currentStrokeStyle.BackgroundColor != strokeStyle.BackgroundColor)
         {
-            _buffer.Append(AnsiTerminalCodes.SetBackgroundColor(style.BackgroundColor));
+            Buffer.Append(AnsiTerminalCodes.SetBackgroundColor(strokeStyle.BackgroundColor));
         }
         
-        if (_currentStyle.Bold != style.Bold)
+        if (_currentStrokeStyle.Bold != strokeStyle.Bold)
         {
-            _buffer.Append(AnsiTerminalCodes.SetBoldMode(style.Bold));
+            Buffer.Append(AnsiTerminalCodes.SetBoldMode(strokeStyle.Bold));
         }
         
-        if (_currentStyle.Italic != style.Italic)
+        if (_currentStrokeStyle.Italic != strokeStyle.Italic)
         {
-            _buffer.Append(AnsiTerminalCodes.SetItalicsMode(style.Italic));
+            Buffer.Append(AnsiTerminalCodes.SetItalicsMode(strokeStyle.Italic));
         }
         
-        if (_currentStyle.Strikethrough != style.Strikethrough)
+        if (_currentStrokeStyle.Strikethrough != strokeStyle.Strikethrough)
         {
-            _buffer.Append(AnsiTerminalCodes.SetStrikethroughMode(style.Strikethrough));
+            Buffer.Append(AnsiTerminalCodes.SetStrikethroughMode(strokeStyle.Strikethrough));
         }
         
-        if (_currentStyle.Underline != style.Underline)
+        if (_currentStrokeStyle.Underline != strokeStyle.Underline)
         {
-            _buffer.Append(AnsiTerminalCodes.SetUnderlineMode(style.Underline));
+            Buffer.Append(AnsiTerminalCodes.SetUnderlineMode(strokeStyle.Underline));
+        }
+        
+        if (_currentStrokeStyle.Blinking != strokeStyle.Blinking)
+        {
+            Buffer.Append(AnsiTerminalCodes.SetBlinkingMode(strokeStyle.Blinking));
         }
 
-        _currentStyle = style;
+        _currentStrokeStyle = strokeStyle;
     }
 
-    public void ResetStyle()
+    public void BufferStyleReset()
     {
-        _buffer.Append(AnsiTerminalCodes.ResetStyles);
-        _buffer.Append(AnsiTerminalCodes.ResetBackgroundColor);
-        _buffer.Append(AnsiTerminalCodes.ResetForegroundColor);
-        _currentStyle = new Style();
+        Buffer.Append(AnsiTerminalCodes.ResetStyles);
+        _currentStrokeStyle = new StrokeStyle();
     }
 
-    public void Flush()
+    public abstract void Flush();
+
+    public abstract void PollSizeChange();
+
+    protected void OnTerminalSizeChanged(object sender, TerminalChangedSizeEventArgs args)
     {
-        ResetStyle();
-        Console.Write(_buffer);
-        _buffer.Clear();
+        TerminalSizeChangedEvent?.Invoke(sender, args);
     }
 }

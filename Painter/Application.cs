@@ -1,5 +1,5 @@
-using Painter.Drawing;
-using Painter.Elements;
+using Painter.Drawables;
+using Painter.Drawing.Canvas;
 using Painter.Events;
 using Painter.Platform;
 
@@ -7,118 +7,136 @@ namespace Painter;
 
 public class Application
 {
-    private readonly ApplicationContext _context = new();
-    private readonly MainWindow _mainWindow;
-    private readonly Canvas _canvas;
+    private readonly Terminal _terminal;
+    private readonly Window _mainWindow;
+    private readonly TerminalCanvas _canvas;
+    
+    public static event BeforeApplicationDrawFrameEvent? BeforeApplicationDrawFrameEvent;
+    public static event AfterApplicationDrawFrameEvent? AfterApplicationDrawFrameEvent;
 
-    public Application()
+    public Application(Terminal? terminal = null)
     {
-        _canvas = new Canvas(_context.Terminal, _context.Width, _context.Height);
-        _mainWindow = new MainWindow(_context);
+        _terminal = terminal ?? Terminal.GetPlatformTerminal();
+        _mainWindow = new Window(this)
+        {
+            Width = _terminal.Width,
+            Height = _terminal.Height
+        };
+
+        _canvas = new TerminalCanvas(_terminal, Width, Height);
+        _terminal.TerminalSizeChangedEvent += (_, args) =>
+        {
+            _terminal.Write(AnsiTerminalCodes.ClearScreen);
+            _mainWindow.Width = args.Width;
+            _mainWindow.Height = args.Height;
+            _mainWindow.NeedsRedraw = true;
+        };
     }
 
-    public Element? Drawable
+    public int Width => _mainWindow.Width;
+    public int Height => _mainWindow.Height;
+
+    public ApplicationState ApplicationState
     {
-        get => _mainWindow.Drawable;
-        set => _mainWindow.Drawable = value;
+        get;
+        private set
+        {
+            if (field != ApplicationState.Inactive && value == ApplicationState.Inactive)
+            {
+                return;
+            }
+
+            field = value;
+        }
+    } = ApplicationState.Inactive;
+
+    public Drawable? Content
+    {
+        get => _mainWindow.Content;
+        set
+        {
+            _mainWindow.Content = value;
+        }
     }
     
-    // handle better
-    public static event ConsoleCancelEventHandler? OnQuitKeyPress;
+    public object? DataContext
+    {
+        get => _mainWindow.DataContext;
+        set => _mainWindow.DataContext = value;
+    }
     
-    public static event ConsoleKeyEventHandler? OnKeyPress;
+    public void AddGlobalKeyBind(Key key, EventHandler<KeyPressedEventArgs> eventHandler)
+    {
+        _mainWindow.AddKeyBind(key, eventHandler);
+    }
     
-    public static event FrameRenderEventHandler? BeforeFrameRender;
-
-    public static event FrameRenderEventHandler? AfterFrameRender;
+    public void RemoveGlobalBoundKey(Key key)
+    {
+        _mainWindow.RemoveBoundKey(key);
+    }
+    
+    public IReadOnlyList<Key> GetGlobalBoundKeys()
+    {
+        return _mainWindow.GetBoundKeys();
+    }
     
     public void Start()
     {
-        if (_context.ApplicationState != ApplicationState.Inactive)
+        if (ApplicationState != ApplicationState.Inactive)
         {
             return;
         }
         
-        Console.Write(
+        _terminal.Write(
+            // AnsiTerminalCodes.FuckAssLinuxThingStolenFromTerminalDotGui +
+            AnsiTerminalCodes.DisableLineWrapping +
             AnsiTerminalCodes.SaveScreen + 
             AnsiTerminalCodes.SaveCursorPositon + 
             AnsiTerminalCodes.ClearScreen +
             AnsiTerminalCodes.HideCursor +
+            // AnsiTerminalCodes.CSI_EnableAnyEventMouse +
+            // AnsiTerminalCodes.CSI_EnableSgrExtModeMouse +
+            // AnsiTerminalCodes.CSI_EnableUrxvtExtModeMouse +
             AnsiTerminalCodes.ResetCursorPosition + 
             AnsiTerminalCodes.ResetStyles);
         
-        Console.CancelKeyPress += (sender, args) =>
+        //Console.TreatControlCAsInput = true;
+        ApplicationState = ApplicationState.Running;
+        // _keyProcessingTimer = new Timer(_ =>
+        // {
+        //     
+        // }, null, 5, 5);
+        
+        while (ApplicationState == ApplicationState.Running)
         {
-            OnQuitKeyPress?.Invoke(sender, args);
-            if (args.Cancel)
+            var key = _terminal.ReadKey();
+            while (key != null)
+            {
+                _mainWindow.Interact(new KeyPressedEventArgs(key.Key, key.Character));
+                key = _terminal.ReadKey();
+            }
+
+            if (ApplicationState != ApplicationState.Running)
             {
                 return;
             }
             
-            _context.ApplicationState = ApplicationState.Killed;
-            Console.Write(
-                AnsiTerminalCodes.ResetStyles + 
-                AnsiTerminalCodes.ClearScreen + 
-                AnsiTerminalCodes.ResetForegroundColor +
-                AnsiTerminalCodes.ResetBackgroundColor +
-                AnsiTerminalCodes.ShowCursor + 
-                AnsiTerminalCodes.RestoreCursorPositon + 
-                AnsiTerminalCodes.RestoreScreen);
-        };
-        
-        _context.ApplicationState = ApplicationState.Running;
-        new Thread(_ =>
-        {
-            while (_context.ApplicationState == ApplicationState.Running)
+            _terminal.PollSizeChange();
+            if (_mainWindow.NeedsRedraw)
             {
-                if (Console.KeyAvailable)
-                {
-                    var key = Console.ReadKey(true);
-                    OnKeyPress?.Invoke(key);
-                }
+                BeforeApplicationDrawFrameEvent?.Invoke();
+                _mainWindow.Draw(_canvas);
+                _mainWindow.NeedsRedraw = false;
+                
+                _canvas.Display();
+                AfterApplicationDrawFrameEvent?.Invoke();
             }
-        }).Start();
-        
-        while (_context.ApplicationState == ApplicationState.Running)
-        {
-            BeforeFrameRender?.Invoke();
-            CheckPrintableAreaChanged();
-            if (_context.NeedsPartialRedraw || _context.NeedsFullRedraw)
-            {
-                Display();
-            }
-            AfterFrameRender?.Invoke();
         }
     }
 
-    private void Display()
+    public void Kill()
     {
-        _mainWindow.Draw(_canvas, _context.NeedsFullRedraw);
-        _canvas.Display();
-        _context.NeedsPartialRedraw = false;
-        _context.NeedsFullRedraw = false;
+        ApplicationState = ApplicationState.Killed;
+        _terminal.Write(AnsiTerminalCodes.EnableLineWrapping);
     }
-
-    private void CheckPrintableAreaChanged()
-    {
-        var width = _context.Width;
-        var height = _context.Height;
-        if (_mainWindow.Width == width && _mainWindow.Height == height)
-        {
-            return;
-        }
-        
-        Console.Write(AnsiTerminalCodes.ClearScreen);
-        _mainWindow.Width = _context.Width;
-        _mainWindow.Height = _context.Height;
-        _canvas.Resize(_context.Width, _context.Height);
-        _context.NeedsFullRedraw = true;
-    }
-}
-
-public enum ApplicationState
-{
-    Inactive,
-    Running,
-    Killed
 }

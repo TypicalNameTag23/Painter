@@ -1,7 +1,8 @@
-﻿using System.Drawing;
-using Painter;
-using Painter.Elements;
-using Painter.Layouts;
+﻿using Painter;
+using Painter.Drawables;
+using Painter.Drawing;
+using Painter.Drawing.Brushes;
+using Sample.ViewModels;
 
 namespace Sample;
 
@@ -9,60 +10,92 @@ static class Program
 {
     static void Main()
     {
+        var grid = new Grid
+        {
+            RowDefinitions = RowDefinition.Of("2*, 3*, 5*"),
+            ColumnDefinitions = ColumnDefinition.Of("12, 10*, *")
+        };
+
+        var viewModel = new MainWindowViewModel();
+        // PopulateGrid(grid, viewModel);
         var app = new Application
         {
-            Drawable = new Panel
-            {
-                Elements = [
-                    new TextBlock 
+            Content = 
+                new Grid
                     {
-                        Text = "This is a big block of text that will show me how bad of a developer I am! This is soooo much fun!!!!!",
-                        Y = 25,
-                        Width = 20, Height = 2, 
-                        TextColor = Color.DarkRed, 
-                        BackgroundColor = Color.IndianRed, 
-                        WrapText = false
-                    },
-                    new TextBlock
-                    {
-                        Text = "This another GIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANTTTTTTT BLOOOOOOOOOOOOOOCK OOOOOOOOOOFFFFFFFFFFFF TEEEEEEEEEEEEEEEEXXXXXXXXXXXXTTTTTTTTTTT!!!!!!!!!!!!!!!a",
-                        X = 5, Y = 5,
-                        Width = 30, 
-                        MaxHeight = 8,
-                        TextColor = Color.CadetBlue,
-                        BackgroundColor = Color.Cornsilk 
-                    },
-                    new TextBlock
-                    {
-                        Text = "When will Infurion upload his next video :thinking:",
-                        X = 20, Y = 20,
-                        MaxHeight = 8, MaxWidth = 40,
-                        TextColor = Color.FloralWhite,
-                        BackgroundColor = Color.Coral,
-                        TextAlignment = TextAlignment.Center
-                    },
-                    new TextBlock
-                    {
-                        Text = "this text box is cut off to the right side of the screen lol", 
-                        X = -10, Y = 3, 
-                        MaxHeight = 8, MaxWidth = 40,
-                        TextColor = Color.FloralWhite,
-                        BackgroundColor = Color.FromArgb(100, 60, 250),
-                        TextAlignment = TextAlignment.Left
-                    },
-                    new TextBlock
-                    {
-                        Text = "and this one is cut off on the right side of the screen",
-                        X = 70, Y = 3, MaxHeight = 8, Width = 40,
-                        TextColor = Color.FloralWhite,
-                        BackgroundColor = Color.FromArgb(100, 60, 150),
-                        TextAlignment = TextAlignment.Right
-                    },
-                    new FpsTacker()
-                ]
-            }
+                        RowDefinitions = RowDefinition.Of("1, *"),
+                    }
+                    .SetContent(new FpsTacker(), row: 0)
+                    .SetContent(
+                        new Grid
+                            {
+                                ColumnDefinitions = ColumnDefinition.Of("10*, 20, *")
+                            }
+                            .SetContent(
+                                new Rectangle 
+                                { 
+                                    Margin = Thickness.Of(top: 1, left: 2, right: 2, bottom: 2), 
+                                    BackgroundColor = new LinearGradientColorBrush(
+                                        (Color.Crimson, 6),
+                                        (Color.MediumVioletRed, 0.1), 
+                                        (Color.Black, 0.1), 
+                                        (Color.Blue, 5),
+                                        (Color.DeepPink, 7),
+                                        (Color.White, 4),
+                                        (Color.IndianRed, 14),
+                                        (Color.Khaki, 4),
+                                        (Color.DarkSalmon, 0)) 
+                                }, column: 0)
+                            .SetContent(new HsvColorSpaceVisualizer(), column: 1)
+                            .SetContent(
+                                new Rectangle 
+                                { 
+                                    Margin = Thickness.Of(top: 1, left: 2, right: 2, bottom: 2), 
+                                    BackgroundColor = new LinearGradientColorBrush(
+                                        (Color.Crimson, 6),
+                                        (Color.MediumVioletRed, 2), 
+                                        (Color.Blue, 5),
+                                        (Color.DeepPink, 7),
+                                        (Color.White, 4),
+                                        (Color.DarkSalmon, 0)) 
+                                }, column: 2)
+                        , row: 1)
         };
         
+        app.AddGlobalKeyBind(new Key(ConsoleKey.C, ConsoleModifiers.Control), (_, _) => app.Kill());
         app.Start();
     }
+
+    // private static void PopulateGrid(Grid grid, MainWindowViewModel viewModel)
+    // {
+    //     for (var row = 0; row < grid.RowDefinitions.Count; row++)
+    //     {
+    //         for (var column = 0; column < grid.ColumnDefinitions.Count; column++)
+    //         {
+    //             var index = row + column * grid.RowDefinitions.Count;
+    //             grid.SetContent(row, column, new HsvColorSpaceVisualizer
+    //             {
+    //                 HueOffset = index % 359,
+    //                 // SaturationOffset = index / 100d % 1,
+    //                 FocusOrder = index
+    //             });
+    //         }
+    //     }
+    //     
+    //     grid/*.SetContent(1, 0, new HsvColorSpaceVisualizer
+    //         {
+    //             FocusOrder = 2
+    //         })*/
+    //         .SetContent(1, 1, new Button
+    //         {
+    //             FocusOrder = 1,
+    //             Content = new TextBlock
+    //                 {
+    //                     DataContext = viewModel
+    //                 }
+    //                 .Bind("BackgroundColor", nameof(viewModel.BackgroundColor), BindingType.TwoWay)
+    //                 .Bind("Text", nameof(viewModel.ButtonClickTimes), BindingType.TwoWay)
+    //         }.OnClick(viewModel.OnClick));
+    // }
+    
 }

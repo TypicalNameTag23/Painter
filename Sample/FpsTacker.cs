@@ -1,93 +1,76 @@
 using System.Diagnostics;
-using System.Drawing;
+using System.Numerics;
 using Painter;
+using Painter.Drawables;
+using Painter.Drawables.Control;
 using Painter.Drawing;
-using Painter.Elements;
 
 namespace Sample;
 
-public sealed class FpsTacker : Element
+public sealed class FpsTacker : DrawableControl
 {
-    private TextBlock _textBlock = new() { TextColor = Color.AliceBlue, BackgroundColor = Color.Black, TextAlignment = TextAlignment.Center, };
+    // Will hit ulong.MaxValue in ~58494241 years **assuming** we have 10,000 FPS (would be a nice problem to have, but I'm too stupid to come up with optimizations like that)
+    private ulong _totalFramesDrawn;
     
-    private int _frames;
+    // uint.MaxValue as seconds is ~136 years, ~~likely~~ don't have to worry about this overflowing
+    private uint _fpsAveragesCalculated = 0;
+    private int _averageFps = 0;
+    private int _minFps = int.MaxValue;
+    
     private double _renderTime;
+    private double _averageRenderTime;
     private double _maxRenderTime;
-#if DEBUG
-    private double _drawTime;
-    private double _maxDrawTime;
-    private Stopwatch _drawStopwatch;
-    private double _drawC;
-    private double _maxDrawC;
-    private Stopwatch _drawCStopwatch;
-#endif
-    private Stopwatch _renderStopwatch;
+    
+    private readonly Stopwatch _renderTimeStopwatch;
+    private readonly Stopwatch _fpsTimerStopwatch;
 
     public FpsTacker()
     {
-        _textBlock.Parent = this;
-        Application.BeforeFrameRender += () =>
+        var textBlock = new TextBlock
         {
-            _renderStopwatch = Stopwatch.StartNew();
+            BackgroundColor = Color.Black,
+            TextColor = Color.DarkSalmon,
+            Text = "a"
         };
         
-        Application.AfterFrameRender += () =>
+        Attach(textBlock);
+        _renderTimeStopwatch = new Stopwatch();
+        _fpsTimerStopwatch = new Stopwatch();
+        var framesDrawn = 0;
+        var fps = 0;
+        _fpsTimerStopwatch.Start();
+        Application.BeforeApplicationDrawFrameEvent += () =>
         {
-            _frames += 1;
-            _renderStopwatch!.Stop();
-            _renderTime = _renderStopwatch.Elapsed.TotalMilliseconds;
+            _renderTimeStopwatch.Restart();
+        };
+        
+        Application.AfterApplicationDrawFrameEvent += () =>
+        {
+            framesDrawn += 1;
+            _renderTimeStopwatch.Stop();
+            _renderTime = _renderTimeStopwatch.Elapsed.TotalMilliseconds;
             if (_renderTime > _maxRenderTime)
             {
                 _maxRenderTime = _renderTime;
             }
-        };
 
-#if DEBUG
-        Application.BeforeDraw += () =>
-        {
-            _drawStopwatch = Stopwatch.StartNew();
-        };
-        Application.AfterDraw += () =>
-        {
-            _drawStopwatch!.Stop();
-            _drawTime = _drawStopwatch.Elapsed.TotalMilliseconds;
-            if (_drawTime > _maxDrawTime)
+            _averageRenderTime = (_averageRenderTime * _totalFramesDrawn + _renderTime) / ++_totalFramesDrawn;
+            textBlock.Text = 
+                $"FPS: {fps} | FPS (Low): {_minFps} | FPS (Average): {_averageFps} | Draw: {_renderTime:N2}ms | Max Draw: {_maxRenderTime:N2}ms | Average Draw: {_averageRenderTime:N2}ms | Frames Drawn: {_totalFramesDrawn}";
+            if (_fpsTimerStopwatch.ElapsedMilliseconds >= 1000)
             {
-                _maxDrawTime = _drawTime;
+                fps = framesDrawn / (int) (_fpsTimerStopwatch.ElapsedMilliseconds / 1000);
+                if (fps < _minFps)
+                {
+                    _minFps = fps;
+                }
+                
+                _averageFps = (int) ((_averageFps * _fpsAveragesCalculated + fps) / ++_fpsAveragesCalculated);
+                _fpsAveragesCalculated++;
+                
+                framesDrawn = 0;
+                _fpsTimerStopwatch.Restart();
             }
         };
-        Canvas.DrawStart += () =>
-        {
-            _drawCStopwatch = Stopwatch.StartNew();
-        };
-        Canvas.DrawEnd += () =>
-        {
-            _drawCStopwatch!.Stop();
-            _drawC = _drawCStopwatch.Elapsed.TotalMilliseconds;
-            if (_drawC > _maxDrawC)
-            {
-                _maxDrawC = _drawC;
-            }
-        };
-#endif
-
-        new Thread(_ =>
-        {
-            while (true)
-            {
-                Redraw();
-                _textBlock.Text = $"FPS: {_frames} | RT: {(_renderTime):N4}ms | MRT: {(_maxRenderTime):N4}ms";
-#if DEBUG
-                _textBlock.Text += $" | DT: {_drawTime}ms | MDT: {_maxDrawTime}ms | PT: {_renderTime - _drawTime:N4} | CD: {_drawC:N4}ms | MCD: {_maxDrawC:N4}ms";
-#endif
-                _frames = 0;
-                Thread.Sleep(1000);
-            }
-        }).Start();
-    }
-    
-    protected override void DrawElement(Canvas canvas, bool force)
-    {
-        _textBlock.Draw(canvas, force);
     }
 }

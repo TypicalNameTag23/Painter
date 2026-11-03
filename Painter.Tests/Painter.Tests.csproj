@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MSTest" Version="4.0.1"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Painter\Painter.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="obj\Painter.Tests.csproj.nuget.dgspec.json" />
+      <Content Include="obj\Painter.Tests.csproj.nuget.g.props" />
+      <Content Include="obj\Painter.Tests.csproj.nuget.g.targets" />
+      <Content Include="obj\Release\net10.0\Painter.Tests.csproj.AssemblyReference.cache" />
+      <Content Include="obj\Release\net10.0\Painter.Tests.csproj.CoreCompileInputs.cache" />
+      <Content Include="obj\Release\net10.0\Painter.Tests.csproj.FileListAbsolute.txt" />
+      <Content Include="obj\Release\net10.0\Painter.Tests.dll" />
+      <Content Include="obj\Release\net10.0\Painter.Tests.genautoregisteredextensionsinputcache.cache" />
+      <Content Include="obj\Release\net10.0\Painter.Tests.genruntimeconfig.cache" />
+      <Content Include="obj\Release\net10.0\Painter.Tests.gentestingplatformentrypointinputcache.cache" />
+      <Content Include="obj\Release\net10.0\Painter.Tests.pdb" />
+      <Content Include="obj\Release\net10.0\Painter.Tests.sourcelink.json" />
+    </ItemGroup>
+
+</Project>
