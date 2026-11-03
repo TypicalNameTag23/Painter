@@ -3,6 +3,7 @@ using System.IO.Pipelines;
 using System.Net.Sockets;
 using SshThing.Game.Packets;
 using TicTacToeServer.Packets;
+using TicTacToeServer.Packets.Generic;
 using TicTacToeServer.Packets.Lobby;
 using TicTacToeServer.Utilities;
 
@@ -18,6 +19,7 @@ public static class PacketDecoder
         [PacketType.LobbyInfo] = () => new LobbyInfoPacket(), //client side
         // [PacketType.LobbyJoinRejected] = () => new LobbyJoinRejectionPacket() client side
         [PacketType.CloseConnection] = () => new CloseConnectionPacket(),
+        [PacketType.Denied] = () => new DeniedPacket(),
         // [PacketType.ViewLeaderboard] = () => new ViewLeaderboardPacket(),
     };
 
