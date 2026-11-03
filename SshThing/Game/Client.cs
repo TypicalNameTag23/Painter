@@ -1,34 +1,40 @@
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
 using FxSsh;
 using FxSsh.Services;
 using Painter;
 using Painter.Drawables;
 using Sample;
 using SshThing.Game.Packets;
-using SshThing.Utilities;
 using SshThing.Views;
+using TicTacToeServer.Packets;
 using TicTacToeServer.Packets.Lobby;
 
 namespace SshThing;
 
 public class Client : IDisposable
 {
-    private const int BackendServerPort = 4343;
-    private const string BackendServerAddress = "127.0.0.1";
+    private readonly PtyArgs _args;
     private static readonly Key CtrlCKey = new(ConsoleKey.C, ConsoleModifiers.Control);
-    
-    private readonly Session _session;
-    private readonly Application _app;
-    private readonly Thread _applicationThread;
-    private readonly ContentControl _contentDisplay;
-    private readonly WelcomeView _welcomeView;
-    private readonly DisconnectedView _disconnectedView;
-    
-    private TcpClient? _server;
+    private const string BackendServerAddress = "127.0.0.1";
+    private const int BackendServerPort = 4343;
+
+    private CancellationTokenSource _cancellationTokenSource;
+    private DisconnectedView _disconnectedView;
+    private ContentControl _contentDisplay;
+    private WelcomeView _welcomeView;
+    private Application _app;
+
+    private ServerConnectionHandler _serverConnectionHandler;
+    private Session _session;
 
     public Client(PtyArgs args, Session session)
     {
+        _args = args;
+        _session = session;
+    }
+
+    public async Task StartAsync()
+    {
+        #region Setup application views
         _welcomeView = new WelcomeView
         {
             OnCreateLobbyClick = OnCreateLobbyClick,
@@ -36,70 +42,60 @@ public class Client : IDisposable
             OnLeaderboardClick = ContentOnLeaderboardClick
         };
         
+        _disconnectedView = new DisconnectedView
+        {
+            OnReconnectButtonClick = OnReconnectClick
+        };
+        
         _contentDisplay = new ContentControl
         {
             Content = _welcomeView
         };
-        
-        var terminal = new SshTerminal(args, new XTermInputParser());
-        _session = session;
+        #endregion
+
+        #region Setup application
+        var terminal = new SshTerminal(_args, new XTermInputParser());
         _app = new Application(terminal)
         {
             Content = new Grid { RowDefinitions = RowDefinition.Of("1, *") }
                 .SetContent(new FpsTacker())
                 .SetContent(_contentDisplay, row: 1)
         };
-        _app.AddGlobalKeyBind(CtrlCKey, (_, _) => { Disconnect(); });
+        _app.AddGlobalKeyBind(CtrlCKey, (_, _) => { DisconnectAsync().Wait(); });
+        #endregion
 
+        #region Setup server connection
+        _serverConnectionHandler = new ServerConnectionHandler(BackendServerAddress, BackendServerPort);
+        _serverConnectionHandler.OnConnectionClosed += (_, _) => OnDisconnectedFromServer();
 
-        _disconnectedView = new DisconnectedView
-        {
-            OnReconnectButtonClick = OnReconnectClick
-        };
-        
-        var connected = ConnectToBackendServer();
+        _cancellationTokenSource = new CancellationTokenSource();
+        var connected = await _serverConnectionHandler.TryConnectAsync(_cancellationTokenSource);
         if (!connected)
         {
             _contentDisplay.Content = _disconnectedView;
         }
+        #endregion
         
-        _applicationThread = new Thread(_app.Start);
-        _applicationThread.Start();
+        var applicationThread = new Thread(_app.Start);
+        applicationThread.Start();
     }
 
-    public void Disconnect()
+    public async Task DisconnectAsync()
     {
-        if (ConnectedToServer())
-        {
-            _server!.Send(new CloseConnectionPacket());
-        }
-
+        await _serverConnectionHandler.DisconnectAsync();
         _app.Kill();
         _session.Disconnect();
-        _server?.Close();
-    }
-
-    private bool ConnectToBackendServer()
-    {
-        try
-        {
-            _server = new TcpClient();
-            _server.Connect(BackendServerAddress, BackendServerPort);
-        }
-        catch (SocketException e)
-        {
-            Console.WriteLine("Failed to connect to the backend server, is it up?");
-            Console.WriteLine(e);
-            
-            return false;
-        }
-
-        return true;
     }
 
     private void OnReconnectClick()
     {
-        if (ConnectToBackendServer())
+        if (_serverConnectionHandler.Connected)
+        {
+            return;
+        }
+        
+        _cancellationTokenSource = new CancellationTokenSource();
+        if (_serverConnectionHandler.TryConnectAsync(_cancellationTokenSource).Result)
         {
             _contentDisplay.Content = _welcomeView;
         }
@@ -107,11 +103,14 @@ public class Client : IDisposable
 
     private void OnCreateLobbyClick()
     {
-        if (!ConnectedToServer() || !_server!.TrySend(new LobbyCreatePacket()))
+        if (!_serverConnectionHandler.TrySendAsync(new LobbyCreatePacket()).Result)
         {
             OnDisconnectedFromServer();
             return;
         }
+
+        var response = _serverConnectionHandler.GetResponseAsync(PacketType.LobbyInfo).Result;
+        Console.WriteLine(response);
         
         _contentDisplay.Content = new GameView();
         UpdateCtrlCKeyBind();
@@ -127,7 +126,7 @@ public class Client : IDisposable
     
     private void OnJoinButtonClick(string code)
     {
-        if (!ConnectedToServer() || !_server!.TrySend(new LobbyJoinPacket(int.Parse(code)))) // todo force int only
+        if (!_serverConnectionHandler.TrySendAsync(new LobbyJoinPacket(int.Parse(code))).Result) // todo force int only
         {
             OnDisconnectedFromServer();
             return;
@@ -139,7 +138,7 @@ public class Client : IDisposable
 
     private void ContentOnLeaderboardClick()
     {
-        if (!ConnectedToServer() || !_server!.TrySend(new ViewLeaderboardPacket()))
+        if (!_serverConnectionHandler.TrySendAsync(new ViewLeaderboardPacket()).Result)
         {
             OnDisconnectedFromServer();
             return;
@@ -150,26 +149,12 @@ public class Client : IDisposable
         Console.WriteLine("Leaderboard button clicked!");
     }
 
-    private bool ConnectedToServer()
-    {
-        return _server != null;
-    }
-
     private void OnDisconnectedFromServer()
     {
-        if (_server == null)
-        {
-            return;
-        }
-        
         _contentDisplay.Content = _disconnectedView;
         
         _app.RemoveGlobalBoundKey(CtrlCKey);
-        _app.AddGlobalKeyBind(CtrlCKey, (_, _) => { Disconnect(); });
-        
-        _server?.Close();
-        _server?.Dispose();
-        _server = null;
+        _app.AddGlobalKeyBind(CtrlCKey, (_, _) => { DisconnectAsync().Wait(); });
     }
 
     // a bunch of stupid hacks since there is no way of interacting with the main application
@@ -183,12 +168,12 @@ public class Client : IDisposable
         {
             _contentDisplay.Content = _welcomeView;
             _app.RemoveGlobalBoundKey(CtrlCKey);
-            _app.AddGlobalKeyBind(CtrlCKey, (_, _) => { Disconnect(); });
+            _app.AddGlobalKeyBind(CtrlCKey, (_, _) => { DisconnectAsync().Wait(); });
         });
     }
 
     public void Dispose()
     {
-        _server?.Dispose();
+        _cancellationTokenSource.Dispose();
     }
 }

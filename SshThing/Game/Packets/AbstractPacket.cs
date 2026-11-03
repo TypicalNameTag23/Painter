@@ -4,25 +4,25 @@ using SshThing.Game.Packets;
 
 namespace TicTacToeServer.Packets;
 
-public interface IPacket
+public abstract class AbstractPacket
 {
     public const int PacketTypeSizeBytes = sizeof(short);
     
     /// <summary>
     /// The <see cref="PacketType"/>
     /// </summary>
-    public PacketType PacketType { get; }
+    public abstract PacketType PacketType { get; }
 
     /// <summary>
     /// The message sent by the packet
     /// </summary>
-    public string Message => ((short) PacketType).ToString();
+    public virtual string Message => ((short) PacketType).ToString();
     
     /// <summary>
     /// Encodes the <see cref="Message"/> into a byte array
     /// </summary>
     /// <returns>The byte array</returns>
-    public byte[] Encode()
+    public virtual byte[] Encode()
     {
         var encoded = BitConverter.GetBytes((short) PacketType);
         if (BitConverter.IsLittleEndian)
@@ -38,5 +38,7 @@ public interface IPacket
     /// </summary>
     /// <param name="buffer">The buffer to read from</param>
     /// <returns>The number of bytes read from the buffer, -1 if nothing was loaded</returns>
-    public int Load(ReadOnlySequence<byte> buffer);
+    public virtual int Load(ReadOnlySequence<byte> buffer) => 0;
+    
+    public override string ToString() => $"{{ PacketType: {PacketType} }}";
 }
