@@ -7,14 +7,25 @@ namespace Painter.Drawables;
 public class Button : ContentControl
 {
     public override bool Focusable { get; set; } = true;
-    
     public bool Selected { get; private set; } = false;
 
-    public Color BackgroundColor { get; set; } = Color.Black;
+    public Color FocusedColor
+    {
+        get;
+        set => SetAndRedrawIfChanged(ref field, value);
+    } = Color.White;
 
-    public Color FocusedColor { get; set; } = Color.White;
+    public Color UnfocusedColor
+    {
+        get;
+        set => SetAndRedrawIfChanged(ref field, value);
+    } = Color.Black;
 
-    public Color UnfocusedColor { get; set; } = Color.Black;
+    public Color DisabledColor
+    {
+        get;
+        set => SetAndRedrawIfChanged(ref field, value);
+    } = Color.Black;
 
     public event EventHandler<ButtonClickedEventArgs>? OnClickEvent;
 
@@ -24,10 +35,10 @@ public class Button : ContentControl
         return this;
     }
 
-    public override void OnFocusChanged(bool focused)
-    {
-        BackgroundColor = focused ? FocusedColor : UnfocusedColor;
-    }
+    // public override void OnFocusChanged(bool focused)
+    // {
+    //     BackgroundColor = focused ? FocusedColor : UnfocusedColor;
+    // }
 
     public override void Interact(KeyPressedEventArgs args)
     {
@@ -41,18 +52,27 @@ public class Button : ContentControl
 
     public override void Draw(ICanvas canvas)
     {
-        var backgroundColor = Focused ? FocusedColor : BackgroundColor;
         for (var y = 0; y < Height; y++)
         {
             for (var x = 0; x < Width; x++)
             {
                 canvas.Draw(x + X, y + Y, new StrokeStyle
                 {
-                    BackgroundColor = backgroundColor
+                    BackgroundColor = GetBackgroundColor()
                 });
             }
         }
         
         base.Draw(canvas);
+    }
+
+    private Color GetBackgroundColor()
+    {
+        if (!Focusable)
+        {
+            return DisabledColor;
+        }
+        
+        return Focused ? FocusedColor : UnfocusedColor;
     }
 }

@@ -5,7 +5,19 @@ namespace Painter.Drawables;
 
 public abstract partial class Drawable
 {
-    public virtual bool Focusable { get; set; }
+    public virtual bool Focusable
+    {
+        get;
+        set
+        {
+            SetAndRedrawIfChanged(ref field, value);
+            
+            if (!Focusable)
+            {
+                Focused = false;
+            }
+        }
+    }
 
     public int FocusOrder { get; set; } = int.MaxValue;
 
