@@ -10,7 +10,8 @@ public class Application
     private readonly Terminal _terminal;
     private readonly Window _mainWindow;
     private readonly TerminalCanvas _canvas;
-    
+    private List<Action> _queuedActions = [];
+
     public static event BeforeApplicationDrawFrameEvent? BeforeApplicationDrawFrameEvent;
     public static event AfterApplicationDrawFrameEvent? AfterApplicationDrawFrameEvent;
 
@@ -79,6 +80,15 @@ public class Application
     {
         return _mainWindow.GetBoundKeys();
     }
+
+    /// <summary>
+    /// Queues an action to run on the UI thread
+    /// </summary>
+    /// <param name="action"></param>
+    public void QueueAction(Action action)
+    {
+        _queuedActions.Add(action);
+    }
     
     public void Start()
     {
@@ -100,15 +110,15 @@ public class Application
             AnsiTerminalCodes.ResetCursorPosition + 
             AnsiTerminalCodes.ResetStyles);
         
-        //Console.TreatControlCAsInput = true;
         ApplicationState = ApplicationState.Running;
-        // _keyProcessingTimer = new Timer(_ =>
-        // {
-        //     
-        // }, null, 5, 5);
-        
         while (ApplicationState == ApplicationState.Running)
         {
+            while (_queuedActions.Count != 0)
+            {
+                _queuedActions[0].Invoke();
+                _queuedActions.RemoveAt(0);
+            }
+            
             var key = _terminal.ReadKey();
             while (key != null)
             {

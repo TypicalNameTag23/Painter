@@ -1,4 +1,5 @@
-﻿using Painter;
+﻿using System;
+using Painter;
 using Painter.Drawables;
 using Painter.Drawing;
 using Painter.Drawing.Brushes;
